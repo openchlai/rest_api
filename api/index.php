@@ -1,5 +1,5 @@
 <?php
-include "/var/www/ug2_config.php";//
+include "../config.php"; //
 
 $db = mysqli_connect (null, THE_DB_USN, null, THE_DB_NAME, null, "/var/lib/mysql/mysql.sock") or die ("Could Not connect to Database Server.");
 $db2 = mysqli_connect (null, THE_DB_USN, null, THE_DB_NAME, null, "/var/lib/mysql/mysql.sock") or die ("Could Not connect to Database Server.");
