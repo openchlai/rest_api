@@ -2,7 +2,7 @@
 //error_reporting(0);
 
 define('ENVIRONMENT', 'production');
-define('THE_DB_USN', 'apache');
+define('THE_DB_USN', 'nginx');
 define('THE_DB_PASSWD', '');
 define('THE_DB_HOST', 'localhost');
 define('THE_DB_NAME', 'helpline');
