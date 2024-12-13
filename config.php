@@ -14,25 +14,23 @@ date_default_timezone_set('Africa/Kampala');
 $VA_SIP_USER_PREFIX="";
 $VA_SIP_PASS_PREFIX="23kdefrtgos09812100";
 $VA_SIP_HOST = explode (":",$_SERVER["HTTP_HOST"])[0]; // $_SERVER["HTTP_HOST"];
-$VA_ICE_HOST = "stun:172.17.3.2:3479";
+$VA_ICE_HOST = "stun:stun.l.google.com:19302"
 $VA_AMI_HOST = "https://".explode (":",$_SERVER["HTTP_HOST"])[0].":8384/ami/"; 
 $VA_ATI_HOST = "https://".explode (":",$_SERVER["HTTP_HOST"])[0].":8384/ati/";
 $VA_AMI_HOST_WALLBOARD =  "https://".explode (":",$_SERVER["HTTP_HOST"])[0].":8384/ami/";
 
-if (substr ($_SERVER["REMOTE_ADDR"],0,4)!="172.") $VA_ICE_HOST = "stun:stun.l.google.com:19302";
-
-$APP_LOGO = "/helpline/images/sauti-logo.png";
-$COUNTRY_CODE = "256";
-$CASE_ID_PREFIX = "UCHL -";
+$APP_LOGO = "/helpline/images/logo.png";
+$COUNTRY_CODE = "254";
+$CASE_ID_PREFIX = "TEST -";
 $LOCATION_HIERARCHY = '"","Region","District","County","SubCounty","Parish","Village","Constitunecy"';
 
-$RECORDING_ARCHIVE_URL = "http://172.17.3.4:90/uchl3/api/?uid=";
+$RECORDING_ARCHIVE_URL = "";
 
-$API_GATEWAY_USN = "child@openchs.com";
-$API_GATEWAY_PASS = "Op3nCh1ld";
-$API_GATEWAY_AUTH = "https://sauti.mglsd.go.ug/api/token/";
-$API_GATEWAY_SEND_MSG = "https://sauti.mglsd.go.ug/api/chat/";
-$API_GATEWAY_CLOSE_MSG = "https://sauti.mglsd.go.ug/api/chat/";
+$API_GATEWAY_USN = "ausername";
+$API_GATEWAY_PASS = "apassword";
+$API_GATEWAY_AUTH = "https://demo-openchs.bitz-itc.com/api/token/";
+$API_GATEWAY_SEND_MSG = "https://demo-openchs.bitz-itc.com/api/chat/";
+$API_GATEWAY_CLOSE_MSG = "https://demo-openchs.bitz-itc.com/api/chat/";
 
 // --- CATEGORY ROOT IDs ---
 $CASE_CATEGORY_ROOT_ID = "362557";	//
