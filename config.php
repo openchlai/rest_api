@@ -6,6 +6,7 @@ define('THE_DB_USN', 'nginx');
 define('THE_DB_PASSWD', '');
 define('THE_DB_HOST', 'localhost');
 define('THE_DB_NAME', 'helpline');
+define('THE_DB_SOCK', '/run/mysqld/mysqld.sock');
 define('THE_APP_ID', 'hlp');
 define('DAT', '/home/dat/helpline');
 
