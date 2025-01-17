@@ -1,4 +1,3 @@
-
 # REST API Setup Documentation
 
 ## 1. Database Setup
@@ -175,4 +174,4 @@ cp -r /home/<app_files_directory>/* /var/www/html/helpline/
 ---
 
 This documentation provides step-by-step instructions for setting up the REST API, database, server, and application files.
-git
+
