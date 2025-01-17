@@ -1,29 +1,29 @@
-# rest_api
-REST API Setup on the Server
-Database Setup
-Create User:
 
-bash
-Copy
-Edit
+# REST API Setup Documentation
+
+## 1. Database Setup
+
+### 1.1 Create User
+Run the following command to create a MySQL user with `unix_socket` authentication:
+```bash
 sudo mysql -e "CREATE USER 'nginx'@'localhost' IDENTIFIED VIA unix_socket;"
-Create Database:
+```
 
-bash
-Copy
-Edit
+### 1.2 Create Database
+Create the database `helpline`:
+```bash
 sudo mysql -e "CREATE DATABASE helpline;"
-Import Database Schema:
+```
 
-bash
-Copy
-Edit
+### 1.3 Import Database Schema
+Import the database schema into the `helpline` database:
+```bash
 sudo mysql helpline < /usr/src/OpenChs/rest_api/uchl.sql
-Grant Permissions:
+```
 
-bash
-Copy
-Edit
+### 1.4 Grant Permissions
+Grant necessary permissions to the `nginx` user:
+```bash
 sudo mysql -e "
 GRANT SELECT, INSERT ON tower.* TO 'nginx'@'localhost';
 GRANT UPDATE ON helpline.auth TO 'nginx'@'localhost';
@@ -35,30 +35,33 @@ GRANT UPDATE ON helpline.disposition TO 'nginx'@'localhost';
 GRANT DELETE ON helpline.session TO 'nginx'@'localhost';
 GRANT UPDATE ON helpline.chan TO 'nginx'@'localhost';
 FLUSH PRIVILEGES;"
-Exit MySQL:
+```
 
-bash
-Copy
-Edit
+### 1.5 Exit MySQL
+Exit the MySQL prompt:
+```bash
 exit
-Server Setup
+```
+
+---
+
+## 2. Server Setup
+
+### 2.1 Install Nginx
 Install Nginx:
-
-bash
-Copy
-Edit
+```bash
 sudo apt-get install nginx
-Configure Nginx:
+```
 
-Edit the file /etc/nginx/nginx.conf and add the following server blocks:
+### 2.2 Configure Nginx
+Edit the Nginx configuration file (`/etc/nginx/nginx.conf`) and add the following server blocks:
 
-nginx
-Copy
-Edit
+#### Server Block for API and Web Application
+```nginx
 server {
-    listen       443 ssl;
-    server_name  _;
-    root         /var/www/html;
+    listen 443 ssl;
+    server_name _;
+    root /var/www/html;
 
     ssl_certificate "/etc/pki/openchs/openchs.crt";
     ssl_certificate_key "/etc/pki/openchs/private/openchs.key";
@@ -79,12 +82,7 @@ server {
         index index.php index.html index.htm;
         try_files $uri $uri/ /helpline/api/index.php?$args;
     }
-}
 
-server {
-    listen     8384 ssl;
-    ssl_certificate "/etc/pki/openchs/openchs.crt";
-    ssl_certificate_key "/etc/pki/openchs/private/openchs.key";
     location / {
         proxy_read_timeout 300s;
         proxy_http_version 1.1;
@@ -95,21 +93,23 @@ server {
         proxy_pass http://127.0.0.1:8383/;
     }
 }
-PHP-FPM Configuration:
+```
 
-Create /etc/nginx/conf.d/php-fpm.conf:
+---
 
-nginx
-Copy
-Edit
+## 3. PHP-FPM Configuration
+
+### 3.1 Create PHP-FPM Upstream
+Create the `/etc/nginx/conf.d/php-fpm.conf` file:
+```nginx
 upstream php-fpm {
     server unix:/run/php/php8.2-fpm.sock;
 }
-Create /etc/nginx/default.d/php.conf:
+```
 
-nginx
-Copy
-Edit
+### 3.2 Create PHP Configuration
+Create the `/etc/nginx/default.d/php.conf` file:
+```nginx
 index index.php index.html index.htm;
 
 location ~ \.(php|phar)(/.*)?$ {
@@ -121,38 +121,38 @@ location ~ \.(php|phar)(/.*)?$ {
     fastcgi_param PATH_INFO $fastcgi_path_info;
     fastcgi_pass php-fpm;
 }
-REST API Setup
+```
+
+---
+
+## 4. REST API Setup
+
+### 4.1 Install PHP
 Install PHP:
-
-bash
-Copy
-Edit
+```bash
 sudo apt-get install php
-Install PHP-MySQL:
+```
 
-bash
-Copy
-Edit
+### 4.2 Install PHP-MySQL
+Install the PHP-MySQL extension:
+```bash
 sudo apt-get install php-mysql
+```
+
+### 4.3 Install PHP-FPM
 Install PHP-FPM:
-
-bash
-Copy
-Edit
+```bash
 sudo apt-get install php-fpm
-Configure PHP-FPM:
+```
 
-Edit /etc/php/8.2/fpm/php-fpm.conf:
-
-ini
-Copy
-Edit
+### 4.4 Configure PHP-FPM
+Edit `/etc/php/8.2/fpm/php-fpm.conf`:
+```ini
 error_log = /var/log/php8.2-fpm.log
-Edit /etc/php/8.2/fpm/pool.d/www.conf:
+```
 
-ini
-Copy
-Edit
+Edit `/etc/php/8.2/fpm/pool.d/www.conf`:
+```ini
 php_admin_value[error_log] = /var/log/fpm-php.www.log
 php_admin_flag[log_errors] = on
 listen = /run/php/php8.2-fpm.sock
@@ -160,9 +160,19 @@ listen.owner = nginx
 listen.group = nginx
 user = nginx
 group = nginx
-UI Setup
-Copy Application Files:
-bash
-Copy
-Edit
+```
+
+---
+
+## 5. UI Setup
+
+### 5.1 Copy Application Files
+Copy application files to the web directory:
+```bash
 cp -r /home/<app_files_directory>/* /var/www/html/helpline/
+```
+
+---
+
+This documentation provides step-by-step instructions for setting up the REST API, database, server, and application files.
+git
