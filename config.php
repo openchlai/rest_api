@@ -15,10 +15,10 @@ date_default_timezone_set('Africa/Kampala');
 $VA_SIP_USER_PREFIX="";
 $VA_SIP_PASS_PREFIX="23kdefrtgos09812100";
 $VA_SIP_HOST = explode (":",$_SERVER["HTTP_HOST"])[0]; // $_SERVER["HTTP_HOST"];
-$VA_ICE_HOST = "stun:stun.l.google.com:19302"
+$VA_ICE_HOST = "stun:stun.l.google.com:19302";
 $VA_AMI_HOST = "https://".explode (":",$_SERVER["HTTP_HOST"])[0].":8384/ami/"; 
 $VA_ATI_HOST = "https://".explode (":",$_SERVER["HTTP_HOST"])[0].":8384/ati/";
-$VA_AMI_HOST_WALLBOARD =  "https://".explode (":",$_SERVER["HTTP_HOST"])[0].":8384/ami/";
+//$VA_AMI_HOST_WALLBOARD =  "https://".explode (":",$_SERVER["HTTP_HOST"])[0].":8384/ami/";
 
 $APP_LOGO = "/helpline/images/logo.png";
 $COUNTRY_CODE = "254";

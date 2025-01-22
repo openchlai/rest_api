@@ -2114,59 +2114,55 @@ function rest_uri_post ($u, $suffix, $id, &$o, &$p)
 
 function rest_uri_parse ($meth, $uri, $i, &$u, &$suffix, &$id, &$o)
 {
-        if ($meth=="POST")
-        {
-                if (isset ($_SERVER["CONTENT_TYPE"]) && strstr ($_SERVER["CONTENT_TYPE"], "application/json")!=FALSE)
-                {
-                        $s = file_get_contents ("php://input"); //error_log (">".$s."<");
-                        $o = json_decode ($s, true);
-                        if ($o===NULL) return 400;
-                }
-                else
-                {
-                        $o = $_POST;
-                }
-        }
+	if ($meth=="POST" && isset ($_SERVER["CONTENT_TYPE"]) && strstr ($_SERVER["CONTENT_TYPE"], "application/json")!=FALSE )
+	{
+		$s = file_get_contents ("php://input");
+		$o = json_decode ($s, true);
+		if ($o==NULL) return 400;
+	}
 
-        $id_ = NULL;
-        $uri_ = explode ('?', $uri);
-        $vv = explode ('/',$uri_[0]);
-        $nn = count ($vv);
-        if ($nn>0 && strlen ($vv[$nn-1])<1) $nn--; // skip last item if blank
+	$id_ = NULL;
+	$uri_ = explode ('?', $uri);
+	$vv = explode ('/',$uri_[0]);
+	$nn = count ($vv);
+	if ($nn>0 && strlen ($vv[$nn-1])<1) $nn--; // skip last item if blank
 
-//      error_log ("[url] ".json_encode ($vv)."|".$nn);
-        if ($nn>2 && $vv[2]!="api") return 302;
+	for ($i; $i<$nn; $i+=2)
+	{
+		$u = $vv[$i];
+		$id_ = NULL;
+		if ($i+1<$nn) $id_ = $vv[($i+1)];
+		
+		error_log ($u.",".$id_." |".$nn." | ".$i);
 
-        for ($i; $i<$nn; $i+=2)
-        {
-                $u_ = $vv[$i];
-                $id_ = NULL;
-                if ($i+1<$nn) $id_ = $vv[($i+1)];
-                if (strlen ($u_)<1)
-                {
-                        error_log ("/".$u_."/".$id_." ".$i." of ".$nn);
-                        return 404;
-                }
-                $u_ = urldecode ($u_);
-                $uu = explode ('^', $u_);
-                $u_ = $uu[0];
-                $suffix_ = "";
-                if (count($uu)>1) $suffix_ = "_".$uu[1];
-                if (!isset ($GLOBALS[($u_."_def")]))
-                {
-                        if (isset ($GLOBALS["FN"][$u_])) break;
-                        error_log ("/".$u_."/".$id_." ".$i." of ".$nn);
-                        return 404;
-                }
-                $a_ = $GLOBALS[($u_."_def")];
-                $k = model_k_id ($u_, $suffix_, $a_);
-                $o[$k] = $id_;
-                if ($meth=="GET") $GET[$k] = $id_;
-        }
+		if (strlen ($u)<1) return 404;
+		$u = urldecode ($u);
+		$uu = explode ('^', $u);
+		$u = $uu[0];
+		$suffix = "";
+		if (count($uu)>1) $suffix = "_".$uu[1];
+		// error_log ("---".$suffix);
+		if (!isset ($GLOBALS[($u."_def")])) 
+		{
+			if (isset ($GLOBALS["FN"][$u])) break;
+			return 404;
+		}
 
-        $id = $id_;
+		$t = $GLOBALS["RESOURCES"][$u][0];
+		$ta = $GLOBALS["RESOURCES"][$u][1];
+		if (strlen($ta)<1) $ta=$t;
+		$a = $GLOBALS[($u."_def")];
+		$n = count ($a);
+		//$k = $ta."_".$a[0][0];
+		//if (strlen ($a[0][1])>0) $k = $a[0][1];
+		$k = model_k_id ($u, $suffix, $a);
+		$o[$k] = $id_;
+		if ($meth=="GET") $GET[$k] = $id_;
+	}
+			
+	$id = $id_;
 
-        return 0;
+	return 0;
 }
 
 ?>

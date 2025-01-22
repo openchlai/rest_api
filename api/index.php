@@ -6,8 +6,8 @@ $db2 = mysqli_connect (null, THE_DB_USN, null, THE_DB_NAME, null, THE_DB_SOCK) o
 
 include "model.php";
 include "model_k.php";
-include "model_qa.php";
-include "model_qa_k.php";
+//include "model_qa.php";
+//include "model_qa_k.php";
 include "../lib/rest.php";
 include "../lib/session.php";
 include "../lib/XLSXbuf.php"; 
@@ -538,8 +538,8 @@ function _home (&$o, &$p)
 	echo ",";
 	if (rest_uri_get ("messages","", "0", $fo, $p, $aa)==200) rest_uri_response ("messages","", "0", $o, $p, $aa, 0); // load messages_k
 
-	echo ",";
-	if (rest_uri_get ("qas","", "0", $fo, $p, $aa)==200) rest_uri_response ("qas","", "0", $o, $p, $aa, 0); // load qas_k
+	//echo ",";
+	//if (rest_uri_get ("qas","", "0", $fo, $p, $aa)==200) rest_uri_response ("qas","", "0", $o, $p, $aa, 0); // load qas_k
 
 	echo ",";
 	if (rest_uri_get ("dispositions","", "0", $fo, $p, $aa)==200) rest_uri_response ("dispositions","", "0", $o, $p, $aa, 0); // load dispositions_k
@@ -587,6 +587,8 @@ function _request_ ()
 	$o = [];
 	$p = [];
 	$fo = [];
+
+	error_log ("[auth] ".$_SERVER["REQUEST_URI"]);
 
 	$rt = rest_uri_parse ($_SERVER["REQUEST_METHOD"], $_SERVER["REQUEST_URI"], 3, $u, $suffix, $id, $o);
 	if ($rt!=0) return $rt;
