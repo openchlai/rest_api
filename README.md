@@ -24,7 +24,7 @@ sudo mysql helpline < /usr/src/OpenChs/rest_api/uchl.sql
 Grant necessary permissions to the `nginx` user:
 ```bash
 sudo mysql -e "
-GRANT SELECT, INSERT ON tower.* TO 'nginx'@'localhost';
+GRANT SELECT, INSERT ON helpline.* TO 'nginx'@'localhost';
 GRANT UPDATE ON helpline.auth TO 'nginx'@'localhost';
 GRANT UPDATE ON helpline.contact TO 'nginx'@'localhost';
 GRANT UPDATE ON helpline.kase TO 'nginx'@'localhost';
