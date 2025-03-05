@@ -928,9 +928,9 @@ $dispositions_def = array
 	array ("reporter_landmark","",		"3","2","","",  "reporters","contact_landmark","",	"Reporter Nearest Landmark",""),
 	array ("reporter_dob","",		"3","3","","",  "reporters","contact_dob","",		"Reporter Date of Birth","d M Y H:i:s"),
 	array ("reporter_age","",		"3","2","","",  "reporters","contact_age","",		"Reporter Age",""),
-	array ("reporter_age_group_id","",	"3","2","","","reporters","contact_age_group_id","",	"Reporter Age Group",""),
+	array ("reporter_age_group_id","",	"3","2","","",  "reporters","contact_age_group_id","",	"Reporter Age Group",""),
 	array ("reporter_age_group","",		"3","2","","",  "reporters","contact_age_group","",	"Reporter Age Group",""),
-	array ("reporter_sex_id","",		"3","2","m","f","reporters","contact_sex_id","",	"Reporter Gender",""),
+	array ("reporter_sex_id","",		"3","2","","f", "reporters","contact_sex_id","",	"Reporter Gender",""),
 	array ("reporter_sex","",		"3","2","","",  "reporters","contact_sex","",		"Reporter Gender",""),
 	array ("reporter_national_id_type_id","","3","2","","", "reporters","contact_national_id_type_id","",	"ID Type ID",""),
 	array ("reporter_national_id_type","",	"3","2","","",  "reporters","contact_national_id_type","",	"ID Type",""),
@@ -940,7 +940,7 @@ $dispositions_def = array
 	array ("reporter_tribe","",		"3","2","","",  "reporters","contact_tribe","",		"Reporter Tribe",""),
 	array ("reporter_lang_id","",		"3","2","","",  "reporters","contact_lang_id","",	"Reporter Language ID",""),
 	array ("reporter_lang","",		"3","2","","",  "reporters","contact_lang","",		"Reporter Language",""),
-	array ("reporter_location_id","",	"3","2","m","f",  "reporters","contact_location_id","",	"Reporter Location","",   "category","level","reporter_location_id_"),
+	array ("reporter_location_id","",	"3","2","","f",  "reporters","contact_location_id","",	"Reporter Location","",   "category","level","reporter_location_id_"),
 	array ("reporter_location","",		"3","2","","",  "reporters","contact_location","",	"Reporter Location",""),
 	array ("reporter_location_id_0","",	"3","2","","",  "reporters","contact_location_id_0","",	"Reporter Region ID",""),
 	array ("reporter_location_id_1","",	"3","2","","",  "reporters","contact_location_id_1","",	"Reporter District ID",""),
@@ -1620,9 +1620,9 @@ $contacts_api = array // todo: primary_contact_foreign_key (when someone calls w
 
 $contacts_disposition_api = array       // attach disposition to contact create/edit
 (
-        array ("reporters","_include","include"),
+        array ("contacts","","include"),
         array ("dispositions","","include"),
-        array ("reporters","","params", "reporter_disposition_id","reporter_id"),
+        array ("contacts","","params", "contact_disposition_id","contact_id"),
 );
 
 $contacts_dup_api = array
@@ -1666,13 +1666,13 @@ $contacts_dup2_api = array
 $reporters_include_api = array
 (
 	array ("cases","","dup","id","case_id", NULL, "id"),
-        // array ("contacts","","include"), // contact created via contacts^disposition
+        // array ("contacts","","include"), 	// contact created via contacts^disposition
         array ("contacts","_dup","include"),
         array ("reporters","",""),
 	array ("reporters","_dup","include")
 );
 
-$reporters_api = array 			// update reporter
+$reporters_api = array 				// update reporter
 (
 	array ("reporters","","aub"),
 	array ("reporters","_include","include"),
@@ -1687,7 +1687,7 @@ $reporters_uuid_api = array
 	array ("reporters","_uuid","")
 );
 
-$reporters_isclient_api = array 	// create|delete client from a reporter
+$reporters_isclient_api = array 		// create|delete client from a reporter
 (
 	array ("reporters","","dup","id","reporter_id", NULL, "contact_id:contact_id","case_uuid:case_uuid"), // get contact_id
 	array ("contacts","_dup","include"),
@@ -1906,12 +1906,27 @@ $case_activities_api = array
 	array ("case_activities","au","agg4",			"id","ca_id",NULL,  "aub_id","aub_id"), // change count
 );
 
+$activities_api = array
+(
+        array ("users","","dup","id","assigned_to_id",NULL, "id:assigned_to_id", "usn:assigned_to", "role:assigned_to_role"),
+        array ("activities","","")
+);
+
 $dispositions_api = array
 (
 	array ("contacts","_dup","include"),
 	array ("reporters","",""),
 	array ("dispositions","","dup", "src","src", "src_uid","src_uid", "reporter_contact_id","contact_id", "case_id"," 0", "disposition_id",":!=: ".$DISPOSITION_ID_CONTACT_NEW, NULL,"id"), // get disposition_id (if exists)
 	array ("dispositions","_include","include"),
+);
+
+$dispositions_unknown_api = array
+(
+	array ("categories","","dup","id","sex_id",NULL, "id:reporter_sex_id", "fullname:reporter_sex"),
+	array ("categories","","dup","id","age_group_id",NULL, "id:reporter_age_group_id", "fullname:reporter_age_group"),
+        array ("dispositions","","dup", "src","src", "src_uid","src_uid", "reporter_contact_id"," 0", "case_id"," 0", "disposition_id",":!=: ".$DISPOSITION_ID_CONTACT_NEW, NULL,"id"), // get disposition_id (if exists)
+        array ("dispositions","_include","include"),
+	array ("dispositions","","params", "dsp_unknown_id","dsp_id")
 );
 
 $dispositions_include_api = array
@@ -1926,11 +1941,6 @@ $dispositions_include_api = array
 	array ("pmessages","dispositions","agg4",	"src","src", "src_callid","src_callid",  NULL, "src","src", "src_callid","src_callid"), // update call (if exists)
 );
 
-$activities_api = array 
-(
-	array ("users","","dup","id","assigned_to_id",NULL, "id:assigned_to_id", "usn:assigned_to", "role:assigned_to_role"),
-        array ("activities","","")
-);
 
 // ===================================================================================
 
