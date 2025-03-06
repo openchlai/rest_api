@@ -173,7 +173,7 @@ function _message_in (&$o, &$p)
 		$msg = str_replace ([' ', '&', '<', '>', "\r","\n","\t"], ['_', '', '', '', '', '', ''], $msg); 
 		if (strlen ($msg)>30) $msg = substr ($msg,0,30)."..."; // trunccate to fit in notif 
 		// $s = "msg?src=".$o_['src']."&address=".$o_['src_address']."&id=".$o_['src_uid']."&msg=".$msg."&";
-		$s = "msg?src=".$o_['src']."&address=".$o_['src_address']."&id=".$o_['src_callid']."&msg=".$msg."&";
+		$s = "msg?ctx=".$o_['src']."&cid=".$o_['src_address']."&chan=".$o_['src_callid']."&msg=".$msg."&";
 		muu ("ati", $s); // post to notif_queue
 
 		$aa = [];
