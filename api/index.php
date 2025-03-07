@@ -122,18 +122,21 @@ function message_out (&$o, &$p)
 		"username"=>$GLOBALS["API_GATEWAY_USN"],
 		"password"=>$GLOBALS["API_GATEWAY_PASS"]  
 	);
-	$token = kurl ($GLOBALS["API_GATEWAY_AUTH"], 60, json_encode($postdata), $hdrs);
+	$token = ""; // kurl ($GLOBALS["API_GATEWAY_AUTH"], 60, json_encode($postdata), $hdrs);
 	
 	$api_url = $GLOBALS["API_GATEWAY_SEND_MSG"];
-	$hdrs = array ("Content-Type: application/json", ("Authorization: Token ".json_decode($token["data"],true)["token"]));
+	$hdrs = array ("Content-Type: application/json");// , ("Authorization: Token ".json_decode($token["data"],true)["token"]));
 	$postdata = array 
 	(
-		"chat_sender"=>$o['src_address'], 
-		"chat_receiver"=>$p['src_usr'], 
-		"chat_message"=>$o['src_msg'], 
-		"chat_session"=>$o['src_callid'], 
-		"chat_channel"=> $o["src"],
-		"chat_source"=>"OUTBOX"//"HELPLINE"
+		//"chat_sender"=>$o['src_address'], 
+		//"chat_receiver"=>$p['src_usr'], 
+		//"chat_message"=>$o['src_msg'], 
+		//"chat_session"=>$o['src_callid'], 
+		//"chat_channel"=> $o["src"],
+		//"chat_source"=>"OUTBOX"//"HELPLINE"
+		"recipient"=>$o['src_address'],
+		"message_type"=>"text",
+		"content"=>$o["src_msg"]
 	);
 	if (isset ($o["close"]))
 	{
@@ -173,7 +176,7 @@ function _message_in (&$o, &$p)
 		$msg = str_replace ([' ', '&', '<', '>', "\r","\n","\t"], ['_', '', '', '', '', '', ''], $msg); 
 		if (strlen ($msg)>30) $msg = substr ($msg,0,30)."..."; // trunccate to fit in notif 
 		// $s = "msg?src=".$o_['src']."&address=".$o_['src_address']."&id=".$o_['src_uid']."&msg=".$msg."&";
-		$s = "msg?ctx=".$o_['src']."&cid=".$o_['src_address']."&chan=".$o_['src_callid']."&msg=".$msg."&";
+		$s = "msg?ctx=".$o_['src']."&cid=".$o_['src_address']."&chan=".$o_['src_callid']."&payload=".$msg."&";
 		muu ("ati", $s); // post to notif_queue
 
 		$aa = [];
