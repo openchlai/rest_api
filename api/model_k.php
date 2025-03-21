@@ -913,8 +913,7 @@ $cases_k=array("id"=>0,
 "dt"=>115,
 "hr"=>116,
 "h"=>117,
-"uuid"=>118,
-"mn_closed"=>119,
+"mn_closed"=>118,
 NULL);
 
 $case_activities_k=array("id"=>0,

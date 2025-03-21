@@ -49,7 +49,6 @@ $RESOURCES = array
 	"services"=>		array ("service","",		"3","0","0",	"Services Offered", 	"","",			""), 
 	"referals"=>		array ("referal","",		"3","0","0",	"Referals", 		"","",			""), 
 	"client_referals"=>	array ("client_referal","",	"3","0","0",	"Client Referals",	"","",			""), 
-	"cases_uuid"=>          array ("kase_uuid","case_uuid", "1","0","0",    "Case UUID",            "","",                  ""),
 	"cases"=>		array ("kase","case",		"3","0","0",	"Case", 		"","",			""), 
 	"case_activities"=>	array ("kase_activity","ca",	"1","0","0",	"Case Activity", 	"","",			""), 
 );
@@ -97,7 +96,6 @@ $RIGHTS_1 = array // sel:0,add:1,upd:2 // agent rights
 	"services"=>	array ("1","1","1","0","0"),
 	"referals"=>	array ("1","1","1","0","0"),
 	"client_referals"=>	array ("1","1","1","0","0"),
-	"cases_uuid"=>  array ("1","1","0","0","0"),
 	"cases"=>	array ("1","1","1","1","0","created_by_id=","auth_id"), // allow couselor to edit other peoples cases
 	"case_activities"=>	array ("1","1","0","0","0"),
 );
@@ -141,7 +139,6 @@ $RIGHTS_2 = array // sel:0,add:1,upd:2,overide-ctc-field:3 // supervisor rights
 	"services"=>	array ("1","1","1","0","0"),
 	"referals"=>	array ("1","1","1","0","0"),
 	"client_referals"=>	array ("1","1","1","0","0"),
-	"cases_uuid"=>  array ("1","1","0","0","0"),
 	"cases"=>	array ("1","1","1","0","0"), // "created_by_id=","auth_id","created_by_role=1",""),
 	"case_activities"=>	array ("1","1","0","0","0"),
 );
@@ -185,7 +182,6 @@ $RIGHTS_3 = array // sel:0,add:1,upd:2 // casemanger rights
 	"services"=>	array ("1","1","1","0","0"),
 	"referals"=>	array ("1","1","1","0","0"),
 	"client_referals"=>	array ("1","1","1","0","0"),
-	"cases_uuid"=>  array ("1","1","0","0","0"),
 	"cases"=>	array ("1","1","1","1","0","assigned_to_id=","auth_id","escalated_by_id=","auth_id"), // allow manager to edit other peoples cases
 	"case_activities"=>	array ("1","1","0","0","0"),
 );
@@ -229,7 +225,6 @@ $RIGHTS_4 = array // sel:0,add:1,upd:2 // case workerr
 	"services"=>	array ("1","1","1","0","0"),
 	"referals"=>	array ("1","1","1","0","0"),
 	"client_referals"=>	array ("1","1","1","0","0"),
-	"cases_uuid"=>  array ("1","1","0","0","0"),
 	"cases"=>	array ("1","1","1","1","0","assigned_to_id=","auth_id"), // allow couselor to edit other peoples cases
 	"case_activities"=>	array ("1","1","0","0","0"),
 );
@@ -278,7 +273,6 @@ $RIGHTS_99 = array // sel:0,add:1,upd:2,sel:id(other) // admin rights (same as s
 	"services"=>	array ("1","1","1","0","0"),
 	"referals"=>	array ("1","1","1","0","0"),
 	"client_referals"=>	array ("1","1","1","0","0"),
-	"cases_uuid"=>  array ("1","1","0","0","0"),
 	"cases"=>	array ("1","1","1","0","0"), // "created_by_id=","auth_id","created_by_role=1",""),
 	"case_activities"=>	array ("1","1","0","0","0"),
 );
@@ -928,7 +922,7 @@ $dispositions_def = array
 	array ("reporter_landmark","",		"3","2","","",  "reporters","contact_landmark","",	"Reporter Nearest Landmark",""),
 	array ("reporter_dob","",		"3","3","","",  "reporters","contact_dob","",		"Reporter Date of Birth","d M Y H:i:s"),
 	array ("reporter_age","",		"3","2","","",  "reporters","contact_age","",		"Reporter Age",""),
-	array ("reporter_age_group_id","",	"3","2","","",  "reporters","contact_age_group_id","",	"Reporter Age Group",""),
+	array ("reporter_age_group_id","",	"3","2","","f",  "reporters","contact_age_group_id","",	"Reporter Age Group",""),
 	array ("reporter_age_group","",		"3","2","","",  "reporters","contact_age_group","",	"Reporter Age Group",""),
 	array ("reporter_sex_id","",		"3","2","","f", "reporters","contact_sex_id","",	"Reporter Gender",""),
 	array ("reporter_sex","",		"3","2","","",  "reporters","contact_sex","",		"Reporter Gender",""),
@@ -1325,21 +1319,6 @@ $client_referals_def = array
 	array ("category_fullname_id","",	"1","1","","",	"","","", 	"Fullname ID",""), 
 );
 
-$cases_uuid_def = array
-(
-        array ("id","",                         "0","2","","", "","","",        "CASE ID",""),
-        array ("created_on","",                 "0","3","","", "","","",        "Created On","d M Y H:i:s"),
-        array ("created_by","",                 "0","2","","", "","","",        "Created By",""),
-        array ("created_by_id","",              "0","2","","", "","","",        "Created By ID",""),
-        array ("created_by_role","",            "0","2","","", "","","",        "Created By Role","::role:0:1"),
-        array ("reporter_id","",    		"1","2","m","f", "","","",      "Reporter",""), 
-        array ("case_id","",                    "1","2","","f", "","","",       "Case",""), 
-	array ("src","",                       "1","2","","",  "","","",        "Channel",""),
-        array ("src_uid","",                    "1","2","","",  "","","",       "Channel Uniqueid",""),
-        array ("src_address","",                "1","2","","", "","","",        "Channel Address",""),
-        array ("src_vector","",                 "1","2","","",  "","","",       "Channel Direction",""),
-);
-
 $cases_def = array 
 (
 	array ("id","",				"0","2","","", "","","",	"CASE ID",""),
@@ -1481,7 +1460,6 @@ $cases_def = array
 	array ("hr","",				"4","2","","",   "cases","UNIX_TIMESTAMP(DATE(FROM_UNIXTIME(created_on))) + (HOUR(FROM_UNIXTIME(created_on))*3600)","",   "Hour",":d:dmyh:0: "), 
         array ("h","",				"4","2","","",   "cases","HOUR(FROM_UNIXTIME(created_on))","",   	"Hour",""), 
 
-	array ("uuid","",			"1","2","","", "","","",						"",""),
 	array ("mn_closed","",			"4","2","","", "case_activities","MIN(IF(status=2,mn,NULL))","",	"",""),
 );
 
@@ -2002,13 +1980,6 @@ $clients_del_subs =
 ["reporters","","",	"id","reporter_id"],
 ];
 
-$cases_uuid_subs = 
-[
-["cases","","",			"id","case_id"],
-["subcategories","","100",	"category_id",(" ".$DISPOSITION_ROOT_ID)], // disposition list
-["reporters","_uuid","",	"id","reporter_id"],
-];
-
 $cases_subs = 
 [
 ["reporters","","",	"id","reporter_id"],
@@ -2017,7 +1988,6 @@ $cases_subs =
 ["attachments","","",	"case_id_","case_id"],
 ["case_activities","","","case_id","case_id"],
 ["dispositions","","",	"id","dsp_id"],
-["reporters","_uuid","","id","reporter_uuid_id"],
 ];
 
 $case_activities_subs = 

@@ -1727,6 +1727,8 @@ function rest_uri_response_error ($rt)
 
 function rest_uri_response ($u, $suffix, $id, &$o, &$p, &$aa, $rt)
 {
+	//error_log ("[rest_uri_response] ".$u.$suffix."/".$id);
+
 	if ($rt!=0)
 	{
 		$h = "200 OK";

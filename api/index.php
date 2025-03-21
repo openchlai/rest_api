@@ -164,6 +164,7 @@ function _message_in (&$o, &$p)
 	$o_["src_msg"] = $o["message"];
 	$o_["src_ts"] = $o["timestamp"];
 	$o_["src_vector"] = "1";
+	$o_['src_mime'] = $o["mime"];
         if ($o_['src']	=='safepal') $o_['src_mime'] = "application/json";
 	// $o_["gateway_msg_id"] = $o["message_id"];
 	// $o_["gateway_session_id"] = $o["session_id"];
