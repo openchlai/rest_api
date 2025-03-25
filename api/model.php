@@ -1641,21 +1641,24 @@ $contacts_dup2_api = array
 "landmark:reporter_landmark")
 );
 
-$reporters_include_api = array
+$reporters_api = array				// update reporter
 (
+	array ("reporters","","aub"),
 	array ("cases","","dup","id","case_id", NULL, "id"),
         // array ("contacts","","include"), 	// contact created via contacts^disposition
         array ("contacts","_dup","include"),
         array ("reporters","",""),
-	array ("reporters","_dup","include")
-);
-
-$reporters_api = array 				// update reporter
-(
-	array ("reporters","","aub"),
-	array ("reporters","_include","include"),
+	array ("reporters","_dup","include"),
         array ("case_activities","","params", "activity_ref","reporter_id", "detail","contact_fullname"),
         array ("case_activities","","include")
+);
+
+$reporters_a_api = array			// create reporter via embeded object
+(
+	// todo: search if exist via passport id
+	array ("contacts","","include"),		
+        array ("contacts","_dup","include"),
+        array ("reporters","_uuid","")
 );
 
 $reporters_uuid_api = array 
@@ -1847,14 +1850,16 @@ $cases_api = array
 	array ("users","","dup","id","escalated_by_id",NULL, "id:escalated_by_id", "usn:escalated_by", "role:escalated_by_role"),
 	array ("users","","duf","id","assigned_to_id",NULL, "id:assigned_to_id", "usn:assigned_to", "role:assigned_to_role"),
 	array ("cases","","lvl","case_category_fullname_id","5","^",":", "cat_","id_",""), // split cat levels
-	
-	array ("cases","","params", "activity_","::case_id: case_new: case_edit", "reporter_id","reporter_uuid_id", "reporter_uuid_id","reporter_uuid_id"),
+
+	array ("reporters","_a","object"),			// create reporter if object exist
+
+	array ("cases","","params", "activity_","::case_id: case_new: case_edit", "reporter_id","reporter_uuid_id"),
 	array ("cases","","dup", "id","case_id", NULL, "reporter_id:reporter_id"),
 	array ("reporters","_dup","include"),
 	
         array ("cases","","aub"),
 	array ("cases","",""), 
-	array ("cases","cases","agg4",  		"id","case_id",NULL,  "id","case_id"), 	// update dt		
+	array ("cases","cases","agg4",  "id","case_id",NULL,  "id","case_id"), 	// update dt		
 
 	array ("cases","","dup", "id","case_id", NULL, "id:case_id_","case_category:case_category", "priority", "status"),			
 	array ("reporters","_case","include","1",""),		// update case_id during case create only
@@ -1864,11 +1869,10 @@ $cases_api = array
 	array ("referals","","array"),
 	array ("services","","array"),
 
-        array ("case_activities","","params", "reporter_id","reporter_uuid_id"), // caller details
-	array ("reporters","_dup","include"),
 	array ("case_activities","","params", "activity_ref","case_id", "detail","plan"),
 	array ("case_activities","","include"),
 
+	array ("dispositions","","params", "disposition_id","::disposition_id: ".$DISPOSITION_ID_COMPLETE.":disposition_id"),
         array ("dispositions","","dup","src","src","src_uid","src_uid","case_id","case_id",NULL,"id"), // get disposition_id (if exists)
 	array ("dispositions","_include","include"),
 );

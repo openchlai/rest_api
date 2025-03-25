@@ -1727,7 +1727,7 @@ function rest_uri_response_error ($rt)
 
 function rest_uri_response ($u, $suffix, $id, &$o, &$p, &$aa, $rt)
 {
-	//error_log ("[rest_uri_response] ".$u.$suffix."/".$id);
+	// error_log ("[rest_uri_response] ".$u.$suffix."/".$id);
 
 	if ($rt!=0)
 	{
@@ -2023,13 +2023,14 @@ function rest_uri_post ($u, $suffix, $id, &$o, &$p)
 			if ($bn>3 && $b[3]=="1" && $id==NULL) $fm_=1; // allow link during add
 			if ($bn>3 && $b[4]=="1" && $id!=NULL) $fm_=1; // allow link during upd
 			if ($bn>3 && $fm_==0) continue;
+		
 			$p_ = [];
 			$o_ = $o[($b[0].$b[1])];
 			$n_ = count ($o_);
 			error_log ("  [arr] ".$b[0].$b[1]."|".$n_);
 			for ($i_=0; $i_<$n_; $i_++)
 			{
-				if (count (array_keys ($o_[$i_]))<1) continue; // skip empty object
+				if (count (array_keys ($o_[$i_]))<1) {error_log ("empty!"); continue; } // skip empty object
 				$o_[$i_]["i_"]=$i_;
 				$p_ = $p; // error_log ("[arr] p: ".json_encode ($p_));
 				$rt_ = rest_uri_post ($b[0], $b[1], NULL, $o_[$i_], $p_); 
