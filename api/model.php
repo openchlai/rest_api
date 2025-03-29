@@ -1653,18 +1653,12 @@ $reporters_api = array				// update reporter
         array ("case_activities","","include")
 );
 
-$reporters_a_api = array			// create reporter via embeded object
-(
-	// todo: search if exist via passport id
-	array ("contacts","","include"),		
-        array ("contacts","_dup","include"),
-        array ("reporters","_uuid","")
-);
-
 $reporters_uuid_api = array 
 (
 	array ("cases","","dup","id","case_id", NULL, "id"),
-        array ("contacts","_dup","include"),
+	array ("contacts","","dup","id","contact_id", NULL, "id"),
+	array ("contacts","","include"),	// create if does not exist
+	array ("contacts","_dup","include"),
 	array ("reporters","_uuid","")
 );
 
@@ -1851,16 +1845,13 @@ $cases_api = array
 	array ("users","","duf","id","assigned_to_id",NULL, "id:assigned_to_id", "usn:assigned_to", "role:assigned_to_role"),
 	array ("cases","","lvl","case_category_fullname_id","5","^",":", "cat_","id_",""), // split cat levels
 
-	array ("reporters","_a","object"),			// create reporter if object exist
-
+	array ("reporters","_uuid","object"),			// create reporter if object exist
 	array ("cases","","params", "activity_","::case_id: case_new: case_edit", "reporter_id","reporter_uuid_id"),
-	array ("cases","","dup", "id","case_id", NULL, "reporter_id:reporter_id"),
 	array ("reporters","_dup","include"),
 	
         array ("cases","","aub"),
 	array ("cases","",""), 
-	array ("cases","cases","agg4",  "id","case_id",NULL,  "id","case_id"), 	// update dt		
-
+	array ("cases","cases","agg4",  "id","case_id",NULL,  "id","case_id"), 	// update dt
 	array ("cases","","dup", "id","case_id", NULL, "id:case_id_","case_category:case_category", "priority", "status"),			
 	array ("reporters","_case","include","1",""),		// update case_id during case create only
 	array ("clients","_case","array","1",""),		// update case_id during case create only
