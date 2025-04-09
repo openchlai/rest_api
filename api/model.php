@@ -2206,7 +2206,8 @@ $src_enum =
 "WHATSAPP"=>["WHATSAPP","Chat","Phone Number","1"],
 "TWITTER"=>["TWITTER","Chat","Username",""],
 "safepal"=>["safepal","Safepal","Username",""],
-
+"webform"=>["webform","Web From","session",""],
+"cmis"=>["cmis","CMIS","session",""],
 ];
 
 ?>
