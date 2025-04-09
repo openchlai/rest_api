@@ -2012,7 +2012,8 @@ $contacts_join =
 
 $dispositions_join = 
 [
-"cases"=>["cases", "kase", "disposition.reporter_contact_id=kase.reporter_contact_id"],
+// "cases"=>["cases", "kase", "disposition.reporter_contact_id=kase.reporter_contact_id"],
+"cases"=>["cases", "kase", "disposition.case_id=kase.id"],
 ];
 
 $cases_join = 
