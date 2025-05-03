@@ -1820,6 +1820,9 @@ function rest_uri_response ($u, $suffix, $id, &$o, &$p, &$aa, $rt)
 		}
 	}
 
+	// error_log ("[subs-p] ".json_encode ($p));
+	// error_log ("[subs-o] ".json_encode ($o));
+
 	$n = count ($bb);
 			
 	for ($i=0; $i<$n; $i++)

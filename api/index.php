@@ -68,7 +68,7 @@ function notify ($activity, $assigned_to_id, &$o, &$p)
 	$p_["assigned_to_id"] = $assigned_to_id;
 	if (!isset ($o["src_ts"]) || strlen ($o["src_ts"])<1) $p_["src_ts"]=$ts;
 	if (!isset ($o["src"]) || strlen ($o["src"])<1) $p["src"]=$p_["activity_"];
-	if (!isset ($o["src_uid"]) || strlen ($o["src_uid"])<1) $p_["src_uid"]= (_val_id()+_rands(4,num));
+	if (!isset ($o["src_uid"]) || strlen ($o["src_uid"])<1) $p_["src_uid"]= (_val_id()+_rands(4,"num"));
 	error_log ("[notify](".$activity.") o:".json_encode ($o));
 	error_log ("[notify](".$activity.") p:".json_encode ($p_));
 	rest_uri_post ("activities", "", NULL, $o, $p_);
