@@ -146,8 +146,8 @@ function message_out (&$o, &$p)
 	error_log ("[postdata] ".json_encode($postdata));
 	kurl ($api_url, 60, json_encode($postdata), $hdrs);
 	
-	$s = "read?id=".$o["src_uid"]."&";
-	if (isset ($o["close"])) $s .= "action=close&"; // close session
+	$s = "read?uid=".$o["src_uid"]."&";
+	// if (isset ($o["close"])) $s .= "action=close&"; // close session
         muu ("ati", $s); // update notification status
 }
 
@@ -309,7 +309,7 @@ function _agent (&$o)
 		$n = count ($k);
 		$me = null;
 		for ($i=0; $i<$n; $i++) if ($o_['ati'][$k[$i]][0]==$exten) { $me=$k[$i]; break; }
-		$s = "usr?action=0&id=".$me."&";
+		$s = "leave?uid=".$me."&";
 		if ($me!=null) muu ("ati",$s); 
 		if ($me==null) error_log (" * [ati agent not found ] ");
 
@@ -345,9 +345,9 @@ function _agent (&$o)
 		}
 		if ($campaigns=="") $campaigns = "0,";
 
-		if ($role==6) // login to ati only
+		// if ($role==6) // login to ati only
 		{
-			$s = "usr?action=1&usr=".$exten."&interface=2&exten=".$GLOBALS['VA_SIP_USER_PREFIX'].$exten."&queue=".$campaigns."&";
+			$s = "join?cid=".$exten."&";
 			muu ("ati",$s); 
 			$campaigns = "Z,";
 		}
