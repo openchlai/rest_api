@@ -146,8 +146,8 @@ function message_out (&$o, &$p)
 	error_log ("[postdata] ".json_encode($postdata));
 	kurl ($api_url, 60, json_encode($postdata), $hdrs);
 	
-	$s = "read?uid=".$o["src_uid"]."&";
-	// if (isset ($o["close"])) $s .= "action=close&"; // close session
+	$s = "read?uid=".$o["src_uid2"]."&cid=".$o["src_usr"]."&";
+	if (isset ($o["close"])) $s .= "args=close&"; // close session
         muu ("ati", $s); // update notification status
 }
 
@@ -349,7 +349,8 @@ function _agent (&$o)
 		{
 			$s = "join?cid=".$exten."&";
 			muu ("ati",$s); 
-			$campaigns = "Z,";
+			// $campaigns = "Z,";
+			$campaigns .= "Z,";
 		}
 
 		$s = "usr?action=1&usr=".$exten."&interface=2&exten=".$GLOBALS['VA_SIP_USER_PREFIX'].$exten."&queue=".$campaigns."&";
