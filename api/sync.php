@@ -10,126 +10,271 @@ include "../lib/rest.php";
 include "../lib/session.php";
 include "../lib/rpc.php";
 
-function subargs (&$b, &$aa, &$av, &$o, &$p)
+function model_k ($u, $suffix)
+{
+	$a = $GLOBALS[($u."_def")];
+        $t = $GLOBALS["RESOURCES"][$u][0];
+        $ta = $GLOBALS["RESOURCES"][$u][1];
+        if (strlen($ta)<1) $ta=$t;
+        $k = $ta.$suffix."_".$a[0][0];
+        if (strlen ($a[0][1])>0) $k = $a[0][1].$suffix;
+        return $k;
+}
+
+function kv ($k, &$op, &$o, &$p)
+{
+        $v = NULL;
+        $op = '=';
+        if (substr ($k,0,1)==':')
+        {
+                $vv = explode (":",$k);
+                $op=$vv[1];
+                $k=$vv[2];
+                if (!isset ($o[$k]) && isset ($vv[3]))
+                {
+                        $k = $vv[3]; // set default and case_activity_add
+                        if ($vv[3]==" null") return ("null"._val_id ()."-"._rands (9,"num"));
+                }
+                if ($op=="")
+                {
+                        // error_log ("---".json_encode ($o));
+                        $k = $vv[3]; // set default and case_activity_add
+                        if (isset ($o[$vv[2]]) && strlen ($o[$vv[2]])>0) $k = $vv[4];
+                        if (isset ($p[$vv[2]]) && strlen ($p[$vv[2]])>0) $k = $vv[4];
+                }
+                if ($op=="@#") return (_val_id ()."-"._rands (9,"num"));
+        }
+        if (isset ($o[$k])) $v = __VESC ($o[$k]);
+        if (isset ($p[$k])) $v = $p[$k];
+	if (substr ($k,0,1)==' ') $v = substr ($k,1);
+        return $v;
+}
+
+function jo (&$a, $an, &$row, &$s)
+{
+        for ($j=0; $j<$an; $j++)
+        {
+                if ($j>0) $s .= ",\r\n";
+                $s .= '"'.$a[$j][0].'":"'.$row[$j].'"';
+
+        }
+}
+
+function fk (&$a, $an, &$row, &$p)
+{
+        for ($j=1; $j<$an; $j++)  // collect fk
+        {
+                $v=$row[$j];
+                if ($a[$j][3]!='2') continue;
+                $p[$a[$j][0]] = $v;
+                error_log ("[fk] ".$j." : ".$a[$j][0]." = ".$v);
+        }
+}
+
+function arg ($t, $k, $v, &$o, &$p, &$aa, &$av)
 {
 	$w=" WHERE ";
-	$e=0;
-	$n = count ($b);
-	for ($i=3; $i<$n; $i+=2)
+	$op = "=";
+	$v_ = _kv ($v, $op, $o, $p);
+	if ($v_!==NULL)
 	{
-		$op = "=";
-		$k = $b[($i+1)];
-		$v = _kv ($k, $op, $o, $p);
-		if ($v===NULL) { error_log ("[sub] (".$b[0].$b[1].")  ".$k." isnull "); $e++; continue; } 
-		if ($i==3 && $b[$i]=="id" && strlen ($v)<1) $v="0";
-		if ($i>3) $w = " && ";
+		$w = " WHERE ";
+		if ($strlen($aa["w"])>0) $w = " && ";
 		$aa["w"] .= $w.$b[$i]." ".$op."?";
 		$aa["s"] .= "s";
-		$av[] = $v;
+		$av[] = $v_;
+	}
+	return $v_;
+}
+
+// todo: arg_s,arg_n,arg_ch,arg_ft,arg_d 
+
+function arg_c ($t, $k, $v, &$o, &$p, &$aa, &$av)
+{
+	$s = ' WHERE ';
+	if (strlen ($aa["w"])>0) $s = ' && ';
+	$n = count ($v);
+	$c = 0;
+	for ($j=0; $j<$n; $j++) if (strlen($v[$j])>0)
+	{
+		if ($c==0) $aa["w"] .= $s.$t.'.'.$k." IN (";
+		if ($c>0) $aa["w"] .=",";
+		$aa["w"] .= "?";
+		$aa["s"] .= "s";
+		$av[] = $v[$j];
+		$c++;
+        }
+        if ($c>0) $aa["w"] .= ")";
+}
+
+function args (&$b, &$o, &$p, &$aa, &$av)
+{
+	$e=0;
+        $n = count ($b);
+        for ($i=3; $i<$n; $i+=2)
+	{
+		if ($b[$i]===NULL) break; // end also on NULL
+		$v = arg ($b[$i], $b[($i+1)], $o, $p, $aa, $av);
+		if ($v===NULL)
+        	{
+                        $e++;
+                        error_log ("[arg] (".$b[0].$b[1].")  ".$k." isnull ");
+                }
 	}
 	return $e;
 }
 
-function fk ($u, &$row, &$p)
+function args_uri ($u, $suffix, $id, &$o, &$aa, &$av) // replacement for ctx_f
 {
+	if ($id!==NULL)
+	{
+		$aa["w"] = " WHERE id=? ";
+		$aa["s"] = "s";
+		$av[] = $id;
+		return 0;
+	}
+	$e=0;
+	$p=[];
+	$t = $GLOBALS["RESOURCES"][$u];
 	$a = $GLOBALS[($u."_def")];
         $an = count ($a);
-	for ($j=1; $j<$an; $j++)  // collect fk
-	{
-		$v=$row[$j];
-		if ($a[$j][3]!='2') continue;
-		$p[$a[$j][0]] = $v;
-		error_log ("[fk] ".$j." : ".$a[$j][0]." = ".$v);
-	}
-}
-
-function jo ($u, &$row, &$s)
-{
-	$a = $GLOBALS[($u."_def")];
-	$an = count ($a);
 	for ($j=0; $j<$an; $j++)
 	{
-		if ($j>0) $s .= ",\r\n"; 
-		$s .= '"'.$a[$j][0].'":"'.$row[$j].'"';
-
+		$m = $a[$j][3];
+		$k = $a[$j][0];
+		$v = NULL;
+		if (strlen($a[$j][1])>0) $k=$a[$j][1];  // alias
+		if (isset ($o[$k])) $v = $o[$k];
+		if (strlen ($v)<1) continue;
+		if ($m==2) arg_c ($t[0], $k, explode (",",$v), $o, $p, $aa, $av);
 	}
+	return $e;
 }
 
-function case_sync (&$s)
+function uri_response_error ()
 {
-	$s = "{";
-	$case_activities_k = $GLOBALS["case_activities_k"];
-	$o = [];
-	$p = [];
-	$aa = ["w"=>"WHERE activity IN (1,2,3)", "sort"=>"ORDER BY id", "lim"=>"LIMIT 1", "s"=>"" ];
-	$av = [];
-	$res = _select ("case_activities", $aa, $av);
-	if ($res==NULL) return -1;
-	$row = mysqli_fetch_row ($res);
-	$p["case_id"] = $row[$case_activities_k["case_id"]];
-	error_log ("---".json_encode ($p));
 
-	// todo get max case_activity with current case_id
-	
-	$cases_k = $GLOBALS["cases_k"];
-	$aa = ["w"=>"WHERE id=?", "sort"=>"", "lim"=>"", "s"=>"s" ];
-        $av = [$p["case_id"]];
-	$res = _select ("cases", $aa, $av);
+}
+
+function uri_response ($u, $suffix, $id, &$o, &$s)
+{
+	$p = [];
+	$a = $GLOBALS[($u."_def")];
+	$an = count ($a);
+	$aa = ["w"=>"", "sort"=>"", "lim"=>"", "s"=>""];
+	$av = []; 
+	args_uri ($u, $suffix, $id, $o, $aa, $av);
+	$res = _select ($u, $aa, $av);
         if ($res==NULL) return -1;
 	$row = mysqli_fetch_row ($res);
-	$p["case_ref"] = $row[$cases_k["ref"]];
-	error_log ("---".json_encode ($p));
-	jo ("cases", $row, $s);
-	fk ("cases", $row, $p);
+	if ($row==NULL) return -2;  // eof
+	$k = model_k ($u, $suffix);
+	$p[$k] = $row[0];
+	jo ($a, $an, $row, $s);
 
-	// $subs = $GLOBALS["cases_subs"]; // subs
-	$subs =
-[
-["reporters","","o",     "id","reporter_id"],
-["perpetrators","","",  "case_id_","case_id"],
-["clients","","",       "case_id_","case_id"],
-["attachments","","",   "case_id_","case_id"],
-//["case_activities","","","case_id","case_id"],
-//["dispositions","","",  "id","dsp_id"],
-//["reporters","_uuid","",     "id","reporter_uuid_id"],
-];
-	$n = count ($subs);
-	for ($i=0; $i<$n; $i++)
+	if ($id===NULL)
 	{
-		$aa = ["w"=>"", "sort"=>"", "lim"=>"", "s"=>"" ];
-		$av = [];
-		if (subargs ($subs[$i], $aa, $av, $o, $p)!=0) continue;
-		$res = _select ($subs[$i][0], $aa, $av);
-		if ($res==NULL) return -1;
-		$s .= "\r\n".',"'.$subs[$i][0].$subs[$i][1].'":';
-		$s .= $subs[$i][2]=='o' ? '{' : '[';
-		$r=0;
-        	while (($row = mysqli_fetch_row ($res)))
+		while (($row = mysqli_fetch_row ($res))) // next rows
 		{
-			if ($r>0) $s.=',';
-			$s .= $subs[$i][2]=='o' ? '' : '{';
-			jo ($subs[$i][0], $row, $s);
-			$s .= $subs[$i][2]=='o' ? '' : '}';
-			$r++;
+			$s .='},{';
+			jo ($a, $an, $row, $s);
 		}
-		$s .= $subs[$i][2]=='o' ? '}' : ']';
+		return 0;
 	}
 
-	$s.="}";
-
+	fk ($a, $an, $row, $p);
+	error_log (json_encode ($p));
+	$bb = $GLOBALS[($u.$suffix."_subs")]; // subs
+	$bn = count ($bb);
+	for ($i=0; $i<$bn; $i++)
+	{
+		$b = $bb[$i];
+		$s .= ",\r\n".'"'.$b[0].$b[1].'":';
+		$s .= $b[2]=='o' ? '{' : '[';
+		$id_ = NULL;
+		$o_ = [];
+		// todo: check model_id match -> set id for more recursion
+		$e = 0;
+        	$jn = count ($b);
+		for ($j=3; $j<$jn; $j+=2)
+        	{
+			$op = "=";
+        		$v_ = _kv ($b[($j+1)], $op, $o, $p);
+			if ($v_===NULL) 
+			{
+				$e++;
+				error_log ("[sub] (".$b[0].$b[1].")  ".$b[($j+1)]." isnull ");
+				continue;
+			}
+			$o_[$b[$j]] = $v_;
+		}
+		if ($e==0) uri_response ($b[0], $b[1], $id_, $o_, $s);
+		$s .= $b[2]=='o' ? '}' : ']';
+	}
 	return 0;
 }
 
-$api_url = "https://backend.bitz-itc.com/api/webhook/helpline/case/ceemis/";
-$api_hdrs = array 
-(
-"Content-Type: application/json"
-);
-$s="";
-case_sync ($s);
-kurl ($api_url, 60, $s, $api_hdrs);
-header("HTTP/1.0 200 OK");
-header ('Content-Type: application/json');
-echo $s;
+// dup, params, val
+
+function uri_post ()
+{
+
+}
+
+function uri_request ()
+{
+	// parse
+	// POST
+	// uri_response ();
+}
+
+// ---------------------------------------
+
+$cases_ceemis_subs =
+[
+//["reporters","_uuid","",     "id","reporter_uuid_id"],
+["reporters","","o",	"id","reporter_id"],
+["perpetrators","","",  "case_id_","case_ceemis_id"],
+["clients","","",       "case_id_","case_ceemis_id"],
+["attachments","","",   "case_id_","case_ceemis_id"],
+["services","","",	"case_id_","case_ceemis_id"],
+["referals","","",  	"case_id_","case_ceemis_id"]
+];
+
+function case_sync ()
+{
+	$aa = ["w"=>"WHERE activity IN (1,2,3)", "sort"=>"ORDER BY id", "lim"=>"LIMIT 1", "s"=>"" ];
+	$av = [];
+        $res = _select ("case_activities", $aa, $av);
+        if ($res==NULL) return -1;
+	$row = mysqli_fetch_row ($res);
+	if ($row==NULL) return -2;   	// eof
+	$case_activities_k = $GLOBALS["case_activities_k"];
+        $p["case_id"] = $row[$case_activities_k["case_id"]];
+        error_log ("[sync] --- ".json_encode ($p));
+
+	// todo get max case_activity with current case_id
+	$o = [];
+	$s = "{";
+	uri_response ("cases","_ceemis",$p["case_id"],$o,$s);	
+	$s .= "}";
+
+	$api_url = "https://backend.bitz-itc.com/api/webhook/helpline/case/ceemis/";
+        $api_hdrs = ["Content-Type: application/json"];
+ 	$r = kurl ($api_url, 60, $s, $api_hdrs);
+	// uri_post (); // update case_activities with sync ts
+
+	header ("HTTP/1.0 200 OK");
+	header ('Content-Type: application/json');
+//	echo $s;
+	echo $r["data"];
+	return 0;
+}
+
+$rt=0;
+// while ($rt==0)
+{
+	$rt = case_sync ();
+}
 
 ?>
