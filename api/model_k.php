@@ -914,6 +914,7 @@ $cases_k=array("id"=>0,
 "hr"=>116,
 "h"=>117,
 "mn_closed"=>118,
+"ref"=>119,
 NULL);
 
 $case_activities_k=array("id"=>0,

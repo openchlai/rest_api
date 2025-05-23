@@ -6,7 +6,7 @@ define('THE_DB_USN', 'nginx');
 define('THE_DB_PASSWD', '');
 define('THE_DB_HOST', 'localhost');
 define('THE_DB_NAME', 'helpline');
-define('THE_DB_SOCK', '/run/mysqld/mysqld.sock');
+define('THE_DB_SOCK', '/var/lib/mysql/mysql.sock');
 define('THE_APP_ID', 'hlp');
 define('DAT', '/home/dat/helpline');
 
@@ -30,7 +30,7 @@ $RECORDING_ARCHIVE_URL = "";
 $API_GATEWAY_USN = "ausername";
 $API_GATEWAY_PASS = "apassword";
 $API_GATEWAY_AUTH = "https://demo-openchs.bitz-itc.com/api/token/";
-$API_GATEWAY_SEND_MSG = "https://demo-openchs.bitz-itc.com/api/chat/";
+$API_GATEWAY_SEND_MSG = "https://backend.bitz-itc.com/api/whatsapp/whatsapp/send/";
 $API_GATEWAY_CLOSE_MSG = "https://demo-openchs.bitz-itc.com/api/chat/";
 
 // --- CATEGORY ROOT IDs ---

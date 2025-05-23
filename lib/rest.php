@@ -314,7 +314,7 @@ function _select ($u, &$aa, &$av, $db_="db", $join=[])
 	if (strlen ($aa["sort"])>0) $orderby = $aa["sort"];
 	if (isset ($aa["group"]) && strlen ($aa["group"])>0) $orderby = $aa["group"];
 
-	$q .= " FROM ".$ta." ".$aa["w"].$orderby.$aa["lim"];  
+	$q .= " FROM ".$ta." ".$aa["w"]." ".$orderby." ".$aa["lim"];  
 
 	error_log ("       [SELECT] (".$u.") ".$q." |".json_encode ($av));
 	

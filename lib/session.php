@@ -140,9 +140,9 @@ function ss_new_phone ($otp_id, $addr_id, $addr, $role)
 	qryp ($q, "sssss", $argv, 2);
 }
 
-session_set_save_handler ("ss_open", "ss_close", "ss_read", "ss_write", "ss_destroy", "ss_gc");
-session_name ("HELPLINE_SESSION_ID");
-session_start ();
+//session_set_save_handler ("ss_open", "ss_close", "ss_read", "ss_write", "ss_destroy", "ss_gc");
+//session_name ("HELPLINE_SESSION_ID");
+//session_start ();
 
 function ss ()
 {

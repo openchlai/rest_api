@@ -1462,7 +1462,9 @@ $cases_def = array
 
 	array ("mn_closed","",			"4","2","","", "case_activities","MIN(IF(status=2,mn,NULL))","",	"",""),
 
-        array ("uuid","",                  "1","2","","", "","","",        "UUID",""),
+       // array ("uuid","",                  "1","2","","", "","","",        "UUID",""),
+
+	array ("ref","",                  "3","2","","", "","","",        "Reference",""),
 );
 
 $case_activities_def = array 

@@ -1,13 +1,11 @@
 <?php
-include "../config.php"; //
+include "/var/www/html/helpline/config.php"; //
 
 $db = mysqli_connect (null, THE_DB_USN, null, THE_DB_NAME, null, THE_DB_SOCK) or die ("Could Not connect to Database Server.");
 $db2 = mysqli_connect (null, THE_DB_USN, null, THE_DB_NAME, null, THE_DB_SOCK) or die ("Could Not connect to Database Server.");
 
 include "model.php";
 include "model_k.php";
-//include "model_qa.php";
-//include "model_qa_k.php";
 include "../lib/rest.php";
 include "../lib/session.php";
 include "../lib/XLSXbuf.php"; 
@@ -746,9 +744,8 @@ function _request_ ()
 		$id = "-2";
 		if (($rt==201 || $rt==202) && isset ($p[$k])) $id = $p[$k];
 		error_log ("rt-->".$rt." ".$k);
-		
-		// todo: increase wrapup to 5minutes on case_uuid // todo convert case_uuid GETs to PUTs
-				
+
+		// todo: increase wrapup to 5minutes on case_uuid // todo convert case_uuid GETs to PUTs				
 		if (($u=="cases" || $u=="dispositions") && $rt>200 && $rt<203 && isset ($o["src"]) && $o["src"]=="call") // shrink wrapup to 20 seconds on save
                 {
 			$s = "wrapup?action=0&usr=".$_SESSION["cc_user_exten"];
@@ -769,7 +766,7 @@ function _request_ ()
 		if ($rt==201 && $u=="cases" && isset ($p["escalated_to_id"]) && $p["escalated_to_id"]>0)
 		{
 			//_notify ("msg?", "escalation", "", $p["auth_usn"], $p["escalated_to_exten"], ($GLOBALS["CASE_ID_PREFIX"].$p["case_id"]), "1", 0);
-			notify ("escalation", $p["escalated_to_id"], $o, $p);
+			// notify ("escalation", $p["escalated_to_id"], $o, $p);
 		}
 		
 		if ($rt==202 && $u=="cases" && isset ($p["escalated_to_id"]) && $p["escalated_to_id"]>0)
@@ -778,8 +775,14 @@ function _request_ ()
 			$av = [$p["aub_id"], $p["case_id"], "cases", "escalated_to_id"];
 			$r = qryp ($q, "ssss", $av, 1);
 			error_log ("[escanb] ".json_encode ($av));
-			notify ("escalation", $p["escalated_to_id"], $o, $p);
+			// notify ("escalation", $p["escalated_to_id"], $o, $p);
 			//if ($r) _notify ("msg?", "escalation", "", $p["auth_usn"], $p["escalated_to_exten"], ($GLOBALS["CASE_ID_PREFIX"].$p["case_id"]), "1", 0); 
+		}
+
+		if ($u=="cases" && $rt>200 && $rt<203)
+		{
+			error_log ("PHP - ".$p["case_id"].", ".$p["dsp_id"].", ".$p["ca_id"]);
+			// $r = muu ("ceemis","sync?c=-1&"); // wakeup eemis sync
 		}
 	}
 	
@@ -801,6 +804,10 @@ function _request_ ()
 	
 	return $rt;
 }
+
+session_set_save_handler ("ss_open", "ss_close", "ss_read", "ss_write", "ss_destroy", "ss_gc");
+session_name ("HELPLINE_SESSION_ID");
+session_start ();
 
 $rt = _request_ ();
 if ($rt>299) rest_uri_response_error ($rt);
