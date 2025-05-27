@@ -782,7 +782,7 @@ function _request_ ()
 		if ($u=="cases" && $rt>200 && $rt<203)
 		{
 			error_log ("PHP - ".$p["case_id"].", ".$p["dsp_id"].", ".$p["ca_id"]);
-			// $r = muu ("ceemis","sync?c=-1&"); // wakeup eemis sync
+			$r = muu ("sync",""); // wakeup sync
 		}
 	}
 	

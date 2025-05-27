@@ -1,14 +1,14 @@
 <?php
 include "/var/www/html/helpline/config.php"; //
 
-$db = mysqli_connect (null, THE_DB_USN, null, THE_DB_NAME, null, THE_DB_SOCK) or die ("Could Not connect to Database Server.");
-$db2 = mysqli_connect (null, THE_DB_USN, null, THE_DB_NAME, null, THE_DB_SOCK) or die ("Could Not connect to Database Server.");
+$db = mysqli_connect (null, "voiceapps", null, THE_DB_NAME, null, THE_DB_SOCK) or die ("Could Not connect to Database Server.");
+$db2 = mysqli_connect (null, "voiceapps",  null, THE_DB_NAME, null, THE_DB_SOCK) or die ("Could Not connect to Database Server.");
 
-include "model.php";
-include "model_k.php";
-include "../lib/rest.php";
-include "../lib/session.php";
-include "../lib/rpc.php";
+include "/var/www/html/helpline/api/model.php";
+include "/var/www/html/helpline/api/model_k.php";
+include "/var/www/html/helpline/lib/rest.php";
+include "/var/www/html/helpline/lib/session.php";
+include "/var/www/html/helpline/lib/rpc.php";
 
 function model_k ($u, $suffix)
 {
@@ -187,7 +187,7 @@ function uri_response ($u, $suffix, $id, &$o, &$s)
 	}
 
 	fk ($a, $an, $row, $p);
-	error_log (json_encode ($p));
+//	error_log (json_encode ($p));
 	$bb = $GLOBALS[($u.$suffix."_subs")]; // subs
 	$bn = count ($bb);
 	for ($i=0; $i<$bn; $i++)
@@ -239,13 +239,13 @@ $cases_ceemis_subs =
 //["perpetrators","_case","",  "case_id_","case_ceemis_id"],
 //["clients","_case","",       "case_id_","case_ceemis_id"],
 // ["attachments","_case","",   "case_id_","case_ceemis_id"],
-["services","","",	"case_id_","case_ceemis_id"],
-["referals","","",  	"case_id_","case_ceemis_id"]
+//["services","","",	"case_id_","case_ceemis_id"],
+//["referals","","",  	"case_id_","case_ceemis_id"]
 ];
 
-function case_sync ()
+function case_sync (&$caid)
 {
-	$aa = ["w"=>"WHERE activity IN (1,2,3)", "sort"=>"ORDER BY id", "lim"=>"LIMIT 1", "s"=>"" ];
+	$aa = ["w"=> ("WHERE activity IN (1,2,3) && syncts<1 && id>".$caid), "sort"=>"ORDER BY id", "lim"=>"LIMIT 1", "s"=>"" ];
 	$av = [];
         $res = _select ("case_activities", $aa, $av);
         if ($res==NULL) return -1;
@@ -254,6 +254,7 @@ function case_sync ()
 	$case_activities_k = $GLOBALS["case_activities_k"];
 	$p["case_id"] = $row[$case_activities_k["case_id"]];
 	$p["ca_id"] = "".$row[0];
+	$caid = $row[0];
 
 	error_log ("[sync] --- ".json_encode ($p));
 
@@ -274,6 +275,8 @@ function case_sync ()
 	uri_response ("cases","_ceemis",$p["case_id"],$o,$s);	
 	if (strlen ($p["case_ref"])>0) $s .= ",\"ref\":\"".$p["case_ref"]."\"";
 	$s .= "}";
+
+error_log ($s);
 
 	$api_url = "https://backend.bitz-itc.com/api/webhook/helpline/case/ceemis/";
 	$api_opts = [];
@@ -296,20 +299,22 @@ function case_sync ()
 		$o__ = [ "syncts" => ("".time()) ];
 		if (strlen ($p["case_ref"])<1) $o__["theirref"] = $o_["ceemis_response"]["msg"];
 		rest_uri_post ("case_activities", "_sync", $p["ca_id"], $o__, $p__);
-		// uri_post (); // update case_activities with sync ts
+		return 0; // uri_post (); // update case_activities with sync ts
 	}
 
-	header ("HTTP/1.0 200 OK");
-	header ('Content-Type: application/json');
-	echo $s;
-	//echo $r["data"];
-	return 0;
-}
 
+	//header ("HTTP/1.0 200 OK");
+	//header ('Content-Type: application/json');
+	//echo $s;
+	//echo $r["data"];
+	return -1;
+}
 $rt=0;
-// while ($rt==0)
+$caid=0;
+while ($rt!=-2)
 {
-	$rt = case_sync ();
+	$rt = case_sync ($caid);
+	error_log ("[sync-return] ".$rt." ".$caid."---------------------------");
 }
 
 ?>
