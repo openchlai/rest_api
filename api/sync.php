@@ -50,13 +50,17 @@ function kv ($k, &$op, &$o, &$p)
         return $v;
 }
 
+
+// dup, params, val
+
 function jo (&$a, $an, &$row, &$s)
 {
         for ($j=0; $j<$an; $j++)
         {
-                if ($j>0) $s .= ",\r\n";
-                $s .= '"'.$a[$j][0].'":"'.$row[$j].'"';
-
+		if ($j>0) $s .= ",\r\n";
+		$k=$a[$j][0];
+		if (strlen ($a[$j][1])>0) $k = $a[$j][1];
+                $s .= '"'.$k.'":"'.$row[$j].'"';
         }
 }
 
@@ -214,17 +218,15 @@ function uri_response ($u, $suffix, $id, &$o, &$s)
 	return 0;
 }
 
-// dup, params, val
-
 function uri_post ()
 {
 
 }
 
-function uri_request ()
+function uri ()
 {
 	// parse
-	// POST
+	// uri_post ()
 	// uri_response ();
 }
 
@@ -233,10 +235,10 @@ function uri_request ()
 $cases_ceemis_subs =
 [
 //["reporters","_uuid","",     "id","reporter_uuid_id"],
-["reporters","","o",	"id","reporter_id"],
-["perpetrators","","",  "case_id_","case_ceemis_id"],
-["clients","","",       "case_id_","case_ceemis_id"],
-["attachments","","",   "case_id_","case_ceemis_id"],
+// ["reporters","","o",	"id","reporter_id"],
+//["perpetrators","_case","",  "case_id_","case_ceemis_id"],
+//["clients","_case","",       "case_id_","case_ceemis_id"],
+// ["attachments","_case","",   "case_id_","case_ceemis_id"],
 ["services","","",	"case_id_","case_ceemis_id"],
 ["referals","","",  	"case_id_","case_ceemis_id"]
 ];
@@ -250,24 +252,57 @@ function case_sync ()
 	$row = mysqli_fetch_row ($res);
 	if ($row==NULL) return -2;   	// eof
 	$case_activities_k = $GLOBALS["case_activities_k"];
-        $p["case_id"] = $row[$case_activities_k["case_id"]];
-        error_log ("[sync] --- ".json_encode ($p));
+	$p["case_id"] = $row[$case_activities_k["case_id"]];
+	$p["ca_id"] = "".$row[0];
+
+	error_log ("[sync] --- ".json_encode ($p));
+
+	$aa = ["w"=>"WHERE id=?", "sort"=>"", "lim"=>"", "s"=>"s" ];
+        $av = [$p["case_id"]];
+        $res = _select ("cases", $aa, $av);
+	if ($res==NULL) return -1;
+	$row = mysqli_fetch_row ($res);
+	if ($row==NULL) return -2;      // eof
+	$cases_k = $GLOBALS["cases_k"];
+	//error_log (json_encode($cases_k));
+	$p["case_ref"] = $row[$cases_k["ref"]];
+	// return;
 
 	// todo get max case_activity with current case_id
 	$o = [];
 	$s = "{";
 	uri_response ("cases","_ceemis",$p["case_id"],$o,$s);	
+	if (strlen ($p["case_ref"])>0) $s .= ",\"ref\":\"".$p["case_ref"]."\"";
 	$s .= "}";
 
 	$api_url = "https://backend.bitz-itc.com/api/webhook/helpline/case/ceemis/";
-        $api_hdrs = ["Content-Type: application/json"];
- 	$r = kurl ($api_url, 60, $s, $api_hdrs);
-	// uri_post (); // update case_activities with sync ts
+	$api_opts = [];
+	if (strlen ($p["case_ref"])>0)
+	{
+		$api_url .= "update/";
+		$api_opts = [CURLOPT_CUSTOMREQUEST => 'PUT'];
+	}
+	$api_hdrs = ["Content-Type: application/json"];
+	$r = kurl ($api_url, 60, $s, $api_hdrs, $api_opts);
+	if ($r['info']['http_code']!=200) return -1;
+	$o_ = json_decode ($r['data'], true);
+	if (!$o_) return -1;
+
+	if ($o_["status"]=="success" && $o_["ceemis_response"]["status"]==true)
+	{
+		$_SESSION["cc_user_role"] = "99";
+		error_log ("CEEMIS: ".$p["ca_id"]."/".$o_["ceemis_response"]["msg"]."---------------------");
+		$p__ = [ "ca_id" => $p["ca_id"] ];
+		$o__ = [ "syncts" => ("".time()) ];
+		if (strlen ($p["case_ref"])<1) $o__["theirref"] = $o_["ceemis_response"]["msg"];
+		rest_uri_post ("case_activities", "_sync", $p["ca_id"], $o__, $p__);
+		// uri_post (); // update case_activities with sync ts
+	}
 
 	header ("HTTP/1.0 200 OK");
 	header ('Content-Type: application/json');
-//	echo $s;
-	echo $r["data"];
+	echo $s;
+	//echo $r["data"];
 	return 0;
 }
 

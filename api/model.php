@@ -50,7 +50,7 @@ $RESOURCES = array
 	"referals"=>		array ("referal","",		"3","0","0",	"Referals", 		"","",			""), 
 	"client_referals"=>	array ("client_referal","",	"3","0","0",	"Client Referals",	"","",			""), 
 	"cases"=>		array ("kase","case",		"3","0","0",	"Case", 		"","",			""), 
-	"case_activities"=>	array ("kase_activity","ca",	"1","0","0",	"Case Activity", 	"","",			""), 
+	"case_activities"=>	array ("kase_activity","ca",	"3","0","0",	"Case Activity", 	"","",			""), 
 );
 
 $RK=$RESOURCES;
@@ -274,7 +274,7 @@ $RIGHTS_99 = array // sel:0,add:1,upd:2,sel:id(other) // admin rights (same as s
 	"referals"=>	array ("1","1","1","0","0"),
 	"client_referals"=>	array ("1","1","1","0","0"),
 	"cases"=>	array ("1","1","1","0","0"), // "created_by_id=","auth_id","created_by_role=1",""),
-	"case_activities"=>	array ("1","1","0","0","0"),
+	"case_activities"=>	array ("1","1","1","0","0"),
 );
 
 // ===================================================================================
@@ -1464,7 +1464,8 @@ $cases_def = array
 
        // array ("uuid","",                  "1","2","","", "","","",        "UUID",""),
 
-	array ("ref","",                  "3","2","","", "","","",        "Reference",""),
+	array ("ref","theirref",                  "3","2","","", "","","",        "Reference",""),
+	array ("src_callid","",			   "3","2","","", "","","", 	  "Session ID","")
 );
 
 $case_activities_def = array 
@@ -1523,6 +1524,8 @@ $case_activities_def = array
         array ("dt","",				"4","2","","",   "case_activities","UNIX_TIMESTAMP(DATE(FROM_UNIXTIME(created_on)))","",   "Date",":d:dmy:0: "), 
 	array ("hr","",				"4","2","","",   "case_activities","UNIX_TIMESTAMP(DATE(FROM_UNIXTIME(created_on))) + (HOUR(FROM_UNIXTIME(created_on))*3600)","",   "Hour",":d:dmyh:0: "), 
         array ("h","",				"4","2","","",   "case_activities","HOUR(FROM_UNIXTIME(created_on))","",   "Hour",""), 
+
+        array ("syncts","",                     "3","3","","",  "","","",    "Sync Timestamp",""),
 );
 
 
@@ -1902,6 +1905,13 @@ $case_activities_api = array
 (
 	array ("case_activities","",""),
 	array ("case_activities","au","agg4",			"id","ca_id",NULL,  "aub_id","aub_id"), // change count
+);
+
+$case_activities_sync_api = array
+(
+	array ("case_activities","","dup", "id","ca_id", NULL, "case_id:case_id"),
+	array ("case_activities","",""),
+	array ("cases","",""),
 );
 
 $activities_api = array

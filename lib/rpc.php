@@ -34,7 +34,9 @@ function kurl ($url,$timeout,$postdata=null,$hdrs=null,$opts=null,$email_to=null
 	curl_setopt ($ch, CURLOPT_HEADER, false);
         curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt ($ch, CURLOPT_TIMEOUT, $timeout);
-        // curl_setopt ($ch, CURLOPT_VERBOSE, 2);
+	curl_setopt ($ch, CURLOPT_VERBOSE, true);
+	$log = fopen('/tmp/curl_debug.log', 'w');
+	curl_setopt($ch, CURLOPT_STDERR, $log);
 	if ($opts!=null)
 	{
 		curl_setopt_array ($ch, $opts);
@@ -62,11 +64,13 @@ function kurl ($url,$timeout,$postdata=null,$hdrs=null,$opts=null,$email_to=null
 	}
         $r['data'] = curl_exec ($ch);
         $r['info'] = curl_getinfo ($ch);
-        curl_close ($ch);
-	if ($fp!=null) fclose ($fp);
-	// error_log ("[curl_info] ". $r['info']['http_code'] ."|".json_encode ($r['info']));
+	error_log ("[curl_info] ". $r['info']['http_code'] ."|".json_encode ($r['info']));
 	error_log ("[curl_result] ".$r['info']['http_code']." | ". $r['data']);
-        return $r;
+	fclose ($log);
+	curl_close ($ch);
+        if ($fp!=null) fclose ($fp);
+
+	return $r;
 }
 
 // function api_response () { } // maps 3rd party response to system

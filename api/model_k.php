@@ -915,6 +915,7 @@ $cases_k=array("id"=>0,
 "h"=>117,
 "mn_closed"=>118,
 "ref"=>119,
+"src_callid"=>120,
 NULL);
 
 $case_activities_k=array("id"=>0,
@@ -966,6 +967,7 @@ $case_activities_k=array("id"=>0,
 "dt"=>46,
 "hr"=>47,
 "h"=>48,
+"syncts"=>49,
 NULL);
 
 

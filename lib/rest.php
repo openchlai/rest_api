@@ -1959,7 +1959,7 @@ function rest_uri_post ($u, $suffix, $id, &$o, &$p)
 		$b = $bb[$i];
 		$a_ = $GLOBALS[($b[0]."_def")];
 		$k_ = model_k_id ($b[0], $b[1], $a_);
-		
+error_log ("--->(".$b[2].")".$k_);		
 		if ($b[2]=="aub")
 		{
 			if (isset ($p["aub_id"]) && strlen ($p["aub_id"])>0) continue;
