@@ -57,6 +57,24 @@ function muu ($cmd, $args)
         return $r;
 }
 
+function muu_ ($cmd, $args) // nb: does not wait for response
+{
+	$sock = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+	if (!$sock) {
+    		error_log ("Failed to create socket: " . socket_strerror(socket_last_error()));
+		return -1;
+	}
+
+	if (!socket_connect($sock, "127.0.0.1", "8383")) {
+    		error_log ("Connection failed: " . socket_strerror(socket_last_error($socket)) );
+		return -1;
+	}
+	
+	$req = "GET /sync/\r\n\r\n";
+
+	socket_write($sock, $req, strlen($req));
+}
+
 function notify ($activity, $assigned_to_id, &$o, &$p)
 {
 	$p_ = $p;
@@ -782,7 +800,7 @@ function _request_ ()
 		if ($u=="cases" && $rt>200 && $rt<203)
 		{
 			error_log ("PHP - ".$p["case_id"].", ".$p["dsp_id"].", ".$p["ca_id"]);
-			$r = muu ("sync",""); // wakeup sync
+			// $r = muu_ ("sync",""); // wakeup sync
 		}
 	}
 	
