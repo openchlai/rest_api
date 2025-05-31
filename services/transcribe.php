@@ -6,8 +6,8 @@ Transcribe audio after end of a call recording and post the result to CRM
 // curl -X POST http://192.168.10.6:11434/api/generate -H "Content-Type: application/json" --data @mistral.json
 
 define('FIFOPATH','/var/spool/asterisk/monitor/123456789.wav');
-define('APIURL','');
-define('FFMPEGCMD','ffmpeg -f s16le -ar 8000 -ac 1 -i pipe:0 -ar 16000 -ac 1 -f wav pipe:1');
+define('APIURL','http://192.168.10.6:8000/api/core/upload/');
+define('FFMPEGCMD','/mnt/recovery/usr/local/bin/ffmpeg -f s16le -ar 8000 -ac 1 -i pipe:0 -ar 16000 -ac 1 -f wav pipe:1');
 
 function io ()
 { 
@@ -47,15 +47,17 @@ function io ()
     		error_log("FFmpeg error:".$stderr);
     		return -1;
 	}
+	$apitimeout=60;
+	$apihdrs = ["Content-Type: multipart/form-data"];
 	$r = array ('data'=>'', 'info'=>0);
 	$ch = curl_init ();
         curl_setopt ($ch, CURLOPT_URL, APIURL);
         curl_setopt ($ch, CURLOPT_HEADER, false);
         curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt ($ch, CURLOPT_TIMEOUT, $timeout);
-    	curl_setopt ($ch, CURLOPT_HTTPHEADER, $hdrs);
-	curl_setopt($ch, CURLOPT_POST, true);
-	curl_setopt($ch, CURLOPT_POSTFIELDS, $postdata);
+        curl_setopt ($ch, CURLOPT_TIMEOUT, $apitimeout);
+    	curl_setopt ($ch, CURLOPT_HTTPHEADER, $apihdrs);
+	curl_setopt ($ch, CURLOPT_POST, true);
+	curl_setopt ($ch, CURLOPT_POSTFIELDS, $outputWav);
 	$r['data'] = curl_exec ($ch);
         $r['info'] = curl_getinfo ($ch);
         error_log ("[curl_info] ". $r['info']['http_code'] ."|".json_encode ($r['info']));
