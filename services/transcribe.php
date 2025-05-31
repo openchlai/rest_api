@@ -33,10 +33,11 @@ function io ()
 	$process = proc_open (FFMPEGCMD, $descriptors, $pipes);
 	if (!is_resource($process)) 
 	{
-    		error_log("Failed to start FFmpeg process.\n");
+    		error_log("Failed to start FFmpeg process");
 		return -1;
 	}
-	fwrite($pipes[0], $data);
+	$w = fwrite($pipes[0], $data);
+	error_log ($w." bytes wriiten to ffmpeg");
 	fclose($pipes[0]); 				// Important: close stdin so FFmpeg knows input has ended
 	$outputWav = stream_get_contents($pipes[1]); 	// Read the output WAV data from FFmpeg's stdout
 	fclose($pipes[1]);
