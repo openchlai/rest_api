@@ -12,6 +12,8 @@ include "../lib/XLSXbuf.php";
 include "../lib/rpc.php"; 
 //include "../lib/dialplan.php";
 
+$FN = ["sendOTP"=>1, "verifyOTP"=>1, "resetAuth"=>1, "changeAuth"=>1, "dash"=>1, "wallonly"=>1, "agent"=>1, "chan"=>1, "sup"=>1, "msg"=>1, "msg_end"=>1, "eemis"=>1, "ai"=>1]; // non-crud endpoints
+
 function copy_from_pabx ($uid) // copy from archive
 {
 	$url = $GLOBALS["RECORDING_ARCHIVE_URL"].$uid;
@@ -70,9 +72,11 @@ function muu_ ($cmd, $args) // nb: does not wait for response
 		return -1;
 	}
 	
-	$req = "GET /sync/\r\n\r\n";
+	$req = "GET /sync/ HTTP/1.1\r\n\r\n";
 
-	socket_write($sock, $req, strlen($req));
+	$ret = socket_write($sock, $req, strlen($req));
+
+	error_log ("dont wait ------------".$ret);
 }
 
 function notify ($activity, $assigned_to_id, &$o, &$p)
@@ -128,6 +132,36 @@ function _notify_ ($verb, $src, $src_uid, $src_address, $src_usr, $src_msg, $src
 	}
 	error_log (" msg rt=".$rt." | ". json_encode ($p));
 	return $rt;
+}
+
+function _ai (&$o, &$p)
+{
+	$s = file_get_contents('../caseai.json'); // demo ai case output
+	header ("HTTP/1.1 200 OK");
+        header ('Content-Type: application/json');
+	echo $s;
+	return 200;
+}
+
+function _eemis (&$o, &$p)
+{
+	error_log ("retrieve contact from eemis");
+
+	// _select (); // check if exist in db
+
+	// if () // get contact details from eemis server
+	{
+		$api_url = "https://backend.bitz-itc.com/api/webhook/eemis"; 
+		$s = "{ \"national_id\": \"B1396553\" }";
+        	$api_hdrs = ["Content-Type: application/json"];
+		$r = kurl ($api_url, 60, $s, $api_hdrs);
+	}
+
+	// rest_uri_post ("clients","_eemis", NULL, $o, $p); // create contact
+
+	header ("HTTP/1.1 200 OK");
+        header ('Content-Type: application/json');	
+	return 200;
 }
 
 function message_out (&$o, &$p)
@@ -658,7 +692,11 @@ function _request_ ()
 	}
 	
 	if ($u=="msg") return _message_in ($o, $p);
-	
+
+	if ($u=="eemis") return _eemis ($o, $p);
+
+	if ($u=="ai") return _ai ($o, $p);
+
 	if ($_SERVER["REQUEST_METHOD"]=="GET") 
 	{
 		$fo = $_GET;
@@ -800,7 +838,7 @@ function _request_ ()
 		if ($u=="cases" && $rt>200 && $rt<203)
 		{
 			error_log ("PHP - ".$p["case_id"].", ".$p["dsp_id"].", ".$p["ca_id"]);
-			// $r = muu_ ("sync",""); // wakeup sync
+			muu_ ("sync",""); // wakeup sync
 		}
 	}
 	

@@ -282,7 +282,7 @@ error_log ($s);
 	$api_opts = [];
 	if (strlen ($p["case_ref"])>0)
 	{
-		$api_url .= "update/";
+		$api_url .= "update/"; // .$p["case_ref"]."/";
 		$api_opts = [CURLOPT_CUSTOMREQUEST => 'PUT'];
 	}
 	$api_hdrs = ["Content-Type: application/json"];
