@@ -17,7 +17,7 @@ function io ()
 		error_log ("Failed to open namedpipe for reading.\n");
 		return -1;
 	}
-	error_log ("connected to asterisk sucessfully at fifo:".FIFOPATH)
+	error_log ("connected to asterisk sucessfully at fifo:".FIFOPATH);
 	$data = stream_get_contents($fifo);
 	if ($data === false || trim($data) === '') 	// Avoid empty reads 
 	{
