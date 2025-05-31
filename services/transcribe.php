@@ -63,7 +63,7 @@ function io ()
         curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
 	
 	curl_setopt ($ch, CURLOPT_VERBOSE, true);
-        $log = fopen('/tmp/curl_debug.log', 'w');
+        $log = fopen('/tmp/transcribe_curl_debug.log', 'w');
 	curl_setopt($ch, CURLOPT_STDERR, $log);
 
 	curl_setopt ($ch, CURLOPT_TIMEOUT, $apitimeout);
