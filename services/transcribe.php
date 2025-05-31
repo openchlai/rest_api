@@ -30,7 +30,7 @@ function io ()
     		1 => ['pipe', 'w'],  // stdout
 		2 => ['pipe', 'w'],  // stderr
 	];
-	$process = proc_open ($FFMPEGCMD, $descriptors, $pipes);
+	$process = proc_open (FFMPEGCMD, $descriptors, $pipes);
 	if (!is_resource($process)) 
 	{
     		error_log("Failed to start FFmpeg process.\n");
