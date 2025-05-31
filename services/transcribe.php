@@ -52,16 +52,19 @@ function io ()
 	}
 	error_log ("Transcribing ".strlen($outputWav)." bytes of 16KHz wav file");
 	$apitimeout=3600;
-	$apihdrs = ["Content-Type: multipart/form-data"];
+	// $apihdrs = ["Content-Type: multipart/form-data"];
+	$dataUri = 'data://audio/wav;base64,' . base64_encode($outputWav);
+	$cfile = new CURLFile($dataUri, 'audio/wav', 'a.wav');
+	$postFields = [ 'audio' => $cfile ];
 	$r = array ('data'=>'', 'info'=>0);
 	$ch = curl_init ();
         curl_setopt ($ch, CURLOPT_URL, APIURL);
         curl_setopt ($ch, CURLOPT_HEADER, false);
         curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt ($ch, CURLOPT_TIMEOUT, $apitimeout);
-    	curl_setopt ($ch, CURLOPT_HTTPHEADER, $apihdrs);
+    	// curl_setopt ($ch, CURLOPT_HTTPHEADER, $apihdrs);
 	curl_setopt ($ch, CURLOPT_POST, true);
-	curl_setopt ($ch, CURLOPT_POSTFIELDS, $outputWav);
+	curl_setopt ($ch, CURLOPT_POSTFIELDS, $postFields);
 	$r['data'] = curl_exec ($ch);
         $r['info'] = curl_getinfo ($ch);
         error_log ("[curl_info] ". $r['info']['http_code'] ."|".json_encode ($r['info']));
