@@ -48,7 +48,8 @@ function io ()
     		error_log("FFmpeg error:".$stderr);
     		return -1;
 	}
-	$apitimeout=60;
+	error_log ("Transcribing ".strlen($outputWav)." bytes of 16KHz wav file");
+	$apitimeout=3600;
 	$apihdrs = ["Content-Type: multipart/form-data"];
 	$r = array ('data'=>'', 'info'=>0);
 	$ch = curl_init ();
