@@ -11,7 +11,7 @@ define('FFMPEGCMD','/mnt/recovery/usr/local/bin/ffmpeg -f s16le -ar 8000 -ac 1 -
 
 function io ()
 { 
-	$fifo = fopen(FIFOPATH, 'r');
+	$fifo = fopen(FIFOPATH, 'rb');
 	if (!$fifo) 
 	{
 		error_log ("Failed to open namedpipe for reading.\n");
@@ -23,6 +23,7 @@ function io ()
 		error_log ("empty reading.\n");
 		return -1;
 	}
+	error_log (strlen($data)." bytes read");
 	$descriptors = 
 	[
 		0 => ['pipe', 'r'],  // stdin
