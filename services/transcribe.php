@@ -61,7 +61,12 @@ function io ()
         curl_setopt ($ch, CURLOPT_URL, APIURL);
         curl_setopt ($ch, CURLOPT_HEADER, false);
         curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt ($ch, CURLOPT_TIMEOUT, $apitimeout);
+	
+	curl_setopt ($ch, CURLOPT_VERBOSE, true);
+        $log = fopen('/tmp/curl_debug.log', 'w');
+	curl_setopt($ch, CURLOPT_STDERR, $log);
+
+	curl_setopt ($ch, CURLOPT_TIMEOUT, $apitimeout);
     	// curl_setopt ($ch, CURLOPT_HTTPHEADER, $apihdrs);
 	curl_setopt ($ch, CURLOPT_POST, true);
 	curl_setopt ($ch, CURLOPT_POSTFIELDS, $postFields);
@@ -70,6 +75,8 @@ function io ()
         error_log ("[curl_info] ". $r['info']['http_code'] ."|".json_encode ($r['info']));
         error_log ("[curl_result] ".$r['info']['http_code']." | ". $r['data']);
 
+	fclose ($log);
+        curl_close ($ch);
 	// todo: POST response to CRM
 }
 
