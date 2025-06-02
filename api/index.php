@@ -12,7 +12,7 @@ include "../lib/XLSXbuf.php";
 include "../lib/rpc.php"; 
 //include "../lib/dialplan.php";
 
-$FN = ["sendOTP"=>1, "verifyOTP"=>1, "resetAuth"=>1, "changeAuth"=>1, "dash"=>1, "wallonly"=>1, "agent"=>1, "chan"=>1, "sup"=>1, "msg"=>1, "msg_end"=>1, "eemis"=>1, "ai"=>1]; // non-crud endpoints
+$FN = ["sendOTP"=>1, "verifyOTP"=>1, "resetAuth"=>1, "changeAuth"=>1, "dash"=>1, "wallonly"=>1, "agent"=>1, "chan"=>1, "sup"=>1, "msg"=>1, "msg_end"=>1, "eemis"=>1, "aii"=>1]; // non-crud endpoints
 
 function copy_from_pabx ($uid) // copy from archive
 {
@@ -134,9 +134,9 @@ function _notify_ ($verb, $src, $src_uid, $src_address, $src_usr, $src_msg, $src
 	return $rt;
 }
 
-function _ai (&$o, &$p)
+function _aii (&$o, &$p)
 {
-	$s = file_get_contents('../caseai.json'); // demo ai case output
+	$s = file_get_contents('aii_demo.json'); // demo ai case output
 	header ("HTTP/1.1 200 OK");
         header ('Content-Type: application/json');
 	echo $s;
@@ -695,7 +695,7 @@ function _request_ ()
 
 	if ($u=="eemis") return _eemis ($o, $p);
 
-	if ($u=="ai") return _ai ($o, $p);
+	if ($u=="aii") return _aii ($o, $p);
 
 	if ($_SERVER["REQUEST_METHOD"]=="GET") 
 	{

@@ -21,7 +21,7 @@ function io ()
 	$data = stream_get_contents($fifo);
 	if ($data === false || trim($data) === '') 	// Avoid empty reads 
 	{
-		error_log ("empty reading.\n");
+		error_log ("empty reading.");
 		return -1;
 	}
 	error_log (strlen($data)." bytes read");
