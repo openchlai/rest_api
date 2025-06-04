@@ -72,7 +72,7 @@ function muu_ ($cmd, $args) // nb: does not wait for response
 		return -1;
 	}
 	
-	$req = "GET /sync/ HTTP/1.1\r\n\r\n";
+	$req = "GET /".$cmd."/".$args." HTTP/1.1\r\n\r\n";
 
 	$ret = socket_write($sock, $req, strlen($req));
 
@@ -370,7 +370,7 @@ function _agent (&$o)
 
 function _wallonly (&$o, &$p)
 {
-	muu ("rpt",""); // sync stats from rpt // rpty ();
+	muu_ ("rpt",""); // sync stats from rpt // rpty ();
 
         if (isset ($_GET["metrics"]))
         {
