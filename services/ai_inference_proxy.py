@@ -18,29 +18,29 @@ def wrap_raw_audio_with_wav(data, sample_rate=16000, channels=1, sampwidth=2):
 	wav_file.writeframes(data)
 	return wav_io.getvalue()
 
-def post_to_crm(uid, content_type, content_b64, url="https://demo-openchs.bitz-itc.com/helpline/api/msg/"):
+def post_to_crm(uid, content_type, content, url="https://demo-openchs.bitz-itc.com/helpline/api/msg/"):
 	status_code = 0
-	response = 0;
-	msg_id = time.time();
-	msg_ts = time.time();
+	response = "";
+	msg_id = str(time.time());
+	msg_ts = str(time.time());
 	auth_token = os.getenv('HELPLINE_AUTH_TOKEN')
-	o = {
+	jo = {
 		"channel":"aii",
-		"session_id":uid,
+		"session_id":uid.decode('utf-8'),
 		"message_id":msg_id,
 		"timestamp":msg_ts,
 		"from":"asterisk",
 		"mime":content_type,
-		"message":content_b64 
+		"message":base64.b64encode(content).decode('utf-8')
 	}
-	s = json.dumps(o)
+	s = json.dumps(jo)
 	buffer = io.BytesIO()
 	curl = pycurl.Curl()
 	curl.setopt(curl.URL, url)
 	curl.setopt(pycurl.VERBOSE, True)
 	curl.setopt(pycurl.HTTPHEADER, ["Content-Type: application/json",'Accept: application/json','User-Agent: curl/8.5.0',f"Authorization: Bearer {auth_token}"])
-	curl.setopt(c.POST, 1)
-	curl.setopt(c.POSTFIELDS, s)
+	curl.setopt(curl.POST, 1)
+	curl.setopt(curl.POSTFIELDS, s)
 	curl.setopt(curl.WRITEDATA, buffer)
 	try:
 		curl.perform()
@@ -87,8 +87,7 @@ def post_to_ai(uid, data, url='http://192.168.10.6:8000/api/core/upload/'):
 		if "response" in o:
 			content_type = "application/json"
 			content = o["response"].encode().decode('unicode_escape') # unesc
-	content_ = base64.b64encode(content.encode("utf-8")) # base64 encode
-	post_crm_msg (uid, content_type, content_)
+	post_to_crm(uid, content_type, content.encode("utf-8"))
 
 def handle_client(conn, addr):
 	print(f"[{os.getpid()}] Handling connection from {addr}")
