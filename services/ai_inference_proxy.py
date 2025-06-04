@@ -4,6 +4,9 @@ import os
 import pycurl
 import io
 import wave
+import json
+import base64
+import time
 
 def wrap_raw_audio_with_wav(data, sample_rate=16000, channels=1, sampwidth=2):
 	# Wraps raw 16-bit signed PCM data with a WAV header
@@ -15,12 +18,50 @@ def wrap_raw_audio_with_wav(data, sample_rate=16000, channels=1, sampwidth=2):
 	wav_file.writeframes(data)
 	return wav_io.getvalue()
 
-def send_post_request(data, url='http://192.168.10.6:8000/api/core/upload/'):
+def post_to_crm(uid, content_type, content_b64, url="https://demo-openchs.bitz-itc.com/helpline/api/msg/"):
+	status_code = 0
+	response = 0;
+	msg_id = time.time();
+	msg_ts = time.time();
+	auth_token = os.getenv('HELPLINE_AUTH_TOKEN')
+	o = {
+		"channel":"aii",
+		"session_id":uid,
+		"message_id":msg_id,
+		"timestamp":msg_ts,
+		"from":"asterisk",
+		"mime":content_type,
+		"message":content_b64 
+	}
+	s = json.dumps(o)
+	buffer = io.BytesIO()
+	curl = pycurl.Curl()
+	curl.setopt(curl.URL, url)
+	curl.setopt(pycurl.VERBOSE, True)
+	curl.setopt(pycurl.HTTPHEADER, ["Content-Type: application/json",'Accept: application/json','User-Agent: curl/8.5.0',f"Authorization: Bearer {auth_token}"])
+	curl.setopt(c.POST, 1)
+	curl.setopt(c.POSTFIELDS, s)
+	curl.setopt(curl.WRITEDATA, buffer)
+	try:
+		curl.perform()
+		status_code = curl.getinfo(pycurl.RESPONSE_CODE)
+		response = buffer.getvalue().decode('utf-8')
+		print(f"[Child {os.getpid()}] POST sent to CRM, status: {status_code} {response}")
+	except pycurl.error as e:
+		print(f"[Child {os.getpid()}] Curl error to CRM: {e}")
+	finally:
+		curl.close()
+
+def post_to_ai(uid, data, url='http://192.168.10.6:8000/api/core/upload/'):
+	status_code = 0
+	response = ""
+	data = wrap_raw_audio_with_wav(data)
 	with open("aii.wav", "wb") as f:
 		f.write(data)
 	buffer = io.BytesIO()
 	curl = pycurl.Curl()
 	curl.setopt(curl.URL, url)
+	curl.setopt(pycurl.VERBOSE, True)
 	curl.setopt(pycurl.HTTPHEADER, [
 	'Accept: application/json',
 	'User-Agent: curl/8.5.0'
@@ -28,8 +69,8 @@ def send_post_request(data, url='http://192.168.10.6:8000/api/core/upload/'):
 	# curl.setopt(pycurl.USERAGENT, "curl/8.5.0")
 	# curl.setopt(curl.POSTFIELDS, bytes(data))
 	curl.setopt(pycurl.HTTPPOST, [('audio', (pycurl.FORM_BUFFER,'audio.wav', pycurl.FORM_BUFFERPTR, data, pycurl.FORM_CONTENTTYPE,'audio/wav'))])
+	# todo: append uid to form-data
 	curl.setopt(curl.WRITEDATA, buffer)
-	curl.setopt(pycurl.VERBOSE, True)
 	try:
 		curl.perform()
 		status_code = curl.getinfo(pycurl.RESPONSE_CODE)
@@ -39,25 +80,41 @@ def send_post_request(data, url='http://192.168.10.6:8000/api/core/upload/'):
 		print(f"[Child {os.getpid()}] Curl error: {e}")
 	finally:
         	curl.close()
+	content_type = "text/plain"
+	content = "Error: AI service returned an error"
+	if status_code == 200:
+		o = json.loads(json_string)
+		if "response" in o:
+			content_type = "application/json"
+			content = o["response"].encode().decode('unicode_escape') # unesc
+	content_ = base64.b64encode(content.encode("utf-8")) # base64 encode
+	post_crm_msg (uid, content_type, content_)
 
 def handle_client(conn, addr):
 	print(f"[{os.getpid()}] Handling connection from {addr}")
-	buffer = bytearray()
+	buffer = [bytearray(),bytearray()]
+	b=0
 	try:
 		while True:
 			data = conn.recv(1024)
 			if not data:
 				print(f"[{os.getpid()}] Connection closed by {addr}")
 				break
-			buffer.extend(data)
-			# print(f"[{os.getpid()}] Received")
-			# conn.sendall(data)  # Echo back
+			if b == 1:
+				buffer[b].extend(data);
+				continue
+			for index, byte in enumerate(data):
+				if byte == 13:
+					print(f"Found ASCII 13 at index {index}")
+					b=1
+					continue
+				buffer[b].append(byte)
 	except Exception as e:
 		print(f"[{os.getpid()}] Error: {e}")
 	finally:
 		print(f"[Child {os.getpid()}] Final buffer size: {len(buffer)} bytes")
 		conn.close()
-		send_post_request(wrap_raw_audio_with_wav(buffer))
+		post_to_ai(buffer[0], buffer[1])
 
 def start_server(host='127.0.0.1', port=8300):
 	server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
