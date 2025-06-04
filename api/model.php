@@ -1977,6 +1977,12 @@ $activities_subs =
 ["messages","","100",           "src","src","src_callid","src_callid"]
 ];
 
+$activities_call_subs =
+[
+//["dispositions","","20",      "src_address","src_address"],
+["messages","","100",           "src_callid","src_uid2"]
+];
+
 $activities_case_subs = 
 [
 ["cases","","",		"id","case_id"], // recursive!
