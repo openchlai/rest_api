@@ -79,61 +79,6 @@ function muu_ ($cmd, $args) // nb: does not wait for response
 	error_log ("dont wait ------------".$ret);
 }
 
-function notify ($activity, $assigned_to_id, &$o, &$p)
-{
-	$p_ = $p;
-	$ts = gettimeofday (true);
-	$p_["action"] = "notif";
-	$p_["activity"] = $activity;
-	$p_["assigned_to_id"] = $assigned_to_id;
-	if (!isset ($o["src_ts"]) || strlen ($o["src_ts"])<1) $p_["src_ts"]=$ts;
-	if (!isset ($o["src"]) || strlen ($o["src"])<1) $p["src"]=$p_["activity_"];
-	if (!isset ($o["src_uid"]) || strlen ($o["src_uid"])<1) $p_["src_uid"]= (_val_id()+_rands(4,"num"));
-	error_log ("[notify](".$activity.") o:".json_encode ($o));
-	error_log ("[notify](".$activity.") p:".json_encode ($p_));
-	rest_uri_post ("activities", "", NULL, $o, $p_);
-	// ati -> notify client ui to update notif list
-}
-
-function _notify_ ($verb, $src, $src_uid, $src_address, $src_usr, $src_msg, $src_vector, $m=1)
-{
-	$o=[];
-	$p=[];
-	if (strlen($src_uid)<1) $src_uid = _val_id()."-"._rands (9,"num");
-	$o["src_ts"] = _val_id ();
-	$o["src"] = $src;
-	$o["src_uid"] = $src_uid;
-	$o["src_address"] = $src_address;
-	$o["src_usr"] = $src_usr;
-	$o["src_msg"] = $src_msg; 
-	$o["src_vector"] = $src_vector;
-	$p["gateway_msg_id"] = _val_id()."-"._rands (9,"num");
-	$p["gateway_session_id"] = $o["src_uid"];
-	$o["i_"]=0;
-	$rt = -1; //rest_uri_post ("messages", "", NULL, $o, $p);
-	if ($rt==201) 
-	{
-		$msg = $o["src_msg"];
-		$msg = preg_replace ('/[[:^print:]]/', ' ', $msg); 
-		$msg = str_replace ([' ', '&', '<', '>', "\r","\n","\t"], ['_', '', '', '', '', '', ''], $msg); 
-		if (strlen ($msg)>60) $msg = substr ($msg,0,60)."..."; // truncate to fit in notif 
-		$s = $verb."src=".$o['src']."&address=".$o['src_address']."&id=".$o['src_uid']."&msg=".$msg."&agent=".$o["src_usr"];
-		muu ("ati", $s); // post to notif_queue
-		
-		if ($m==0) return $rt;
-		
-		$aa = [];
-		$fo = [];
-		$rt = rest_uri_get ("messages", "", $p["msg_id"], $fo, $p, $aa);
-		if ($rt==200)
-		{
-			return rest_uri_response ("messages", "", $p["msg_id"], $o, $p, $aa, 201);
-		}
-	}
-	error_log (" msg rt=".$rt." | ". json_encode ($p));
-	return $rt;
-}
-
 function _aii (&$o, &$p)
 {
 	$s = file_get_contents('aii_demo.json'); // demo ai case output
@@ -215,19 +160,19 @@ function _message_in (&$o, &$p)
 	$o_["src_ts"] = $o["timestamp"];
 	$o_["src_vector"] = "1";
 	$o_['src_mime'] = $o["mime"];
-        if ($o_['src']	=='safepal') $o_['src_mime'] = "application/json";
+        if ($o_['src']=='safepal') $o_['src_mime'] = "application/json";
 	// $o_["gateway_msg_id"] = $o["message_id"];
 	// $o_["gateway_session_id"] = $o["session_id"];
 	$rt = rest_uri_post ("messages", "", NULL, $o_, $p);
 	if ($rt==201) 
 	{
-
 		$msg = $o_["src_msg"];
 		$msg = preg_replace ('/[[:^print:]]/', ' ', $msg); 
 		$msg = str_replace ([' ', '&', '<', '>', "\r","\n","\t"], ['_', '', '', '', '', '', ''], $msg); 
 		if (strlen ($msg)>30) $msg = substr ($msg,0,30)."..."; // trunccate to fit in notif 
 		// $s = "msg?src=".$o_['src']."&address=".$o_['src_address']."&id=".$o_['src_uid']."&msg=".$msg."&";
 		$s = "msg?ctx=".$o_['src']."&cid=".$o_['src_address']."&chan=".$o_['src_callid']."&payload=".$msg."&";
+		if ($o_["src"]=="aii") $s .= "exten=*&"; // dont agtk!
 		muu ("ati", $s); // post to notif_queue
 
 		$aa = [];
