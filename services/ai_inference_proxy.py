@@ -33,7 +33,8 @@ def send_post_request(data, url='http://192.168.10.6:8000/api/core/upload/'):
 	try:
 		curl.perform()
 		status_code = curl.getinfo(pycurl.RESPONSE_CODE)
-		print(f"[Child {os.getpid()}] POST sent, status: {status_code}")
+		response = buffer.getvalue().decode('utf-8')
+		print(f"[Child {os.getpid()}] POST sent, status: {status_code} {response}")
 	except pycurl.error as e:
 		print(f"[Child {os.getpid()}] Curl error: {e}")
 	finally:
