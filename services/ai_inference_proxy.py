@@ -7,6 +7,9 @@ import wave
 import json
 import base64
 import time
+import requests
+import logging
+import sys
 
 def wrap_raw_audio_with_wav(data, sample_rate=16000, channels=1, sampwidth=2):
 	# Wraps raw 16-bit signed PCM data with a WAV header
@@ -16,7 +19,8 @@ def wrap_raw_audio_with_wav(data, sample_rate=16000, channels=1, sampwidth=2):
 	wav_file.setsampwidth(sampwidth)  # 2 bytes = 16 bits
 	wav_file.setframerate(sample_rate)
 	wav_file.writeframes(data)
-	return wav_io.getvalue()
+	wav_io.seek(0)
+	return wav_io #.getvalue()
 
 def post_to_crm(uid, content_type, content, url="https://demo-openchs.bitz-itc.com/helpline/api/msg/"):
 	status_code = 0
@@ -52,42 +56,55 @@ def post_to_crm(uid, content_type, content, url="https://demo-openchs.bitz-itc.c
 	finally:
 		curl.close()
 
+def process_chunk(uid,chunk):
+	print("Received chunk:--------------------------------------------")
+	print(chunk.decode('utf-8'))
+	content_type = "text/plain"
+	content = "Ai service Error"
+	try:
+		o = json.loads(chunk)
+		content = chunk # o.encode().decode('unicode_escape')
+		content_type = "application/json"	
+	except Exception as e:
+		print(f"json load error {e}")
+	post_to_crm(uid, content_type, content)
+
 def post_to_ai(uid, data, url='http://192.168.10.6:8000/api/core/upload/'):
-	status_code = 0
-	response = ""
 	data = wrap_raw_audio_with_wav(data)
 	with open("aii.wav", "wb") as f:
-		f.write(data)
-	buffer = io.BytesIO()
-	curl = pycurl.Curl()
-	curl.setopt(curl.URL, url)
-	curl.setopt(pycurl.VERBOSE, True)
-	curl.setopt(pycurl.HTTPHEADER, [
-	'Accept: application/json',
-	'User-Agent: curl/8.5.0'
-	])
-	# curl.setopt(pycurl.USERAGENT, "curl/8.5.0")
-	# curl.setopt(curl.POSTFIELDS, bytes(data))
-	curl.setopt(pycurl.HTTPPOST, [('audio', (pycurl.FORM_BUFFER,'audio.wav', pycurl.FORM_BUFFERPTR, data, pycurl.FORM_CONTENTTYPE,'audio/wav'))])
-	# todo: append uid to form-data
-	curl.setopt(curl.WRITEDATA, buffer)
+		f.write(data.getvalue())
+	logger = logging.getLogger()
+	logger.setLevel(logging.DEBUG)
+	handler = logging.StreamHandler(sys.stderr)
+	formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+	handler.setFormatter(formatter)
+	logger.addHandler(handler)
+	f=0
 	try:
-		curl.perform()
-		status_code = curl.getinfo(pycurl.RESPONSE_CODE)
-		response = buffer.getvalue().decode('utf-8')
-		print(f"[Child {os.getpid()}] POST sent, status: {status_code} {response}")
+		files = {  'audio': ('audio.wav', data, 'audio/wav') }
+		custom_headers = {'Accept-Encoding': ''}
+		response = requests.post(url, files=files, stream=True, headers=custom_headers)
+		print(f"REQUEST-----------------------{len(data.getvalue())} bytes")
+		with open("aii.post","wb") as p:
+			p.write(response.request.body)
+		for header, value in response.request.headers.items():
+            		print(f"{header}: {value}")
+		print("RESPONSE----------------------")
+		for header, value in response.headers.items():
+            		print(f"{header}: {value}")
+		if (response.status_code==200 and response.headers.get('Transfer-Encoding')=="chunked"):
+			for chunk in response.iter_content(chunk_size=None):  # Let requests decide chunk size (based on server)
+				if chunk:  # Filter out keep-alive chunks
+					f=f+1
+					process_chunk(uid,chunk)
+			print(f"{f} chunks recieved")
 	except pycurl.error as e:
-		print(f"[Child {os.getpid()}] Curl error: {e}")
-	finally:
-        	curl.close()
-	content_type = "text/plain"
-	content = "Error: AI service returned an error"
-	if status_code == 200:
-		o = json.loads(json_string)
-		if "response" in o:
-			content_type = "application/json"
-			content = o["response"].encode().decode('unicode_escape') # unesc
-	post_to_crm(uid, content_type, content.encode("utf-8"))
+		print(f"post to ai exception")
+	if (f==0):
+		print(f"post failed {response.status_code}-------------------------")	
+		content_type = "text/plain"
+		content = f"Error: AI service invalid response | {response.status_code}"
+		post_to_crm(uid, content_type, content.encode("utf-8"))
 
 def handle_client(conn, addr):
 	print(f"[{os.getpid()}] Handling connection from {addr}")
