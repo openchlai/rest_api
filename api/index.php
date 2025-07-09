@@ -88,25 +88,33 @@ function _aii (&$o, &$p)
 	return 200;
 }
 
-function _eemis (&$o, &$p)
+function national_registry (&$o, &$p)
 {
-	error_log ("retrieve contact from eemis");
-
-	// _select (); // check if exist in db
-
-	// if () // get contact details from eemis server
+	if (strlen($o["national_id_"])<1) return -1;
+	$id=NULL;
+	$dup_ = array ("contacts","","dup","national_id","national_id_",NULL, "id"); // todo: use hidden field to match same contact everytime
+	_dup ($dup_, $o, $p);
+	if (isset($p["contact_id"])) $id=$p["contact_id"];
+	error_log ("national_register: [o] ".json_encode($p));
+	error_log ("national_register: [p] ".json_encode($o));
+	$api_url = "https://backend.bitz-itc.com/api/webhook/eemis"; 
+	$api_hdrs = ["Content-Type: application/json"];
+	$api_body = "{ \"national_id\": \"B1396553\" }";
+	$r = kurl ($api_url, 60, $api_body, $api_hdrs);
+	$a = json_decode ($r["data"], true);
+	if ($a && isset($a["data"]) && isset($a["data"]["data"]))
 	{
-		$api_url = "https://backend.bitz-itc.com/api/webhook/eemis"; 
-		$s = "{ \"national_id\": \"B1396553\" }";
-        	$api_hdrs = ["Content-Type: application/json"];
-		$r = kurl ($api_url, 60, $s, $api_hdrs);
+		$da = $a["data"]["data"];
+		$o["lname"] = $da["surname"];
+		$o["fname"] = $da["first_name"];
+		//$o["phone"] = $da["phone"];
+		//$o["phone2"] = $da["home_phone"];
+		$o["email"] = $da["email"];
+		$o["national_id"] = $da["passport_no"];
+		rest_uri_post ("contacts","", $id, $o, $p); // create/update contact
+		if (isset($p["contact_id"])) $id = $p["contact_id"]; 
 	}
-
-	// rest_uri_post ("clients","_eemis", NULL, $o, $p); // create contact
-
-	header ("HTTP/1.1 200 OK");
-        header ('Content-Type: application/json');	
-	return 200;
+	return $id;
 }
 
 function message_out (&$o, &$p)
@@ -638,14 +646,13 @@ function _request_ ()
 	
 	if ($u=="msg") return _message_in ($o, $p);
 
-	if ($u=="eemis") return _eemis ($o, $p);
-
 	if ($u=="aii") return _aii ($o, $p);
 
 	if ($_SERVER["REQUEST_METHOD"]=="GET") 
 	{
 		$fo = $_GET;
 		$rt = 200;
+		if ($id=="-1") $o = $fo;
 	
 		if ($u=="calls" && isset ($_GET["dash_period"])) 
 		{
@@ -670,8 +677,6 @@ function _request_ ()
 				$fo["type"] = $case_count_yaxis[$_GET["dash_period"]][1];
 			}
 		}
-
-		if ($id=="-1") $o = $fo;
 
 		if ($u=="activities" && $suffix=="_case" && $id=="-1" && isset($o["src_msg"])) {$o["case_id"] = explode ("-", $o["src_msg"])[1];}
 	}
@@ -736,7 +741,13 @@ function _request_ ()
 			//$p["gateway_session_id"] = $o["src_uid"];
 			//$p["gateway_msg_id"] = $o["src"]."-".$tv["sec"]."-".$tv["usec"]; 
 		}
-		
+
+		if ($u=="clients" && isset($o["national_id_"]) && national_registry($o, $p)<1)
+		{
+			echo "{}";
+			return 200;
+		}
+					
 		$o['i_']=0;
 		$rt = rest_uri_post ($u, $suffix, $id, $o, $p);
 
