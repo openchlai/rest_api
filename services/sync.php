@@ -1,14 +1,14 @@
 <?php
-include "/var/www/html/helpline/config.php"; //
+include "/var/www/html/test/config.php"; //
 
 $db = mysqli_connect (null, "voiceapps", null, THE_DB_NAME, null, THE_DB_SOCK) or die ("Could Not connect to Database Server.");
 $db2 = mysqli_connect (null, "voiceapps",  null, THE_DB_NAME, null, THE_DB_SOCK) or die ("Could Not connect to Database Server.");
 
-include "/var/www/html/helpline/api/model.php";
-include "/var/www/html/helpline/api/model_k.php";
-include "/var/www/html/helpline/lib/rest.php";
-include "/var/www/html/helpline/lib/session.php";
-include "/var/www/html/helpline/lib/rpc.php";
+include "/var/www/html/test/api/model.php";
+include "/var/www/html/test/api/model_k.php";
+include "/var/www/html/test/lib/rest.php";
+include "/var/www/html/test/lib/session.php";
+include "/var/www/html/test/lib/rpc.php";
 
 function model_k ($u, $suffix)
 {
@@ -245,7 +245,7 @@ $cases_ceemis_subs =
 
 function case_sync (&$caid)
 {
-	$aa = ["w"=> ("WHERE activity IN (1,2,3) && syncts<1 && id>".$caid), "sort"=>"ORDER BY id", "lim"=>"LIMIT 1", "s"=>"" ];
+	$aa = ["w"=> ("WHERE case_dept=1 && activity IN (1,2,3) && syncts=0 && id>".$caid), "sort"=>"ORDER BY id", "lim"=>"LIMIT 1", "s"=>"" ];
 	$av = [];
         $res = _select ("case_activities", $aa, $av);
         if ($res==NULL) return -1;

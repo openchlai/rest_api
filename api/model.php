@@ -1526,6 +1526,7 @@ $case_activities_def = array
         array ("h","",				"4","2","","",   "case_activities","HOUR(FROM_UNIXTIME(created_on))","",   "Hour",""), 
 
         array ("syncts","",                     "3","3","","",  "","","",    "Sync Timestamp",""),
+	array ("case_dept","",                  "1","2","","",  "","","",    "Department",""),
 );
 
 
@@ -1652,7 +1653,7 @@ $reporters_api = array				// update reporter
 (
 	array ("reporters","",     "aub"),
 	array ("reporters","",     "dup","id","reporter_id", NULL, "id", "contact_id:contact_id"), // get contact_id
-	array ("cases","",         "dup","id","case_id", NULL, "id"),
+	array ("cases","",         "dup","id","case_id", NULL, "id","dept"),
         array ("contacts","",      "include"), 	// update contact
         array ("contacts","_dup",  "include"),
         array ("reporters","",""),
@@ -1669,13 +1670,13 @@ $reporters_uuid_api = array			// create reporter
 (
 	array ("contacts","","include"),	// create if does not exist -- used by gateway
 	array ("contacts","_dup","include"),
-	array ("cases","","dup","id","case_id", NULL, "id"),
+	array ("cases","","dup","id","case_id", NULL, "id","dept"),
 	array ("reporters","_uuid",""),
 );
 
 $reporters_none_api = array
 (
-	array ("cases","","dup","id","case_id", NULL, "id"),
+	array ("cases","","dup","id","case_id", NULL, "id","dept"),
 	array ("reporters","_none",""),
 	array ("reporters","","params", "reporter_uuid_id","reporter_none_id")
 );
@@ -1685,7 +1686,7 @@ $reporters_isclient_api = array 		// create|delete client from a reporter
 	array ("reporters","","aub"),
 	array ("reporters","","dup","id","reporter_isclient_id", NULL, "id:reporter_isclient_id","contact_id:contact_id"), // get contact_id
 	array ("contacts","_dup","include"),
-	array ("cases","","dup","id","case_id",NULL, "id", "case_category:case_category", "priority", "status"), 
+	array ("cases","","dup","id","case_id",NULL, "id", "case_category:case_category", "priority", "status","dept"), 
 	array ("clients","","dup","is_reporter_id","reporter_isclient_id", NULL, "id"), 	 // check if client_id already in case
         array ("clients","","params", "activity_ref","reporter_isclient_id", "detail","contact_fullname", "is_reporter_id","reporter_isclient_id"),
 	array ("clients","",""),
@@ -1735,7 +1736,7 @@ $clients_api = array
 	array ("categories","","dup","id","household_id",NULL, "id:household_id", "fullname:household"),
 	array ("categories","","dup","id","household_head_occupation_id",NULL, "id:household_head_occupation_id", "fullname:household_head_occupation"),
 	array ("categories","","dup","id","not_in_school_id",NULL, "id:not_in_school_id", "fullname:not_in_school"),
-	array ("cases",""     ,"dup","id","case_id",NULL, "id", "case_category:case_category", "priority", "status"),
+	array ("cases",""     ,"dup","id","case_id",NULL, "id", "case_category:case_category", "priority", "status","dept"),
 
 	array ("clients","","params", "case_id_","case_id"),
 	array ("clients","",""),
@@ -1787,7 +1788,7 @@ $perpetrators_api = array
 	array ("categories","","dup","id","health_id",NULL, "id:health_id", "fullname:health"),
 	array ("categories","","dup","id","employment_id",NULL, "id:employment_id", "fullname:employment"),
 	array ("categories","","dup","id","spouse_profession_id",NULL, "id:spouse_profession_id", "fullname:spouse_profession"),
-	array ("cases","","dup", "id","case_id", NULL, "id","case_category:case_category", "priority", "status"),			
+	array ("cases","","dup", "id","case_id", NULL, "id","case_category:case_category", "priority", "status","dept"),			
 		
 	array ("perpetrators","","params", "case_id_","case_id"),
 	array ("perpetrators","",""),
@@ -1812,7 +1813,7 @@ $perpetrators_del_api = array
 $attachments_api = array
 (
 	array ("files","","dup","id","file_id",NULL,"id","name","mime","size","uploadstatus","movestatus","channels","sample_rate","duration"),
-	array ("cases","","dup","id","case_id",NULL,"id"),		
+	array ("cases","","dup","id","case_id",NULL,"id","dept"),		
 	array ("attachments","","params", "case_id_","case_id"),	
 	array ("attachments","","aub"),	
 	array ("attachments","",""),	
@@ -1874,7 +1875,7 @@ $cases_api = array
         array ("cases","","aub"),
 	array ("cases","",""), 
 	array ("cases","cases","agg4",  "id","case_id",NULL,  "id","case_id"), 	// update dt
-	array ("cases","","dup", "id","case_id", NULL, "id:case_id_","case_category:case_category", "priority", "status"),			
+	array ("cases","","dup", "id","case_id", NULL, "id:case_id_","case_category:case_category", "priority", "status","dept"),			
 
 	// clients
 	// perpetrators

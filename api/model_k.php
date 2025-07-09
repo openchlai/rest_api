@@ -969,6 +969,7 @@ $case_activities_k=array("id"=>0,
 "hr"=>47,
 "h"=>48,
 "syncts"=>49,
+"case_dept"=>50,
 NULL);
 
 
