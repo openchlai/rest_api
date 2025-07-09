@@ -1463,7 +1463,9 @@ $cases_def = array
        // array ("uuid","",                  "1","2","","", "","","",        "UUID",""),
 
 	array ("ref","theirref",                  "3","2","","", "","","",        "Reference",""),
-	array ("src_callid","",			   "3","2","","", "","","", 	  "Session ID","")
+	array ("src_callid","",			   "3","2","","", "","","", 	  "Session ID",""),
+
+	array ("dept","",                    "3","2","","", "","","",       "Department","")
 );
 
 $case_activities_def = array 

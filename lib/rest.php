@@ -1792,7 +1792,7 @@ function rest_uri_response ($u, $suffix, $id, &$o, &$p, &$aa, $rt)
 	 
 	if ($i==0) echo ', "'.$u.$suffix.'_no_data":[[]]'."\n";
 	
-	echo ",".$aa["f"]."\n";
+	if (isset($aa["f"])) echo ",".$aa["f"]."\n";
 	
 	if ($id===NULL) echo ",".$aa["ctx"]."\n";
 	

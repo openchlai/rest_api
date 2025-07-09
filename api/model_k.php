@@ -916,6 +916,7 @@ $cases_k=array("id"=>0,
 "mn_closed"=>118,
 "ref"=>119,
 "src_callid"=>120,
+"dept"=>121,
 NULL);
 
 $case_activities_k=array("id"=>0,

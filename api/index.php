@@ -112,7 +112,11 @@ function national_registry (&$o, &$p)
 		$o["email"] = $da["email"];
 		$o["national_id"] = $da["passport_no"];
 		rest_uri_post ("contacts","", $id, $o, $p); // create/update contact
-		if (isset($p["contact_id"])) $id = $p["contact_id"]; 
+		if (isset($p["contact_id"])) 
+		{
+			$id = $p["contact_id"];
+			_dup ($GLOBALS["contacts_dup_api"][0], $o, $p);
+		}	
 	}
 	return $id;
 }
@@ -742,9 +746,11 @@ function _request_ ()
 			//$p["gateway_msg_id"] = $o["src"]."-".$tv["sec"]."-".$tv["usec"]; 
 		}
 
-		if ($u=="clients" && isset($o["national_id_"]) && national_registry($o, $p)<1)
+		if ($u=="clients" && isset($o["national_id_"]))
 		{
-			echo "{}";
+			$aa = [];
+			national_registry($o, $p);
+			rest_uri_response ("clients", "", "-1", $o, $p, $aa, 200);
 			return 200;
 		}
 					
