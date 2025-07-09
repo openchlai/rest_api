@@ -92,31 +92,30 @@ function national_registry (&$o, &$p)
 {
 	if (strlen($o["national_id_"])<1) return -1;
 	$id=NULL;
-	$dup_ = array ("contacts","","dup","national_id","national_id_",NULL, "id"); // todo: use hidden field to match same contact everytime
-	_dup ($dup_, $o, $p);
-	if (isset($p["contact_id"])) $id=$p["contact_id"];
+	//$dup_ = array ("contacts","","dup","national_id","national_id_",NULL, "id"); // todo: use hidden field to match same contact everytime
+	//_dup ($dup_, $o, $p);
+	//if (isset($p["contact_id"])) $id=$p["contact_id"];
 	error_log ("national_register: [o] ".json_encode($p));
 	error_log ("national_register: [p] ".json_encode($o));
 	$api_url = "https://backend.bitz-itc.com/api/webhook/eemis"; 
 	$api_hdrs = ["Content-Type: application/json"];
-	$api_body = "{ \"national_id\": \"B1396553\" }";
+	$api_body = "{ \"national_id\": \"".$o["national_id_"]."\" }";
 	$r = kurl ($api_url, 60, $api_body, $api_hdrs);
 	$a = json_decode ($r["data"], true);
-	if ($a && isset($a["data"]) && isset($a["data"]["data"]))
+	if ($a && isset($a["national_id"])) //  && isset($a["data"]) && isset($a["data"]["data"]))
 	{
-		$da = $a["data"]["data"];
-		$o["lname"] = $da["surname"];
-		$o["fname"] = $da["first_name"];
-		//$o["phone"] = $da["phone"];
-		//$o["phone2"] = $da["home_phone"];
-		$o["email"] = $da["email"];
-		$o["national_id"] = $da["passport_no"];
-		rest_uri_post ("contacts","", $id, $o, $p); // create/update contact
-		if (isset($p["contact_id"])) 
-		{
-			$id = $p["contact_id"];
-			_dup ($GLOBALS["contacts_dup_api"][0], $o, $p);
-		}	
+		$kk = array_keys ($a);
+		$kn = count($kk);
+		for ($i=0; $i<$kn; $i++) $o[("contact_".$kk[$i])] = $a[$kk[$i]];
+		$o["contact_id"] = 0;
+		$o["contact_fullname"] = $o["contact_lname"]." ".$o["contact_fname"];
+		//rest_uri_post ("contacts","", $id, $a, $p); // create/update contact
+		//if (isset($p["contact_id"])) 
+		//{
+		//	$id = $p["contact_id"];
+		//	_dup ($GLOBALS["contacts_dup_api"][0], $o, $p);
+		//}	
+		$id=1;
 	}
 	return $id;
 }
@@ -749,8 +748,14 @@ function _request_ ()
 		if ($u=="clients" && isset($o["national_id_"]))
 		{
 			$aa = [];
-			national_registry($o, $p);
-			rest_uri_response ("clients", "", "-1", $o, $p, $aa, 200);
+			$id = national_registry($o, $p);
+			echo "{";
+			if ($id>0)
+			{
+				error_log ("[national reg]".json_encode($o));
+				rest_uri_response ("clients", "", "-1", $o, $p, $aa, 0);
+			}
+			echo "}";
 			return 200;
 		}
 					
