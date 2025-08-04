@@ -27,13 +27,13 @@ $RESOURCES = array
 	//"voiceprompts"=>	array ("voiceprompt","",	"3","0","0",	"VoicePrompt", 		"","",			""),	
 	//"voicefiles"=>	array ("voicefile","",		"3","0","0",	"VoiceFile", 		"pos ASC","",		""),
 	"categories"=>          array ("category","",           "3","0","0",    "Category",             "level,name","",	""), 
-        "subcategories"=>       array ("category","subcategory","3","0","0",    "Category",             "level,name","",	"categories"), 
+	"subcategories"=>       array ("category","subcategory","3","0","0",    "Category",             "level,name","",	"categories"), 
 
 	"files"=>		array ("file","",		"1","0","0",	"File", 		"","",			""),
 	"calls"=>		array ("chan","",		"0","0","0",	"Call", 		"","",			""), 
 	"chanss"=>		array ("chan_ss","",		"0","0","0",	"Agent Session", 	"","",			""), 
-        "pmessages"=>		array ("pmsg","",		"1","0","0",	"Message Session",	"id DESC","",		""), 
-        "messages"=>		array ("msg","",		"1","0","0",	"Message", 		"id DESC","",		""), 
+     "pmessages"=>		array ("pmsg","",		"1","0","0",	"Message Session",	"id DESC","",		""), 
+     "messages"=>		array ("msg","",		"1","0","0",	"Message", 		"id DESC","",		""), 
 
 	"activities"=>		array ("activity","",		"3","0","0",	"Activity", 		"src_ts DESC","",	""), 
 	"dispositions"=>	array ("disposition","dsp",	"3","0","0",	"Dispositions", 	"created_on DESC","",	""), 
@@ -1933,8 +1933,8 @@ $dispositions_unk_api = array
 (
 	array ("categories","","dup","id","sex_id",NULL, "id:reporter_sex_id", "fullname:reporter_sex"),
 	array ("categories","","dup","id","age_group_id",NULL, "id:reporter_age_group_id", "fullname:reporter_age_group"),
-        array ("dispositions","","dup", "src","src", "src_uid","src_uid", "reporter_contact_id"," 0", "case_id"," 0", "disposition_id",":!=: ".$DISPOSITION_ID_CONTACT_NEW, NULL,"id"), // get disposition_id (if exists)
-        array ("dispositions","_include","include"),
+     array ("dispositions","","dup", "src","src", "src_uid","src_uid", "reporter_contact_id"," 0", "case_id"," 0", "disposition_id",":!=: ".$DISPOSITION_ID_CONTACT_NEW, NULL,"id"), // get disposition_id (if exists)
+     array ("dispositions","_include","include"),
 	array ("dispositions","","params", "dsp_unk_id","dsp_id")
 );
 
@@ -2005,6 +2005,7 @@ $contacts_disposition_subs =
 $reporters_uuid_subs = 
 [
 ["cases","","",		"id","case_id"], // recursive!
+["contacts","","",		"id","contact_id"]
 ];
 
 $reporters_none_subs =
@@ -2030,7 +2031,7 @@ $cases_subs =
 ["attachments","","",	"case_id_","case_id"],
 ["case_activities","","","case_id","case_id"],
 ["dispositions","","",	"id","dsp_id"],
-["reporters","_uuid","",     "id","reporter_uuid_id"],
+// ["reporters","_uuid","",     "id","reporter_uuid_id"],
 ];
 
 $case_activities_subs = 
@@ -2251,11 +2252,12 @@ $src_enum =
 "sms"=>["sms","SMS","Phone Number","1"],
 "WENI"=>["WENI","Chat","Username",""],
 "FACEBOOK"=>["FACEBOOK","Chat","Username",""],
-"WHATSAPP"=>["WHATSAPP","Chat","Phone Number","1"],
+"whatsApp"=>["whatsApp","Chat","Phone Number","1"],
 "TWITTER"=>["TWITTER","Chat","Username",""],
 "safepal"=>["safepal","Safepal","Username",""],
 "webform"=>["webform","Web From","session",""],
 "cmis"=>["cmis","CMIS","session",""],
+"ceemis"=>["ceemis","Integration","Phone Number","1"],
 ];
 
 ?>

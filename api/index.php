@@ -339,24 +339,25 @@ function _agent (&$o)
 		$av = [$row[0], $row[0], _S('cc_user_id')];	
 		$q = "SELECT workinghour.campaign_id, campaign_campaign FROM workinghour INNER JOIN member ON workinghour.campaign_id=member.campaign_id && source='1' && dt0<=? && dt1>=? && ".$k[$row[1]]."='1' && user_id=?";  // fetch active campaigns
 		$res = qryp ($q, "sss", $av, 0);
-		$campaigns = "";
+		$campaigns = "0,";
 		$outbound = 0;
-		while ($row = mysqli_fetch_row ($res))
-		{
-			error_log ("MBR: [".$row[0]." ".$row[1]."]");
-			$v = $row[0];
-			if ($row[1]==2) { $v="O"; $outbound++; }
-			if ($outbound>1) continue;
-			$campaigns .= $v.",";
-		}
-		if ($campaigns=="") $campaigns = "0,";
+		
+		//while ($row = mysqli_fetch_row ($res))
+		//{
+		//	error_log ("MBR: [".$row[0]." ".$row[1]."]");
+		//	$v = $row[0];
+		//	if ($row[1]==2) { $v="O"; $outbound++; }
+		//	if ($outbound>1) continue;
+		//	$campaigns .= $v.",";
+		//}
+		//if ($campaigns=="") $campaigns = "0,";
 
 		// if ($role==6) // login to ati only
 		{
 			$s = "join?cid=".$exten."&";
 			muu ("ati",$s); 
 			// $campaigns = "Z,";
-			$campaigns .= "Z,";
+			// $campaigns .= "Z,";
 		}
 
 		$s = "usr?action=1&usr=".$exten."&interface=2&exten=".$GLOBALS['VA_SIP_USER_PREFIX'].$exten."&queue=".$campaigns."&";
@@ -599,10 +600,12 @@ function _request_ ()
 	$p = [];
 	$fo = [];
 
-	error_log ("[auth] ".$_SERVER["REQUEST_URI"]);
+	// error_log ("[request] ".$_SERVER["REQUEST_URI"]);
 
 	$rt = rest_uri_parse ($_SERVER["REQUEST_METHOD"], $_SERVER["REQUEST_URI"], 3, $u, $suffix, $id, $o);
 	if ($rt!=0) return $rt;
+
+	error_log ("[request] " . $u . "/" . $id ."|". json_encode ($o));
 	
 	if ($u=="wallonly") return _wallonly ($o, $p);
 
@@ -817,6 +820,7 @@ function _request_ ()
 		$rt = rest_uri_get ($u, $suffix, $id, $fo, $p, $aa);
 		if ($rt==200) 
 		{
+			error_log ("response: ".$id);
 			$rt = rest_uri_response ($u, $suffix, $id, $o, $p, $aa, $rt_);
 			//if ($u=="activities" && $id==-1 && $o["src"]=="escalation") // onview close notif
 			//{

@@ -127,7 +127,7 @@ function _phone_fmt ($s)
 		if ($ch=="+" || $ch=="0" || $ch==" ") { $a++; continue; }
 		break;
 	}
-	// error_log ("phone_fmt: ".$a." ".$n." '".substr ($s,$a,($n-$a))."'" );
+	error_log ("phone_fmt: ".$a." ".$n." '".substr ($s,$a,($n-$a))."'" );
 	if ($n-$a==9) return $GLOBALS["COUNTRY_CODE"].substr ($s,$a,($n-$a));
 	return substr ($s, $a, ($n-$a));
 }
@@ -1249,7 +1249,9 @@ function ctx ($u, $suffix, &$aa, &$av, &$fo, &$join)
 		for ($j=0; $j<$n; $j++)
 		{
 			if (!isset ($kk[$vv[$j]])) continue;
-			$group .= $d.$a[$kk[$vv[$j]]][0];
+			$k_ = $a[$kk[$vv[$j]]][0];
+			$group .= $d.$k_;
+			if (substr($k_, -2) === 'id') $group .= " DESC";
 			$d=',';
 			$gl = $a[$kk[$vv[$j]]][0];
 		}
@@ -1760,6 +1762,8 @@ function rest_uri_response ($u, $suffix, $id, &$o, &$p, &$aa, $rt)
 		$fmt = 4;
 	}
 	
+	// error_log (">>".$id);
+
 	echo '"'.$u.$suffix.$fmt_start[$fmt]; 
 	if ($id=="-1") 
 	{
@@ -2128,6 +2132,7 @@ function rest_uri_parse ($meth, $uri, $i, &$u, &$suffix, &$id, &$o)
 	if ($meth=="POST" && isset ($_SERVER["CONTENT_TYPE"]) && strstr ($_SERVER["CONTENT_TYPE"], "application/json")!=FALSE )
 	{
 		$s = file_get_contents ("php://input");
+		// error_log ("[POST] ".$s);
 		$o = json_decode ($s, true);
 		if ($o==NULL) return 400;
 	}
@@ -2168,7 +2173,7 @@ function rest_uri_parse ($meth, $uri, $i, &$u, &$suffix, &$id, &$o)
 		//if (strlen ($a[0][1])>0) $k = $a[0][1];
 		$k = model_k_id ($u, $suffix, $a);
 		$o[$k] = $id_;
-		if ($meth=="GET") $GET[$k] = $id_;
+		if ($meth=="GET") $_GET[$k] = $id_;
 	}
 			
 	$id = $id_;
