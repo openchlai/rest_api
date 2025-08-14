@@ -1999,6 +1999,7 @@ $dispositions_subs =
 
 $contacts_disposition_subs =	
 [
+// disposition
 ["subcategories","","100",      "category_id",(" ".$DISPOSITION_ROOT_ID)]
 ];
 
