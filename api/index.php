@@ -12,6 +12,8 @@ include "../lib/session.php";
 include "../lib/XLSXbuf.php"; 
 include "../lib/rpc.php"; 
 //include "../lib/dialplan.php";
+include "model_qa.php";
+include "model_qa_k.php";
 
 $FN = ["sendOTP"=>1, "verifyOTP"=>1, "resetAuth"=>1, "changeAuth"=>1, "dash"=>1, "wallonly"=>1, "agent"=>1, "chan"=>1, "sup"=>1, "msg"=>1, "msg_end"=>1, "eemis"=>1, "aii"=>1]; // non-crud endpoints
 

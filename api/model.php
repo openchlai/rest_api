@@ -39,7 +39,7 @@ $RESOURCES = array
 	"dispositions"=>	array ("disposition","dsp",	"3","0","0",	"Dispositions", 	"created_on DESC","",	""), 
 	"actions"=>		array ("action","",		"1","0","0",	"Actions", 		"id DESC","",		""), 
 	"attachments"=>		array ("attachment","",		"3","0","0",	"Attachment",		"","",			""), 			
-	//"qas"=>			array ("qa","",			"1","0","0",	"Quality Assessment",	"","",			""), 
+	"qas"=>			array ("qa","",			"1","0","0",	"Quality Assessment",	"","",			""), 
 		
 	"reporters"=>		array ("reporter","",		"3","0","0",	"Reporter", 		"","",			""), 
 	"clients"=>		array ("client","",		"3","0","0",	"Client", 		"","",			""), 
@@ -279,6 +279,8 @@ $RIGHTS_99 = array // sel:0,add:1,upd:2,sel:id(other) // admin rights (same as s
 
 $METRICS = array 
 (
+	"qa_count"=>array ("COUNT(DISTINCT qa.id)",		"","","",  "","",  ""),
+
 	"case_count"=>array ("COUNT(DISTINCT kase.id)",		"","","",  "","",  ""),
 
 	"kase_count"=>array ("COUNT(DISTINCT kase.id)",		"","","",  "","",  ""),
