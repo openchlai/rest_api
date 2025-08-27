@@ -1824,10 +1824,10 @@ $attachments_api = array
 
 $attachments_del_api = array
 (
-	array ("attachments","","dup","id","attachment_id", NULL, "file_id:file_id", "file_name:file_name", "case_id:case_id"), // needed for case_Activity
+	array ("attachments","","dup","id","attachment_del_id", NULL, "id","file_id:file_id", "file_name:file_name", "case_id:case_id"), // needed for case_Activity
 	array ("attachments","","params", "case_id_"," 0"),	
 	array ("attachments","","aub"),
-	array ("attachments","",""),
+	array ("attachments","_del",""),
 
 	array ("reporters","_dup","include"),	
 	array ("case_activities","","params","activity_ref","attachment_id","detail","file_name"),	
