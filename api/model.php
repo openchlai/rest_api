@@ -343,7 +343,6 @@ $METRICS = array
 	"score"=>array ("SUM(score)",				"","","",  "","",  ""),
 );
 
-
 // ===================================================================================
 
 $au_def = array 
@@ -1666,7 +1665,7 @@ $reporters_api = array				// update reporter
 	array ("case_activities","","include")
 );
 
-$reporters_uuid_api = array			// create reporter 
+$reporters_uuid_api = array			// create reporter -- todo: check if contact_id,src_uid exist
 (
 	array ("contacts","","include"),	// create if does not exist -- used by gateway
 	array ("contacts","_dup","include"),
@@ -1893,7 +1892,7 @@ $cases_api = array
 	array ("case_activities","","include"),
 
 	array ("dispositions","","params", "disposition_id","::disposition_id: ".$DISPOSITION_ID_COMPLETE.":disposition_id"),
-        array ("dispositions","","dup","src","src","src_uid","src_uid","case_id","case_id",NULL,"id"), // get disposition_id (if exists)
+     array ("dispositions","","dup","src","src","src_uid","src_uid","case_id","case_id",NULL,"id"), // get disposition_id (if exists)
 	array ("dispositions","_include","include"),
 );
 
@@ -2032,7 +2031,7 @@ $cases_subs =
 ["attachments","","",	"case_id_","case_id"],
 ["case_activities","","","case_id","case_id"],
 ["dispositions","","",	"id","dsp_id"],
-// ["reporters","_uuid","",     "id","reporter_uuid_id"],
+["reporters","_uuid","",     "id","reporter_uuid_id"],
 ];
 
 $case_activities_subs = 

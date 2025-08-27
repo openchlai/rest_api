@@ -1,5 +1,6 @@
 <?php
 include "/var/www/html/helpline/config.php"; //
+//include "../config.php";
 
 $db = mysqli_connect (null, THE_DB_USN, null, THE_DB_NAME, null, THE_DB_SOCK) or die ("Could Not connect to Database Server.");
 $db2 = mysqli_connect (null, THE_DB_USN, null, THE_DB_NAME, null, THE_DB_SOCK) or die ("Could Not connect to Database Server.");
