@@ -970,6 +970,7 @@ $case_activities_k=array("id"=>0,
 "h"=>48,
 "syncts"=>49,
 "case_dept"=>50,
+"src_uid2"=>51,
 NULL);
 
 

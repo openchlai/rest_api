@@ -1526,8 +1526,10 @@ $case_activities_def = array
 	array ("hr","",				"4","2","","",   "case_activities","UNIX_TIMESTAMP(DATE(FROM_UNIXTIME(created_on))) + (HOUR(FROM_UNIXTIME(created_on))*3600)","",   "Hour",":d:dmyh:0: "), 
         array ("h","",				"4","2","","",   "case_activities","HOUR(FROM_UNIXTIME(created_on))","",   "Hour",""), 
 
-        array ("syncts","",                     "3","3","","",  "","","",    "Sync Timestamp",""),
+     array ("syncts","",                     "3","3","","",  "","","",    "Sync Timestamp",""),
 	array ("case_dept","",                  "1","2","","",  "","","",    "Department",""),
+	array ("src_uid2","",			"1","2","","",	"","","", 	"Channel Uniqueid 2",""),
+
 );
 
 
@@ -1966,8 +1968,14 @@ $categories_setup_subs =
 
 $calls_subs = 
 [
-["activities","","",	"chan_uniqueid","chan_uniqueid"],
+//["activities","","",	"chan_uniqueid","chan_uniqueid"],
 ["qas","","",		"chan_uniqueid","chan_uniqueid"],
+];
+
+$calls_vw_subs = 
+[
+["qas","","",				"chan_uniqueid","chan_vw_uniqueid"],
+["case_activities","","",	"src"," call","src_uid2","chan_vw_uniqueid"]
 ];
 
 $pmessages_subs = 

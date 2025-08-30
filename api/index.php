@@ -387,13 +387,13 @@ function _wallonly (&$o, &$p)
 {
 	muu_ ("rpt",""); // sync stats from rpt // rpty ();
 
-        if (isset ($_GET["metrics"]))
-        {
-                if (isset ($_GET["dash_period"]))
-                {
-                         $_GET["dt"] = _str2ts ("today");
-                       //  muu ("rpt",""); // sync stats from rpt // rpty ();
-                }
+	if (isset ($_GET["metrics"]))
+	{
+		if (isset ($_GET["dash_period"]))
+		{
+			$_GET["dt"] = _str2ts ("today");
+               //  muu ("rpt",""); // sync stats from rpt // rpty ();
+		}
 
 		header("HTTP/1.1 200");
 		header ('Content-Type: application/json');
@@ -411,29 +411,28 @@ function _wallonly (&$o, &$p)
 
 		echo ', "stats":{ ';
 
-
 		$q = "SELECT UNIX_TIMESTAMP(Date(Now())) dt, UNIX_TIMESTAMP(CONCAT(YEAR(Now()),'-',MONTH(Now()),'-01')) mn";
-                $row = qryp ($q, "", $av, 1);
+		$row = qryp ($q, "", $av, 1);
 		$dt_now = $row[0];
 		$mn_now = $row[1];
 
 		$q = "SELECT COUNT(id) FROM kase WHERE dt=?";
 		$av_ = [$dt_now];
-                $row = qryp ($q, "s", $av_, 1);
-                echo '"cases_today":"'.$row[0].'",';
+		$row = qryp ($q, "s", $av_, 1);
+		echo '"cases_today":"'.$row[0].'",';
 
 		$q = "SELECT COUNT(id) FROM kase WHERE status=2";
 		$av_ = [$mn_now];
-                $row = qryp ($q, "", $av, 1);
-                echo '"cases_closed_this_month":"'.$row[0].'",'; 
+		$row = qryp ($q, "", $av, 1);
+		echo '"cases_closed_this_month":"'.$row[0].'",'; 
 
 		$q = "SELECT COUNT(id) FROM kase WHERE status=1";
 		$row = qryp ($q, "", $av, 1);
-                echo '"cases_ongoing_total":"'.$row[0].'",';
+		echo '"cases_ongoing_total":"'.$row[0].'",';
 
-                $q = "SELECT COUNT(id) FROM kase";
-                $row = qryp ($q, "", $av, 1);
-                echo '"cases_total":"'.$row[0].'",';
+		$q = "SELECT COUNT(id) FROM kase";
+		$row = qryp ($q, "", $av, 1);
+		echo '"cases_total":"'.$row[0].'",';
 
 		$q = "SELECT COUNT(id) FROM chan WHERE dt=?";
                 $av_ = [$dt_now];
@@ -458,11 +457,11 @@ function _wallonly (&$o, &$p)
                 $row = qryp ($q, "s", $av_, 1);
                 echo '"responsive_calls_today":"'.$row[2].'"';
  */
-                echo '}';
+		echo '}';
 
-                echo '}';
-                return 200;
-        }
+		echo '}';
+          return 200;
+	}
 
 	if (isset ($_GET["stats"]))
 	{
@@ -477,13 +476,13 @@ function _wallonly (&$o, &$p)
 		return 200;
 	}
 
-        $q = "SELECT id, usn, exten, role FROM auth WHERE exten=?";
-        $av = [__VESC(_G("exten"))];
-        $row = qryp ($q, "s", $av, 1);
-        header("HTTP/1.0 200 OK");
-        header ('Content-Type: application/json');
-        echo '{ "users":[["'.$row[0].'","'.$row[1].'"]] }';
-        return 200;
+	$q = "SELECT id, usn, exten, role FROM auth WHERE exten=?";
+	$av = [__VESC(_G("exten"))];
+	$row = qryp ($q, "s", $av, 1);
+	header("HTTP/1.0 200 OK");
+	header ('Content-Type: application/json');
+	echo '{ "users":[["'.$row[0].'","'.$row[1].'"]] }';
+	return 200;
 }
 
 function _dash (&$o, &$p)
@@ -562,6 +561,12 @@ function _home (&$o, &$p)
 	echo ",";
 	$fo_=["_c"=>"10"];
 	if (rest_uri_get ("activities","", NULL, $fo_, $p, $aa)==200) rest_uri_response ("activities","", NULL, $o, $p, $aa, 0); // load activities
+
+	echo ",";
+	if (rest_uri_get ("calls","", "0", $fo_, $p, $aa)==200) rest_uri_response ("calls","", "0", $o, $p, $aa, 0); // load calls
+
+	echo ",";
+	if (rest_uri_get ("case_activities","", "0", $fo_, $p, $aa)==200) rest_uri_response ("case_activities","", "0", $o, $p, $aa, 0); // load calls
 
 	echo ","; 
 	$fo_ = ["_c"=>"1000", "root_id"=>$GLOBALS["AGE_GROUP_ROOT_ID"] ];
