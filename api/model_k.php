@@ -571,6 +571,7 @@ $reporters_k=array("id"=>0,
 "is_client"=>51,
 "case_id"=>52,
 "case_uuid"=>53,
+"src_uid2"=>54,
 NULL);
 
 $clients_k=array("id"=>0,

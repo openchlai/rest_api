@@ -709,7 +709,7 @@ if(reporter_location_id>0,CONCAT(", ",reporter_location),"")
 $calls_def = array // SELECT phone, hangup_reason, hangup_status
 (
 	array ("uniqueid","",			"0","2","","",   "","","",   "ID",""), 
-        array ("chan_ts","",			"0","3","","",   "","","",   "Date","d M Y H:i:s"),
+        array ("chan_ts","",			"0","3","","",   "","","",   "Date",":d:dmyhnr:0: "),
         array ("context","",			"0","2","","",   "","","",   "",""),
         array ("trunk","",			"0","2","","",   "","","",   "Trunk DID",""),
         array ("phone","",			"0","1","","",   "","","",   "Phone",""),  
@@ -919,7 +919,7 @@ $dispositions_def = array
 	array ("reporter_phone2","",		"3","2","","",  "reporters","contact_phone2","",	"Reporter Alternative Contact",""),
 	array ("reporter_national_id","",	"3","2","","",  "reporters","contact_national_id","",	"Reporter National ID",""),
 	array ("reporter_landmark","",		"3","2","","",  "reporters","contact_landmark","",	"Reporter Nearest Landmark",""),
-	array ("reporter_dob","",		"3","3","","",  "reporters","contact_dob","",		"Reporter Date of Birth","d M Y H:i:s"),
+	array ("reporter_dob","",		"3","3","","",  "reporters","contact_dob","",		"Reporter Date of Birth",":d:dmyhnr:0: "),
 	array ("reporter_age","",		"3","2","","",  "reporters","contact_age","",		"Reporter Age",""),
 	array ("reporter_age_group_id","",	"3","2","","f",  "reporters","contact_age_group_id","",	"Reporter Age Group",""),
 	array ("reporter_age_group","",		"3","2","","",  "reporters","contact_age_group","",	"Reporter Age Group",""),
@@ -1027,7 +1027,7 @@ $reporters_def = array
 	array ("contact_phone","",		"3","2","","", "","","",	"Phone",""),
 	array ("contact_email","",		"3","2","","", "","","",	"Email",""),
 	array ("contact_phone2","",		"3","2","","", "","","",	"Alternative Contact",""),
-	array ("contact_dob","",		"3","3","","", "","","",	"Date of Birth","d M Y H:i:s"),
+	array ("contact_dob","",		"3","3","","", "","","",	"Date of Birth",":d:dmyhnr:0: "),
 	array ("contact_age","",		"3","2","","", "","","",	"Age",""),
 	array ("contact_age_group_id","",	"3","2","","f", "","","",	"Age Group ID",""),
 	array ("contact_age_group","",		"3","2","","", "","","",	"Age Group",""),
@@ -1072,6 +1072,8 @@ $reporters_def = array
 	array ("is_client","",			"4","2","","",	"clients","IF(COUNT(id)>0,'1','')","", 	"Is Client",""),
 
 	array ("case_id","",			"1","2","","f", "","","",	"Case ID",""),  // link once
+	array ("src_uid2","",			"1","2","","",	"","","", 	"Channel Uniqueid 2",""),
+
 );
 
 $perpetrators_def = array 
@@ -1091,7 +1093,7 @@ $perpetrators_def = array
 	array ("contact_phone","",		"3","2","","", "","","",	"Perp Phone",""), // todo: regex
 	array ("contact_email","",		"3","2","","", "","","",	"Perp Email",""),
 	array ("contact_phone2","",		"3","2","","", "","","",	"Perp Alternative Contact",""),
-	array ("contact_dob","",		"3","3","","", "","","",	"Perp Date of Birth","d M Y H:i:s"),
+	array ("contact_dob","",		"3","3","","", "","","",	"Perp Date of Birth",":d:dmyhnr:0: "),
 	array ("contact_age","",		"3","2","","", "","","",	"Perp Age",""),
 	array ("contact_age_group_id","",	"3","2","","f", "","","",	"Age Group ID",""),
 	array ("contact_age_group","",		"3","2","","", "","","",	"Perp Age Group",""),
@@ -1168,7 +1170,7 @@ $clients_def = array
 	array ("contact_phone","",		"3","2","","", "","","",	"Client Phone",""), // todo: regex
 	array ("contact_email","",		"3","2","","", "","","",	"Client Email",""),
 	array ("contact_phone2","",		"3","2","","", "","","",	"Client Alternative Contact",""),
-	array ("contact_dob","",		"3","3","","", "","","",	"Client Date of Birth","d M Y H:i:s"),
+	array ("contact_dob","",		"3","3","","", "","","",	"Client Date of Birth",":d:dmyhnr:0: "),
 	array ("contact_age","",		"3","2","","", "","","",	"Client Age",""),
 	array ("contact_age_group_id","",	"3","2","","f", "","","",	"Age Group ID",""),
 	array ("contact_age_group","",		"3","2","","", "","","",	"Client Age Group",""),
@@ -1234,7 +1236,7 @@ $clients_def = array
 
 	array ("not_in_school_id","",		"3","2","","f", "","","",	"Reason for not attending School ID",""),
 	array ("not_in_school","",		"3","2","","", "","","",	"Client Reason for not attending School",""),
-	array ("not_in_school_reason","",	"3","1","","", "","","",	"Client Not In School Reason",""),	
+	array ("not_in_school_reason","",	"3","1","","", "","","",	"Client Reason for not attending School",""),	
 	
 	array ("is_married","",			"3","2","","", "","","",	"Client Is Married","::yesno:0:1"),
 	array ("marital_id","",			"3","2","","f", "","","",	"Marital Status ID",""),
@@ -1321,12 +1323,12 @@ $client_referals_def = array
 $cases_def = array 
 (
 	array ("id","",				"0","2","","", "","","",	"CASE ID",""),
-	array ("created_on","",			"0","3","","", "","","",	"Created On","d M Y H:i:s"),
+	array ("created_on","",			"0","3","","", "","","",	"Created On",":d:dmyhnr:0: "), // d M Y H:i:s
 	array ("created_by","",			"0","2","","", "","","",	"Created By",""),
 	array ("created_by_id","",		"0","2","","", "","","",	"Created By ID",""),
-	array ("created_by_role","",		"0","2","","", "","","", 	"Created By Role","::role:0:1"),
+	array ("created_by_role","",		"0","2","","", "","","", "Created By Role","::role:0:1"),
 
-	array ("gbv_related","",		"3","2","m","", "","","", 	"GBV Related","::yesno:0:2"),
+	array ("gbv_related","",			"3","2","m","", "","","", 	"GBV Related","::yesno:0:2"),
 
 	array ("case_category_id","",		"3","2","m","f","","","",  	"Case Category ID","",   "category","level","cat_id_"),	
 	array ("case_category","",		"3","2","","", "","","", 	"Case Category",""),
@@ -1337,39 +1339,39 @@ $cases_def = array
 	array ("cat_id_2","",			"3","2","","", "","","",	"Sub Category 1 ID",""),
 	array ("cat_id_3","",			"3","2","","", "","","",	"Sub Category 2 ID",""),
 	array ("cat_id_4","",			"3","2","","", "","","",	"Sub Category 3 ID",""),
-	array ("cat_0","",			"3","2","","", "","","",	"Case Type",""),
-	array ("cat_1","",			"3","2","","", "","","",	"Main Category",""),
-	array ("cat_2","",			"3","2","","", "","","",	"Sub Category 1",""),
-	array ("cat_3","",			"3","2","","", "","","",	"Sub Category 2",""),
-	array ("cat_4","",			"3","2","","", "","","",	"Sub Category 3",""),
+	array ("cat_0","",				"3","2","","", "","","",	"Case Type",""),
+	array ("cat_1","",				"3","2","","", "","","",	"Main Category",""),
+	array ("cat_2","",				"3","2","","", "","","",	"Sub Category 1",""),
+	array ("cat_3","",				"3","2","","", "","","",	"Sub Category 2",""),
+	array ("cat_4","",				"3","2","","", "","","",	"Sub Category 3",""),
 	
 	array ("knowabout116_id","",		"3","2","","f", "","","",	"Know about 116 Id",""),
 	array ("knowabout116","",		"3","2","","",  "","","",	"Know about 116",""),					
 	array ("justice_id","",			"3","2","","f",	"","","", 	"Justice ID",""), 
-	array ("justice","",			"3","2","","",	"","","", 	"Justice",""),
+	array ("justice","",			"3","2","","",	"","","", 	"Status in the Justice System",""),
 	array ("assessment_id","",		"3","2","","f",	"","","", 	"Assessment ID",""),
 	array ("assessment","",			"3","2","","",	"","","", 	"Assessment",""),
 				
 	array ("escalated_by_id","",		"3","2","","f",	"","","",	"Escalated By ID",""),
 	array ("escalated_by","",		"3","2","","f",	"","","",	"Escalated By",""),
-	array ("escalated_by_role","",		"3","2","","f",	"","","",	"Escalated By Role",""),
+	array ("escalated_by_role","",	"3","2","","f",	"","","",	"Escalated By Role",""),
 
 	array ("escalated_to_id","",		"3","2","","f",	"","","",	"Escalated To ID",""),
 	array ("escalated_to","",		"3","2","","",	"","","", 	"Escalated To",""),	
-	array ("escalated_to_role","",		"3","2","","",	"","","", 	"Escalated To Role",""),
+	array ("escalated_to_role","",	"3","2","","",	"","","", 	"Escalated To Role",""),
 	
 	array ("assigned_to_id","",		"3","2","","",	"","","", 	"Assigned To ID",""),	
-	array ("assigned_to","",		"3","2","","",	"","","", 	"Assigned To",""),	
+	array ("assigned_to","",			"3","2","","",	"","","", 	"Assigned To",""),	
 	array ("assigned_to_role","",		"3","2","","",	"","","", 	"Assigned To Role",""),	
 	
 	array ("priority","",			"3","2","m","",	"","","", 	"Priority","::case_priority:0:1"), 
-	array ("status","",			"3","2","m","",	"","","", 	"Status","::case_status:0:1"),
+	array ("status","",				"3","2","m","",	"","","", 	"Status","::case_status:0:1"),
 
 	array ("services","",			"4","1","","",	"services","GROUP_CONCAT(CONCAT(category_id,':',category_name))","",	"Services Offered",""),
 	array ("referals","",			"4","1","","",	"referals","GROUP_CONCAT(CONCAT(category_id,':',category_name))", "",	"Referals", ""),
 
 	array ("narrative","",			"3","1","m","",	"","","", 	"Narrative",""), 		
-	array ("plan","",			"3","1","m","",	"","","", 	"Plan",""), 	
+	array ("plan","",				"3","1","m","",	"","","", 	"Plan",""), 	
 
 	array ("police_ob_no","",		"3","2","","",  "","","",	"Police Ref Number",""),
 	array ("specify_service","",		"3","2","","",  "","","",	"Specify Service",""),
@@ -1383,36 +1385,36 @@ $cases_def = array
 	array ("is_ecp_given","",		"3","2","","",  "","","",	"Is ECP Given?","::yesno:0:1"),
 	array ("is_counselling_given","",	"3","2","","",  "","","",	"Is Counselling Given?","::yesno:0:1"),
 	
-	array ("incidence_when","",		"3","3","","", "","","",	"Date of Incident","d M Y H:i:s"),
-	array ("incidence_location","",		"3","1","","", "","","",	"Incidence Reported Where",""),
-	array ("incidence_ref_no","",		"3","1","","", "","","",	"Incidence Police Ref. No.",""),
-	array ("hiv_test_result","",		"3","2","","", "","","",	"HIV Test Result","::charge:0:1"),
-	array ("counseling_org","",		"3","2","","", "","","",	"Counseling Organisation",""),	
+	array ("incidence_when","",		"3","3","","", "","","",		"Date of Incident",":d:dmy:0: : "),
+	array ("incidence_location","",	"3","1","","", "","","",		"Incidence Reported Where",""),
+	array ("incidence_ref_no","",		"3","1","","", "","","",		"Incidence Police Ref. No.",""),
+	array ("hiv_test_result","",		"3","2","","", "","","",		"HIV Test Result","::yesno:0:3"),
+	array ("counseling_org","",		"3","2","","", "","","",		"Counseling Organisation",""),	
  
- 	array ("src","",			"1","2","","",	"","","", 	"Channel",""),
+ 	array ("src","",				"1","2","","",	"","","", 	"Channel",""),
 	array ("src_uid","",			"1","2","","",	"","","", 	"Channel Uniqueid",""),
-	array ("src_address","",		"1","2","","P",	"","","", 	"Channel Address",""),
+	array ("src_address","",			"1","2","","P",	"","","", 	"Channel Address",""),
 	array ("src_vector","",			"1","2","","",	"","","", 	"Channel Direction",""),
 
-	array ("reporter_id","",		"1","2","m","f","","","",	"Reporter ID",""),
+	array ("reporter_id","",			"1","2","m","f","","","",	"Reporter ID",""),
 	array ("reporter_contact_id","",	"1","2","m","f","","","",	"Reporter Contact ID",""),
-	array ("reporter_fullname","",		"3","1","m","",  "","","",	"Reporter Fullname",""),
+	array ("reporter_fullname","",	"3","1","m","",  "","","",	"Reporter Fullname",""),
 	array ("reporter_phone","",		"3","2","","",  "","","",	"Reporter Phone",""),
 	array ("reporter_email","",		"3","2","","",  "","","",	"Reporter Email",""),
 	array ("reporter_phone2","",		"3","2","","",  "","","",	"Reporter Alternative Contact",""),
 	array ("reporter_national_id","",	"3","2","","",  "","","",	"Reporter National ID",""),
-	array ("reporter_landmark","",		"3","2","","",  "","","",	"Reporter Nearest Landmark",""),
-	array ("reporter_dob","",		"3","3","","",  "","","",	"Reporter Date of Birth","d M Y H:i:s"),
+	array ("reporter_landmark","",	"3","2","","",  "","","",	"Reporter Nearest Landmark",""),
+	array ("reporter_dob","",		"3","3","","",  "","","",	"Reporter Date of Birth",":d:dmyhnr:0: "),
 	array ("reporter_age","",		"3","2","","",  "","","",	"Reporter Age",""),
 	array ("reporter_age_group_id","",	"3","2","m","",  "","","",	"Reporter Age Group",""),
-	array ("reporter_age_group","",		"3","2","","",  "","","",	"Reporter Age Group",""),
+	array ("reporter_age_group","",	"3","2","","",  "","","",	"Reporter Age Group",""),
 	array ("reporter_sex_id","",		"3","2","m","",  "","","",	"Reporter Gender",""),
 	array ("reporter_sex","",		"3","2","","",  "","","",	"Reporter Gender",""),
 	array ("reporter_national_id_type_id","","3","2","","", "","","",	"ID Type ID",""),
 	array ("reporter_national_id_type","",	"3","2","","",  "","","",	"ID Type",""),
 	array ("reporter_nationality_id","",	"3","2","","",  "","","",	"Reporter Nationality ID",""),
 	array ("reporter_nationality","",	"3","2","","",  "","","",	"Reporter Nationality",""),
-	array ("reporter_tribe_id","",		"3","2","","",  "","","",	"Reporter Tribe ID",""),
+	array ("reporter_tribe_id","",	"3","2","","",  "","","",	"Reporter Tribe ID",""),
 	array ("reporter_tribe","",		"3","2","","",  "","","",	"Reporter Tribe",""),
 	array ("reporter_lang_id","",		"3","2","","",  "","","",	"Reporter Language ID",""),
 	array ("reporter_lang","",		"3","2","","",  "","","",	"Reporter Language",""),
@@ -1674,6 +1676,7 @@ $reporters_uuid_api = array			// create reporter -- todo: check if contact_id,sr
 	array ("contacts","","include"),	// create if does not exist -- used by gateway
 	array ("contacts","_dup","include"),
 	array ("cases","","dup","id","case_id", NULL, "id","dept"),
+	// todo: check if already exists
 	array ("reporters","_uuid",""),
 );
 
@@ -1875,23 +1878,20 @@ $cases_api = array
 	array ("cases","","params", "activity_","::case_id: case_new: case_edit", "reporter_id","::case_id:reporter_uuid_id:reporter_id"),
 	array ("reporters","_dup","include"),
 	
-        array ("cases","","aub"),
+     array ("cases","","aub"),
 	array ("cases","",""), 
 	array ("cases","cases","agg4",  "id","case_id",NULL,  "id","case_id"), 	// update dt
 	array ("cases","","dup", "id","case_id", NULL, "id:case_id_","case_category:case_category", "priority", "status","dept"),			
-
-	// clients
-	// perpetrators
 	
-	array ("reporters","_case",  	"include","1",""),		// update case_id during case create only
-	array ("clients","_case",    	"array","1",""),		// update case_id during case create only
+	array ("reporters","_case",  		"include","1",""),		// update case_id during case create only
+	array ("clients","_case",    		"array","1",""),		// update case_id during case create only
 	array ("perpetrators","_case",	"array","1",""), 		// update case_id during case create only
-	array ("attachments","_case",	"array","1",""),		// update case_id during case create only
-	array ("referals","",		"array"),
-	array ("services","",		"array"),
+	array ("attachments","_case",		"array","1",""),		// update case_id during case create only
+	array ("referals","",			"array"),
+	array ("services","",			"array"),
 
 	array ("reporters","","params", "reporter_id","reporter_uuid_id"),
-        array ("reporters","_dup","include"),
+     array ("reporters","_dup","include"),
 	array ("case_activities","","params", "activity_ref","case_id", "detail","plan"),
 	array ("case_activities","","include"),
 
