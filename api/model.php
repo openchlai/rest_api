@@ -13,11 +13,11 @@ update kase set escalated_by_id= ///5
 $RESOURCES = array 
 (
 	"au"=>			array ("au","",			"1","0","0",	"Audit Trail", 		"","",			""), 
-	"addr"=>		array ("addr","",		"1","0","0",	"Registered Address", 	"id DESC","",		""), 
+	"addr"=>			array ("addr","",		"1","0","0",	"Registered Address", 	"id DESC","",		""), 
 	"otp"=>			array ("otp","",		"1","0","0",	"OTP", 			"","",			""), 
 	"extens"=>		array ("exten","",		"1","0","0",	"WebRTC Extension", 	"","",			""), 
-	"auth"=>		array ("auth","",		"0","0","0",	"Auth", 		"","",			""),
-	"users"=>		array ("auth","user",		"3","0","0",	"User", 		"","",			""),
+	"auth"=>			array ("auth","",		"0","0","0",	"Auth", 		"","",			""),
+	"users"=>			array ("auth","user",		"3","0","0",	"User", 		"","",			""),
 	"contacts"=>		array ("contact","",		"3","0","0",	"Contact", 		"fullname","",		""), 
 	"profile"=>		array ("contact","profile",	"0","0","0",	"Profile", 		"","",			"contacts"), 
 
@@ -26,11 +26,11 @@ $RESOURCES = array
 	//"members"=>		array ("member","",		"3","0","0",	"Member", 		"","",			""), 		
 	//"voiceprompts"=>	array ("voiceprompt","",	"3","0","0",	"VoicePrompt", 		"","",			""),	
 	//"voicefiles"=>	array ("voicefile","",		"3","0","0",	"VoiceFile", 		"pos ASC","",		""),
-	"categories"=>          array ("category","",           "3","0","0",    "Category",             "level,name","",	""), 
-	"subcategories"=>       array ("category","subcategory","3","0","0",    "Category",             "level,name","",	"categories"), 
+	"categories"=>		array ("category","",           "3","0","0",    "Category",             "level,name","",	""), 
+	"subcategories"=>	array ("category","subcategory","3","0","0",    "Category",             "level,name","",	"categories"), 
 
-	"files"=>		array ("file","",		"1","0","0",	"File", 		"","",			""),
-	"calls"=>		array ("chan","",		"0","0","0",	"Call", 		"","",			""), 
+	"files"=>			array ("file","",		"1","0","0",	"File", 		"","",			""),
+	"calls"=>			array ("chan","",		"0","0","0",	"Call", 		"","",			""), 
 	"chanss"=>		array ("chan_ss","",		"0","0","0",	"Agent Session", 	"","",			""), 
      "pmessages"=>		array ("pmsg","",		"1","0","0",	"Message Session",	"id DESC","",		""), 
      "messages"=>		array ("msg","",		"1","0","0",	"Message", 		"id DESC","",		""), 
@@ -38,7 +38,7 @@ $RESOURCES = array
 	"activities"=>		array ("activity","",		"3","0","0",	"Activity", 		"src_ts DESC","",	""), 
 	"dispositions"=>	array ("disposition","dsp",	"3","0","0",	"Dispositions", 	"created_on DESC","",	""), 
 	"actions"=>		array ("action","",		"1","0","0",	"Actions", 		"id DESC","",		""), 
-	"attachments"=>		array ("attachment","",		"3","0","0",	"Attachment",		"","",			""), 			
+	"attachments"=>	array ("attachment","",		"3","0","0",	"Attachment",		"","",			""), 			
 	"qas"=>			array ("qa","",			"1","0","0",	"Quality Assessment",	"","",			""), 
 		
 	"reporters"=>		array ("reporter","",		"3","0","0",	"Reporter", 		"","",			""), 
@@ -47,7 +47,7 @@ $RESOURCES = array
 	"services"=>		array ("service","",		"3","0","0",	"Services Offered", 	"","",			""), 
 	"referals"=>		array ("referal","",		"3","0","0",	"Referals", 		"","",			""), 
 	"client_referals"=>	array ("client_referal","",	"3","0","0",	"Client Referals",	"","",			""), 
-	"cases"=>		array ("kase","case",		"3","0","0",	"Case", 		"","",			""), 
+	"cases"=>			array ("kase","case",		"3","0","0",	"Case", 		"","",			""), 
 	"case_activities"=>	array ("kase_activity","ca",	"3","0","0",	"Case Activity", 	"","",			""), 
 );
 
@@ -838,49 +838,49 @@ $messages_def = array
 $activities_def = array // nb: activity for any chani
 (
 
-	array ("id","",				"0","2","","", "","","",	"",""),
-	array ("created_on","",			"0","3","","", "","","",	"",""),
-	array ("created_by","",			"0","2","","", "","","",	"",""),
-	array ("created_by_id","",		"0","2","","", "","","",	"",""),
+	array ("id","",				"0","2","","", "","","",		"",""),
+	array ("created_on","",			"0","3","","", "","","",		"",""),
+	array ("created_by","",			"0","2","","", "","","",		"",""),
+	array ("created_by_id","",		"0","2","","", "","","",		"",""),
 	array ("created_by_role","",		"0","2","","", "","","", 	"Created By Role",""),
 
-	array ("activity_ts","",		"1","3","","",	"","","",	"Sched Ts",""),
-	array ("campaign_id","",		"1","2","","f", "","","",	"Campaign ID",""), 
+	array ("activity_ts","",			"3","3","","",	"","","",		"Sched Ts",""),
+	array ("action","",				"3","2","","",  "","","",     "Action",""),
+	array ("action_id","",			"3","2","","f", "","","",	"Action ID",""), 
 	array ("contact_id","",			"1","2","","f", "","","",	"Contact ID",""), 
+	array ("campaign_id","",			"1","2","","f", "","","",	"Campaign ID",""), 
+	array ("form_id","",			"1","2","","f", "","","",	"Form ID",""), 	// form_id
 
-	array ("assigned_on","",		"1","3","","", "","","",	"Assigned On",""),
-	array ("assigned_to_id","",		"1","2","","", "","","",	"Assigned To ID",""),
-	array ("assigned_to","",		"1","2","","", "","","",	"Assigned To",""),
+	array ("assigned_on","",			"1","3","","", "","","",		"Assigned On",""),
+	array ("assigned_to_id","",		"1","2","","", "","","",		"Assigned To ID",""),
+	array ("assigned_to","",			"1","2","","", "","","",		"Assigned To",""),
 	array ("assigned_to_role","",		"1","2","","", "","","", 	"Assigned To Role",""),
 		
-	array ("src","",			"1","2","","",	"","","", 	"Channel",""),
-	array ("src_uid","",			"1","2","","",	"","","", 	"Channel Uniqueid",""),
-	array ("src_uid2","",			"1","2","","",	"","","", 	"Channel Uniqueid 2",""),
-	array ("src_address","",		"1","2","","P",	"","","", 	"Channel Address",""),
-	array ("src_usr","",			"1","2","","",	"","","", 	"Channel User",""),
-	array ("src_vector","",			"1","2","","",	"","","", 	"Channel Direction",""),
-	array ("src_ts","",			"1","2","","",	"","","", 	"Channel Timestamp",""),	
-	array ("src_callid","",			"1","2","","",	"","","", 	"Channel Call ID",""),
-	array ("src_campaign_id","",		"1","2","","",	"","","", 	"Channel Campaign ID",""),
-	array ("src_action_id","",		"1","2","","",	"","","", 	"Channel Action ID",""),
-	array ("src_status","",			"1","2","","",	"","","", 	"Channel Status",""),
-	array ("src_status_ts","",		"1","3","","",	"","","", 	"Channel Status Ts",""),
-	array ("src_status_duration","",	"1","4","","",	"","","", 	"Channel Status Duration",""),
-	array ("src_end_ts","",			"1","3","","",	"","","", 	"Channel End Ts",""),
-	array ("src_end_duration","",		"1","4","","",	"","","", 	"Channel Status Duration",""),
+	array ("src","",				"3","2","","",	"","","", 	"Channel",""),
+	array ("src_uid","",			"3","2","","",	"","","", 	"Channel Uniqueid",""),
+	array ("src_uid2","",			"3","2","","",	"","","", 	"Channel Uniqueid 2",""),
+	array ("src_address","",			"3","2","","P","","","", 	"Channel Address",""),
+	array ("src_usr","",			"3","2","","",	"","","", 	"Channel User",""),
+	array ("src_vector","",			"3","2","","",	"","","", 	"Channel Direction",""),
+	array ("src_ts","",				"3","2","","",	"","","", 	"Channel Timestamp",""),	
+	array ("src_callid","",			"3","2","","",	"","","", 	"Channel Call ID",""),
+	array ("src_campaign_id","",		"3","2","","",	"","","", 	"Channel Campaign ID",""),
+	array ("src_action_id","",		"3","2","","",	"","","", 	"Channel Action ID",""),
+	array ("src_status","",			"3","2","","",	"","","", 	"Channel Status",""),
+	array ("src_status_ts","",		"3","3","","",	"","","", 	"Channel Status Ts",""),
+	array ("src_status_duration","",	"3","4","","",	"","","", 	"Channel Status Duration",""),
+	array ("src_end_ts","",			"3","3","","",	"","","", 	"Channel End Ts",""),
+	array ("src_end_duration","",		"3","4","","",	"","","", 	"Channel Status Duration",""),
+	array ("src_msg","",			"3","4","","",	"","","", 	"Channel Status Duration",""),
 			
-        array ("dispositions","",		"4","1","","",  "dispositions","GROUP_CONCAT(disposition)","",  "Disposition",""), 
+	array ("dispositions","",		"4","1","","",  "dispositions","GROUP_CONCAT(disposition)","",  "Disposition",""), 
 	        
 	array ("yr","",				"4","2","","",  "activities","UNIX_TIMESTAMP(CONCAT(YEAR(FROM_UNIXTIME(src_ts)),'-01-01'))","",   "Year",":d:y:0: "), 
-        array ("mn","",				"4","2","","",   "activities","UNIX_TIMESTAMP(CONCAT(YEAR(FROM_UNIXTIME(src_ts)),'-',MONTH(FROM_UNIXTIME(src_ts)),'-01'))","",   "Month",":d:my:0: "), 
-        array ("wk","",				"4","2","","",   "activities","UNIX_TIMESTAMP(DATE(FROM_UNIXTIME(src_ts))) - (DAYOFWEEK(FROM_UNIXTIME(src_ts))*86400)","",   "Week",":d:dmy:0: "), 
-        array ("dt","",				"4","2","","",   "activities","UNIX_TIMESTAMP(DATE(FROM_UNIXTIME(src_ts)))","",   "Date",":d:dmy:0: "), 
-	array ("dth","",			"4","2","","",   "activities","UNIX_TIMESTAMP(DATE(FROM_UNIXTIME(src_ts))) + (HOUR(FROM_UNIXTIME(src_ts))*3600)","",   "Hour",":d:dmyh:0: "), 
-        array ("h","hour",			"4","2","","",   "activities","HOUR(FROM_UNIXTIME(src_ts))","",   "Hour",""), 
-
-	array ("activity","",                    "1","2","","",  "","","",       "Activity",""),
-      array ("action","",                      "3","2","","",  "","","",       "Action","")
-
+	array ("mn","",				"4","2","","",   "activities","UNIX_TIMESTAMP(CONCAT(YEAR(FROM_UNIXTIME(src_ts)),'-',MONTH(FROM_UNIXTIME(src_ts)),'-01'))","",   "Month",":d:my:0: "), 
+	array ("wk","",				"4","2","","",   "activities","UNIX_TIMESTAMP(DATE(FROM_UNIXTIME(src_ts))) - (DAYOFWEEK(FROM_UNIXTIME(src_ts))*86400)","",   "Week",":d:dmy:0: "), 
+	array ("dt","",				"4","2","","",   "activities","UNIX_TIMESTAMP(DATE(FROM_UNIXTIME(src_ts)))","",   "Date",":d:dmy:0: "), 
+	array ("dth","",				"4","2","","",   "activities","UNIX_TIMESTAMP(DATE(FROM_UNIXTIME(src_ts))) + (HOUR(FROM_UNIXTIME(src_ts))*3600)","",   "Hour",":d:dmyh:0: "), 
+	array ("h","",					"4","2","","",   "activities","HOUR(FROM_UNIXTIME(src_ts))","",   "Hour",""), 
 );
 
 $dispositions_def = array 
@@ -1437,38 +1437,34 @@ $cases_def = array
 	array ("client_count","",		"4","4","v","",  "","","",	"Client Count",""), 
 	array ("perp_count","",			"4","4","v","",  "","","",	"Perpetrator Count",""), 
 			
-	array ("is_reporter_client","",         "4","2","","",  "clients","MAX(IF(is_reporter=1,1,0))","",      "Is Reporter Client?","::yesno:0:1"),
+	array ("is_reporter_client","",	"4","2","","",  "clients","MAX(IF(is_reporter=1,1,0))","",      "Is Reporter Client?","::yesno:0:1"),
 	
 	array ("activity_count","",		"4","4","","",	"dispositions","COUNT(id)","", 			"Activity Count",""),
 	array ("activity_ids","",		"4","1","","",	"dispositions","GROUP_CONCAT(id)","", 		"Activity IDs",""),
 	array ("activity_last_id","",		"4","2","","f",	"dispositions","MAX(id)","activity_last_id", 	"Last Activity ID",""),
 
-	array ("activity_on","",		"5","3","","",	"dispositions","created_on","", 			"Last Activity On",""),	
-	array ("activity_by","",		"5","2","","",	"dispositions","created_by","", 			"Last Activity By",""),	
+	array ("activity_on","",			"5","3","","",	"dispositions","created_on","", 			"Last Activity On",""),	
+	array ("activity_by","",			"5","2","","",	"dispositions","created_by","", 			"Last Activity By",""),	
 	array ("activity_by_id","",		"5","2","","",	"dispositions","created_by_id","", 			"Last Activity By ID",""),	
 	array ("activity_by_role","",		"5","2","","",	"dispositions","created_by_role","", 		"Last Activity By Role",""),	
 	array ("activity_src","",		"5","2","","",	"dispositions","src","", 				"Last Activity Source",""), 	
 	array ("activity_src_uid","",		"5","2","","",	"dispositions","src_uid","", 			"Last Activity Source UID",""), 	
 	array ("disposition_id","",		"3","2","","f", "dispositions","disposition_id","",			"Disposition ID",""), 
-	array ("disposition","",		"3","2","","",  "dispositions","disposition","",			"Disposition",""),  
+	array ("disposition","",			"3","2","","",  "dispositions","disposition","",			"Disposition",""),  
 	
 	array ("final_status","",		"4","2","","",   "cases","IF(status!=2 && escalated_to_id>0,3,status)","",	"Final Status",""), 
  
 	array ("yr","",				"4","2","","",   "cases","UNIX_TIMESTAMP(CONCAT(YEAR(FROM_UNIXTIME(created_on)),'-01-01'))","",   "Year",":d:y:0: "), 
-        array ("mn","",				"4","2","","",   "cases","UNIX_TIMESTAMP(CONCAT(YEAR(FROM_UNIXTIME(created_on)),'-',MONTH(FROM_UNIXTIME(created_on)),'-01'))","",   "Month",":d:my:0: "), 
-        array ("wk","",				"4","2","","",   "cases","UNIX_TIMESTAMP(DATE(FROM_UNIXTIME(created_on))) - (DAYOFWEEK(FROM_UNIXTIME(created_on))*86400)","",   "Week",":d:dmy:0: "), 
-        array ("dt","",				"4","2","","",   "cases","UNIX_TIMESTAMP(DATE(FROM_UNIXTIME(created_on)))","",   "Date",":d:dmy:0: "), 
+	array ("mn","",				"4","2","","",   "cases","UNIX_TIMESTAMP(CONCAT(YEAR(FROM_UNIXTIME(created_on)),'-',MONTH(FROM_UNIXTIME(created_on)),'-01'))","",   "Month",":d:my:0: "), 
+	array ("wk","",				"4","2","","",   "cases","UNIX_TIMESTAMP(DATE(FROM_UNIXTIME(created_on))) - (DAYOFWEEK(FROM_UNIXTIME(created_on))*86400)","",   "Week",":d:dmy:0: "), 
+	array ("dt","",				"4","2","","",   "cases","UNIX_TIMESTAMP(DATE(FROM_UNIXTIME(created_on)))","",   "Date",":d:dmy:0: "), 
 	array ("hr","",				"4","2","","",   "cases","UNIX_TIMESTAMP(DATE(FROM_UNIXTIME(created_on))) + (HOUR(FROM_UNIXTIME(created_on))*3600)","",   "Hour",":d:dmyh:0: "), 
-        array ("h","",				"4","2","","",   "cases","HOUR(FROM_UNIXTIME(created_on))","",   	"Hour",""), 
+	array ("h","",					"4","2","","",   "cases","HOUR(FROM_UNIXTIME(created_on))","",   	"Hour",""), 
 
 	array ("mn_closed","",			"4","2","","", "case_activities","MIN(IF(status=2,mn,NULL))","",	"",""),
-
-       // array ("uuid","",                  "1","2","","", "","","",        "UUID",""),
-
-	array ("ref","theirref",                  "3","2","","", "","","",        "Reference",""),
-	array ("src_callid","",			   "3","2","","", "","","", 	  "Session ID",""),
-
-	array ("dept","",                    "3","2","","", "","","",       "Department","")
+	array ("ref","theirref",			"3","2","","", "","","",        "Reference",""),
+	array ("src_callid","",			"3","2","","", "","","", 	  "Session ID",""),
+	array ("dept","",				"3","2","","", "","","",       "Department","")
 );
 
 $case_activities_def = array 
@@ -1673,10 +1669,10 @@ $reporters_api = array				// update reporter
 
 $reporters_uuid_api = array			// create reporter -- todo: check if contact_id,src_uid exist
 (
-	array ("contacts","","include"),	// create if does not exist -- used by gateway
+	array ("contacts","","include"),	// create if does not exist (contact_id is NULL) -- used by gateway
 	array ("contacts","_dup","include"),
 	array ("cases","","dup","id","case_id", NULL, "id","dept"),
-	// todo: check if already exists
+	// todo: check if already exists a (src, src_uid, contact_id) match
 	array ("reporters","_uuid",""),
 );
 
@@ -1692,7 +1688,7 @@ $reporters_isclient_api = array 		// create|delete client from a reporter
 	array ("reporters","","aub"),
 	array ("reporters","","dup","id","reporter_isclient_id", NULL, "id:reporter_isclient_id","contact_id:contact_id"), // get contact_id
 	array ("contacts","_dup","include"),
-	array ("cases","","dup","id","case_id",NULL, "id", "case_category:case_category", "priority", "status","dept"), 
+	array ("cases","","dup","id","case_id",NULL, "id", "case_category:case_category", "priority", "status","dept", "created_by_id", "created_by", "assigned_to_id", "assigned_to"), 
 	array ("clients","","dup","is_reporter_id","reporter_isclient_id", NULL, "id"), 	 // check if client_id already in case
         array ("clients","","params", "activity_ref","reporter_isclient_id", "detail","contact_fullname", "is_reporter_id","reporter_isclient_id"),
 	array ("clients","",""),
@@ -1881,7 +1877,7 @@ $cases_api = array
      array ("cases","","aub"),
 	array ("cases","",""), 
 	array ("cases","cases","agg4",  "id","case_id",NULL,  "id","case_id"), 	// update dt
-	array ("cases","","dup", "id","case_id", NULL, "id:case_id_","case_category:case_category", "priority", "status","dept"),			
+	array ("cases","","dup", "id","case_id", NULL, "id:case_id_","case_category:case_category", "priority", "status","dept","created_by_id","created_by","assigned_to_id","assigned_to"),			
 	
 	array ("reporters","_case",  		"include","1",""),		// update case_id during case create only
 	array ("clients","_case",    		"array","1",""),		// update case_id during case create only
@@ -1920,8 +1916,18 @@ $case_activities_sync_api = array
 
 $activities_api = array
 (
-        array ("users","","dup","id","assigned_to_id",NULL, "id:assigned_to_id", "usn:assigned_to", "role:assigned_to_role"),
-        array ("activities","","")
+	array ("users","","dup","id","assigned_to_id",NULL, "id:assigned_to_id", "usn:assigned_to", "role:assigned_to_role"),
+     array ("cases","","dup","id","form_id",NULL, "id:form_id"), 
+	array ("activities","","")
+);
+
+$activities_uuid_api = array			// create reporter from notification -- todo: check if contact_id,src_uid exist
+(
+	array ("contacts","_dup","include"),
+	array ("cases","","dup","id","case_id", NULL, "id","dept"),
+	// todo: check if reporter already exists with (src, src_uid, contact_id) match
+	array ("reporters","_uuid",""),
+	array ("activities","_uuid","")
 );
 
 $dispositions_api = array
@@ -1945,14 +1951,13 @@ $dispositions_include_api = array
 (
 	array ("categories","","dup","id","disposition_id",NULL, "id:disposition_id", "name:disposition"),
 	array ("reporters","_dup","include"),
-        array ("dispositions","","params", "src_uid2","::src_uid2: nill:src_uid2", "src_uid_","src_uid", "src_uid2_","src_uid2", "is_active"," 1"),
-        array ("dispositions","",""),
- //       array ("dispositions","dispositions","agg1",    "src","src","src_uid","src_uid", "case_id"," 0", NULL, "src","src","src_uid","src_uid", "case_id",":>: 0"), // unlink non-case (if with-case exists)
-        array ("activities","dispositions","agg4",      "src","src", "src_uid","src_uid", NULL, "src","src","src_uid_","src_uid"),      // update activity (if exists)  
-        array ("calls",	"dispositions","agg4",          "uniqueid","src_uid2",  NULL, "src"," call","src_uid2_","src_uid2"),            // update call (if exists)
+	array ("dispositions","","params", "src_uid2","::src_uid2: nill:src_uid2", "src_uid_","src_uid", "src_uid2_","src_uid2", "is_active"," 1"),
+	array ("dispositions","",""),
+ 	// array ("dispositions","dispositions","agg1",    "src","src","src_uid","src_uid", "case_id"," 0", NULL, "src","src","src_uid","src_uid", "case_id",":>: 0"), // unlink non-case (if with-case exists)
+	array ("activities","dispositions","agg4",      "src","src", "src_uid","src_uid", NULL, "src","src","src_uid_","src_uid"),      // update activity (if exists)  
+	array ("calls",	"dispositions","agg4",          "uniqueid","src_uid2",  NULL, "src"," call","src_uid2_","src_uid2"),            // update call (if exists)
 	array ("pmessages","dispositions","agg4",	"src","src", "src_callid","src_callid",  NULL, "src","src", "src_callid","src_callid"), // update msg (if exists)
 );
-
 
 // ===================================================================================
 
@@ -2254,6 +2259,8 @@ $case_priority_enum = [""=>["","Unknown"], "0"=>["0","Unknown"], "1"=>["1","Low"
 
 $src_enum = 
 [
+"escalation"=>["escalation","Case Escalation","username",""],
+"update"=>["update","Case Update","username",""],
 "call"=>["call","Call","Phone Number","1"],
 "walkin"=>["walkin","Walkin","Phone Number","1"],
 "caseupd"=>["caseupd","Case Update","User",""],

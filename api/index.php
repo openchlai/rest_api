@@ -123,6 +123,22 @@ function national_registry (&$o, &$p)
 	return $id;
 }
 
+function notify ($src, $from, $to, $msg, $to_id, $form_id)
+{
+	$o_ = ["assigned_to_id"=>$to_id, "contact_id"=>"-1", "form_id"=>$form_id];
+	$p_ = [];
+	$o_['i_']=0;
+	$o_["src"] = $src;
+	$o_["src_ts"] = _val_id();
+	$o_["src_uid"] = "notify".$o_["src_ts"]; 
+	$o_["src_address"] = $to;
+	$o_["src_usr"] = $from;
+	$o_["src_vector"] = "2"; // leg1 for notify is pseudo
+	$o_["src_msg"] = $msg;
+	error_log ("[notify] ".json_encode($o_));
+	$rt = rest_uri_post ("activities", "", NULL, $o_, $p_);
+}
+
 function message_out (&$o, &$p)
 {
 	$hdrs = array ("Content-Type: application/json");
@@ -672,7 +688,7 @@ function _request_ ()
 		{
 			error_log ("dash ----|".json_encode ($_GET));
 			$_GET["dt"] = _str2ts ("today");
-			// muu ("rpt",""); // sync stats from rpt // rpty ();
+			muu_ ("rpt",""); // sync stats from rpt
 		}
 	
 		if ($u=="cases") // eval _title
@@ -697,15 +713,11 @@ function _request_ ()
 		
 	if ($_SERVER["REQUEST_METHOD"]=="POST")
 	{
-		if ($u=="reporters") 
-		{
-			if ($id!=NULL) { $o["activity"]="9"; }; 
-		}
-			
 		if ($u=="clients" && $id==NULL) { $o["activity"]="6"; }	
 		if ($u=="perpetrators" && $id==NULL) { $o["activity"]="7"; }
 		if ($u=="attachments" && $id==NULL) { $o["activity"]="8"; }			
 
+		if ($u=="reporters" && $id!=NULL) { $o["activity"]="9"; }; 
 		if ($u=="clients" && $id!=NULL) { $o["activity"]="10"; }
 		if ($u=="perpetrators" && $id!=NULL) { $o["activity"]="11"; }
 		if ($u=="attachments" && $id!=NULL) { $o["activity"]="12"; }	
@@ -737,9 +749,6 @@ function _request_ ()
 						$o["escalated_to"] = "";
 						$o["escalated_to_role"] = "";
 					}
-					
-
-					// escalated_to same but escalated_by diff
 				}
 			}
 			
@@ -779,44 +788,42 @@ function _request_ ()
 		if (($rt==201 || $rt==202) && isset ($p[$k])) $id = $p[$k];
 		error_log ("rt-->".$rt." ".$k);
 
-		// todo: increase wrapup to 5minutes on case_uuid // todo convert case_uuid GETs to PUTs				
-		if (($u=="cases" || $u=="dispositions") && $rt>200 && $rt<203 && isset ($o["src"]) && $o["src"]=="call") // shrink wrapup to 20 seconds on save
-                {
+		if ($rt>200 && $rt<203 && ($u=="cases" || $u=="dispositions") && isset ($o["src"]) && $o["src"]=="call") // shrink wrapup to 20 seconds on save
+		{
 			$s = "wrapup?action=0&usr=".$_SESSION["cc_user_exten"];
-                        $r = muu ("ami","sync?c=-1&");
-                        $o_ = json_decode ($r['data'], true);
+			$r = muu ("ami","sync?c=-1&");
+			$o_ = json_decode ($r['data'], true);
 			if (isset ($o_["channels"]) && isset ($o["src_uid"]) && isset ($o_["channels"][$o["src_uid"]]))  // get chan.uid (if rxists)
 			{
 				$s .= "&chan=".$o_["channels"][$o["src_uid"]][3]."&";
 			}
 			muu ("ami",$s);
-                }
-                
-                if ($rt==201 && $u=="messages")
-                {
-                        message_out ($o, $p);
-                }
-		
-		if ($rt==201 && $u=="cases" && isset ($p["escalated_to_id"]) && $p["escalated_to_id"]>0)
-		{
-			//_notify ("msg?", "escalation", "", $p["auth_usn"], $p["escalated_to_exten"], ($GLOBALS["CASE_ID_PREFIX"].$p["case_id"]), "1", 0);
-			// notify ("escalation", $p["escalated_to_id"], $o, $p);
 		}
-		
-		if ($rt==202 && $u=="cases" && isset ($p["escalated_to_id"]) && $p["escalated_to_id"]>0)
-		{
-			$q = "SELECT id FROM au WHERE aub_id=? && row_id=? && t=? && k=?"; // query aub if escalated_to has changed
-			$av = [$p["aub_id"], $p["case_id"], "cases", "escalated_to_id"];
-			$r = qryp ($q, "ssss", $av, 1);
-			error_log ("[escanb] ".json_encode ($av));
-			// notify ("escalation", $p["escalated_to_id"], $o, $p);
-			//if ($r) _notify ("msg?", "escalation", "", $p["auth_usn"], $p["escalated_to_exten"], ($GLOBALS["CASE_ID_PREFIX"].$p["case_id"]), "1", 0); 
+                
+		if ($rt==201 && $u=="messages")
+          {
+			message_out ($o, $p);
 		}
 
 		if ($u=="cases" && $rt>200 && $rt<203)
 		{
-			error_log ("PHP - ".$p["case_id"].", ".$p["dsp_id"].", ".$p["ca_id"]);
-			muu_ ("sync",""); // wakeup sync
+			if (isset ($o["escalated_to_id"]) && $o["escalated_to_id"]>0 && isset ($p["escalated_to_id"]) && $o["escalated_to_id"]==$p["escalated_to_id"])
+			{
+				notify ("escalation", $p["auth_usn"], $p["escalated_to"], ("#".$p["case_id"]." ".$p["case_category"]), $p["escalated_to_id"], $p["case_id"]);
+			}
+
+			if ($rt==202 && $p["auth_id"]!=$p["case_created_by_id"])
+			{
+				notify ("update", $p["auth_usn"], $p["case_created_by"], ("#".$p["case_id"]." ".$p["case_category"]), $p["case_created_by_id"], $p["case_id"]);
+			}
+
+			if ($rt==202 && $p["auth_id"]!=$p["case_assigned_to_id"]) 
+			{
+				notify ("update", $p["auth_usn"], $p["case_assigned_to"], ("#".$p["case_id"]." ".$p["case_category"]), $p["case_assigned_to_id"], $p["case_id"]);
+			}
+
+			error_log ("SYNC ".$p["case_id"].", ".$p["dsp_id"].", ".$p["ca_id"]);
+			// muu_ ("sync",""); // wakeup sync
 		}
 	}
 	
@@ -830,10 +837,6 @@ function _request_ ()
 		{
 			error_log ("response: ".$id);
 			$rt = rest_uri_response ($u, $suffix, $id, $o, $p, $aa, $rt_);
-			//if ($u=="activities" && $id==-1 && $o["src"]=="escalation") // onview close notif
-			//{
-			//	//_notify ("close?", $o["src"], $o["src_uid"], $o["src_address"], $p["auth_exten"], "close", "2", 0); 
-			//}
 		}
 	}
 	

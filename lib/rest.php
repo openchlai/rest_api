@@ -1963,8 +1963,7 @@ function rest_uri_post ($u, $suffix, $id, &$o, &$p)
 	{
 		$b = $bb[$i];
 		$a_ = $GLOBALS[($b[0]."_def")];
-		$k_ = model_k_id ($b[0], $b[1], $a_);
-error_log ("--->(".$b[2].")".$k_);		
+
 		if ($b[2]=="aub")
 		{
 			if (isset ($p["aub_id"]) && strlen ($p["aub_id"])>0) continue;
@@ -2008,6 +2007,7 @@ error_log ("--->(".$b[2].")".$k_);
 			if ($bn>3 && $b[4]=="1" && $id!=NULL) $fm_=1; // allow link during upd
 			if ($bn>3 && $fm_==0) continue;
 			
+			$k_ = model_k_id ($b[0], $b[1], $a_);
 			$rt_ = rest_uri_post ($b[0], $b[1], (isset($p[$k_])?$p[$k_]:NULL), $o, $p); // evaluate the full api scope
 			if ($rt_==412) return 412;
 			continue;
@@ -2017,11 +2017,11 @@ error_log ("--->(".$b[2].")".$k_);
 		{	
 			if (!isset ($o[($b[0].$b[1])])) continue; 
 			$o_ = $o[($b[0].$b[1])];
-			$k_ = array_keys ($o_);
-			$n_ = count ($k_);
+			$kk_ = array_keys ($o_);
+			$n_ = count ($kk_);
 			error_log ("[obj] ".$b[0].$b[1]."|".$n_."|".json_encode ($o_));
 			if ($n_<1) continue; 
-			for ($i_=0; $i_<$n_; $i_++) $o[$k_[$i_]] = $o_[$k_[$i_]]; // copy
+			for ($i_=0; $i_<$n_; $i_++) $o[$kk_[$i_]] = $o_[$kk_[$i_]]; // copy
 			$rt_ = rest_uri_post ($b[0], $b[1], NULL, $o, $p);
 			// error_log ("[obj] ".$b[0].$b[1]." copied |".$rt_."|".json_encode ($o)); 
 			if ($rt_==412) return 412;
@@ -2053,6 +2053,7 @@ error_log ("--->(".$b[2].")".$k_);
 			continue;
 		}
 		
+		$k_ = model_k_id ($b[0], $b[1], $a_);
 		$t_ = $GLOBALS["RESOURCES"][$b[0]][0];
 		$m_ = $GLOBALS["RESOURCES"][$b[0]][2];
 		$s_ = "";	
