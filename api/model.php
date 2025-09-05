@@ -82,7 +82,7 @@ $RIGHTS_1 = array // sel:0,add:1,upd:2 // agent rights
 	"messages"=>	array ("1","1","0","0","0"),
 //	"emails"=>	array ("1","1","0","0","0"), 
 			
-	"activities"=>	array ("1","1","1","0","0","created_by_id=","auth_id"),	
+	"activities"=>	array ("1","1","1","0","0","assigned_to_id=","auth_id"),	
 	"dispositions"=>array ("1","1","1","0","0"),
 	"actions"=>	array ("1","1","0","0","0"),
 	"attachments"=>	array ("1","1","1","0","0"),
@@ -125,7 +125,7 @@ $RIGHTS_2 = array // sel:0,add:1,upd:2,overide-ctc-field:3 // supervisor rights
 	"messages"=>	array ("1","1","0","0","0"),
 //	"emails"=>	array ("1","1","0","0","0"), 
 				
-	"activities"=>	array ("1","1","1","0","0","created_by_id=","auth_id"),	
+	"activities"=>	array ("1","1","1","0","0","assigned_to_id=","auth_id"),	
 	"dispositions"=>array ("1","1","1","0","0"),
 	"actions"=>	array ("1","1","0","0","0"),
 	"attachments"=>	array ("1","1","1","0","0"),
@@ -168,7 +168,7 @@ $RIGHTS_3 = array // sel:0,add:1,upd:2 // casemanger rights
 	"messages"=>	array ("1","1","0","0","0"),
 //	"emails"=>	array ("1","1","0","0","0"), 
 				
-	"activities"=>	array ("1","1","1","0","0","created_by_id=","auth_id"),	
+	"activities"=>	array ("1","1","1","0","0","assigned_to_id=","auth_id"),	
 	"dispositions"=>array ("1","1","1","0","0"),
 	"actions"=>	array ("1","1","0","0","0"),
 	"attachments"=>	array ("1","1","1","0","0"),
@@ -211,7 +211,7 @@ $RIGHTS_4 = array // sel:0,add:1,upd:2 // case workerr
 	"messages"=>	array ("1","1","0","0","0"),
 //	"emails"=>	array ("1","1","0","0","0"), 
 			
-	"activities"=>	array ("1","1","1","0","0","created_by_id=","auth_id"),	
+	"activities"=>	array ("1","1","1","0","0","assigned_to_id=","auth_id"),	
 	"dispositions"=>array ("1","1","1","0","0"),
 	"actions"=>	array ("1","1","0","0","0"),
 	"attachments"=>	array ("1","1","1","0","0"),
@@ -259,7 +259,7 @@ $RIGHTS_99 = array // sel:0,add:1,upd:2,sel:id(other) // admin rights (same as s
 	"messages"=>	array ("1","1","0","0","0"),
 //	"emails"=>	array ("1","1","0","0","0"), 
 				
-	"activities"=>	array ("1","1","1","0","0","created_by_id=","auth_id"),	
+	"activities"=>	array ("1","1","1","0","0","assigned_to_id=","auth_id"),	
 	"dispositions"=>array ("1","1","1","0","0"),
 	"actions"=>	array ("1","1","0","0","0"),
 	"attachments"=>	array ("1","1","1","0","0"),
