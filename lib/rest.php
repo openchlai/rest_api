@@ -1946,8 +1946,8 @@ function rest_uri_get ($u, $suffix, $id, &$fo, &$p, &$aa)
 function rest_uri_post ($u, $suffix, $id, &$o, &$p)
 {
 	error_log ("----------------------POST START (".$u.$suffix."/".$id.")-------------------------------------".$_SESSION["cc_user_role"]);
-	//error_log ("  [o] ". json_encode ($o));
-	//error_log ("  [p] ". json_encode ($p));
+	error_log ("[o] ". json_encode ($o));
+	//error_log ("[p] ". json_encode ($p));
 	
 	if (!isset ($GLOBALS[("RIGHTS_".$_SESSION["cc_user_role"])])) return 403;
 	$rights = $GLOBALS[("RIGHTS_".$_SESSION["cc_user_role"])];

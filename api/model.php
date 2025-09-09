@@ -144,10 +144,10 @@ $RIGHTS_2 = array // sel:0,add:1,upd:2,overide-ctc-field:3 // supervisor rights
 $RIGHTS_3 = array // sel:0,add:1,upd:2 // casemanger rights
 (
 	"au"=>		array ("1","0","0","0","0"),
-	"addr"=>	array ("0","0","0","0","0"),
+	"addr"=>		array ("0","0","0","0","0"),
 	"otp"=>		array ("0","0","0","0","0"),
-	"auth"=>	array ("1","0","0","0","0","id=","auth_id"),
-	"users"=>	array ("1","0","0","0","0"),
+	"auth"=>		array ("1","0","0","0","0","id=","auth_id"),
+	"users"=>		array ("1","0","0","0","0"),
 	"contacts"=>	array ("1","1","1","0","0"),
 	"profile"=>	array ("1","0","1","0","0","id=","profile_id"), // 1177
 	
@@ -160,8 +160,8 @@ $RIGHTS_3 = array // sel:0,add:1,upd:2 // casemanger rights
 	"categories"=>	array ("1","0","0","0","0"),
 	"subcategories"=>array ("1","0","0","0","0"),
 
-	"files"=>	array ("1","1","0","0","0"),		
-	"calls"=>	array ("1","0","0","0","0"), 
+	"files"=>		array ("1","1","0","0","0"),		
+	"calls"=>		array ("1","0","0","0","0"), 
 	"chanss"=>	array ("1","0","0","0","0","user_id=","auth_id"),  
 	"prompts"=>	array ("1","0","0","0","0"),
 	"pmessages"=>	array ("1","1","0","0","0"),
@@ -171,7 +171,7 @@ $RIGHTS_3 = array // sel:0,add:1,upd:2 // casemanger rights
 	"activities"=>	array ("1","1","1","0","0","assigned_to_id=","auth_id"),	
 	"dispositions"=>array ("1","1","1","0","0"),
 	"actions"=>	array ("1","1","0","0","0"),
-	"attachments"=>	array ("1","1","1","0","0"),
+	"attachments"=>array ("1","1","1","0","0"),
 	"qas"=>		array ("1","1","0","0","0"), 
 
 	"reporters"=>	array ("1","1","1","0","0"),
@@ -180,7 +180,7 @@ $RIGHTS_3 = array // sel:0,add:1,upd:2 // casemanger rights
 	"services"=>	array ("1","1","1","0","0"),
 	"referals"=>	array ("1","1","1","0","0"),
 	"client_referals"=>	array ("1","1","1","0","0"),
-	"cases"=>	array ("1","1","1","1","0","assigned_to_id=","auth_id","escalated_by_id=","auth_id"), // allow manager to edit other peoples cases
+	"cases"=>		array ("1","1","1","1","0","assigned_to_id=","auth_id","escalated_by_id=","auth_id"), // allow manager to edit other peoples cases
 	"case_activities"=>	array ("1","1","0","0","0"),
 );
 
@@ -871,8 +871,9 @@ $activities_def = array // nb: activity for any chani
 	array ("src_status_duration","",	"3","4","","",	"","","", 	"Channel Status Duration",""),
 	array ("src_end_ts","",			"3","3","","",	"","","", 	"Channel End Ts",""),
 	array ("src_end_duration","",		"3","4","","",	"","","", 	"Channel Status Duration",""),
-	array ("src_msg","",			"3","4","","",	"","","", 	"Channel Status Duration",""),
-			
+
+	array ("action_detail","",		"3","1","","",	"","","", 	"Action Detail",""),
+
 	array ("dispositions","",		"4","1","","",  "dispositions","GROUP_CONCAT(disposition)","",  "Disposition",""), 
 	        
 	array ("yr","",				"4","2","","",  "activities","UNIX_TIMESTAMP(CONCAT(YEAR(FROM_UNIXTIME(src_ts)),'-01-01'))","",   "Year",":d:y:0: "), 
@@ -1921,13 +1922,14 @@ $activities_api = array
 	array ("activities","","")
 );
 
-$activities_uuid_api = array			// create reporter from notification -- todo: check if contact_id,src_uid exist
+$activities_notify_api = array			// create reporter from notification -- todo: check if contact_id,src_uid exist
 (
-	array ("contacts","_dup","include"),
+	array ("activities","","dup","id","activity_notify_id",NULL,"form_id:case_id","src:src","src_uid:src_uid"),
 	array ("cases","","dup","id","case_id", NULL, "id","dept"),
-	// todo: check if reporter already exists with (src, src_uid, contact_id) match
+	// array ("activities","","params","action"," complete"),
+	// todo: check if reporter already exists with (src, src_uid, case_id, (contact_id)) match
 	array ("reporters","_uuid",""),
-	array ("activities","_uuid","")
+	array ("activities","_notify","")
 );
 
 $dispositions_api = array
@@ -2001,6 +2003,11 @@ $activities_call_subs =
 ];
 
 $activities_case_subs = 
+[
+["cases","","",		"id","case_id"], // recursive!
+];
+
+$activities_notify_subs = 
 [
 ["cases","","",		"id","case_id"], // recursive!
 ];

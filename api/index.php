@@ -129,8 +129,8 @@ function notify ($src, $from, $to, $msg, $to_id, $form_id)
 	$p_ = [];
 	$o_['i_']=0;
 	$o_["src"] = $src;
-	$o_["src_ts"] = _val_id();
-	$o_["src_uid"] = "notify".$o_["src_ts"]; 
+	$o_["src_ts"] = _val_id()/10000;
+	$o_["src_uid"] = "notify"._val_id(); //$o_["src_ts"]; 
 	$o_["src_address"] = $to;
 	$o_["src_usr"] = $from;
 	$o_["src_vector"] = "2"; // leg1 for notify is pseudo
@@ -575,8 +575,12 @@ function _home (&$o, &$p)
 	if (rest_uri_get ("dispositions","", "0", $fo, $p, $aa)==200) rest_uri_response ("dispositions","", "0", $o, $p, $aa, 0); // load dispositions_k
 	
 	echo ",";
-	$fo_=["_c"=>"10"];
+	$fo_=["_c"=>"10", "action"=>"complete"];
 	if (rest_uri_get ("activities","", NULL, $fo_, $p, $aa)==200) rest_uri_response ("activities","", NULL, $o, $p, $aa, 0); // load activities
+
+	echo ",";
+	$fo_=["_c"=>"10", "action"=>"notify"];
+	if (rest_uri_get ("activities","_notify", NULL, $fo_, $p, $aa)==200) rest_uri_response ("activities","_notify", NULL, $o, $p, $aa, 0); // load _notifications
 
 	echo ",";
 	if (rest_uri_get ("calls","", "0", $fo_, $p, $aa)==200) rest_uri_response ("calls","", "0", $o, $p, $aa, 0); // load calls
