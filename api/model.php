@@ -849,7 +849,8 @@ $activities_def = array // nb: activity for any chani
 	array ("action_id","",			"3","2","","f", "","","",	"Action ID",""), 
 	array ("contact_id","",			"1","2","","f", "","","",	"Contact ID",""), 
 	array ("campaign_id","",			"1","2","","f", "","","",	"Campaign ID",""), 
-	array ("form_id","",			"1","2","","f", "","","",	"Form ID",""), 	// form_id
+	array ("case_id","",			"1","2","","f", "","","",	"Case ID",""), 	// todo: form_id
+	array ("ca_id","",				"1","2","","f", "","","",	"Update ID",""), 	// todo: update_id
 
 	array ("assigned_on","",			"1","3","","", "","","",		"Assigned On",""),
 	array ("assigned_to_id","",		"1","2","","", "","","",		"Assigned To ID",""),
@@ -1064,17 +1065,16 @@ $reporters_def = array
 	array ("contact_location_5","",		"3","2","","", "","","",	"Location Level 5",""),
 	array ("contact_location_6","",		"3","2","","", "","","",	"Location Level 6",""),
 	array ("contact_is_refugee","",		"3","2","","", "","","",	"Reporter Is Refugee","::yesno:0:2"),
+	array ("is_client","",				"4","2","","",	"clients","IF(COUNT(id)>0,'1','')","", 	"Is Client",""),
 		
-	array ("src","",			"1","2","m","","","","", 	"Channel",""),
+	array ("src","",				"1","2","m","","","","", 	"Channel",""),
 	array ("src_uid","",			"1","2","","",	"","","", 	"Channel Uniqueid",""),
-	array ("src_address","",		"1","2","","P",	"","","", 	"Channel Address",""),
+	array ("src_address","",			"1","2","","P",	"","","", 	"Channel Address",""),
 	array ("src_vector","",			"1","2","","",	"","","", 	"Channel Direction",""),
-	
-	array ("is_client","",			"4","2","","",	"clients","IF(COUNT(id)>0,'1','')","", 	"Is Client",""),
-
-	array ("case_id","",			"1","2","","f", "","","",	"Case ID",""),  // link once
 	array ("src_uid2","",			"1","2","","",	"","","", 	"Channel Uniqueid 2",""),
-
+	
+	array ("case_id","",			"1","2","","f", "","","",	"Case ID",""),  // link once
+	array ("ca_id","",				"1","2","","f", "","","",	"Update ID",""),  // link once
 );
 
 $perpetrators_def = array 

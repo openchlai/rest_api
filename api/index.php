@@ -123,9 +123,9 @@ function national_registry (&$o, &$p)
 	return $id;
 }
 
-function notify ($src, $from, $to, $msg, $to_id, $form_id)
+function notify ($src, $from, $to, $msg, $to_id, $ca_id)
 {
-	$o_ = ["assigned_to_id"=>$to_id, "contact_id"=>"-1", "form_id"=>$form_id];
+	$o_ = ["assigned_to_id"=>$to_id, "contact_id"=>"-1", "ca_id"=>$ca_id];
 	$p_ = [];
 	$o_['i_']=0;
 	$o_["src"] = $src;
@@ -813,17 +813,17 @@ function _request_ ()
 		{
 			if (isset ($o["escalated_to_id"]) && $o["escalated_to_id"]>0 && isset ($p["escalated_to_id"]) && $o["escalated_to_id"]==$p["escalated_to_id"])
 			{
-				notify ("escalation", $p["auth_usn"], $p["escalated_to"], ("#".$p["case_id"]." ".$p["case_category"]), $p["escalated_to_id"], $p["case_id"]);
+				notify ("escalation", $p["auth_usn"], $p["escalated_to"], ("#".$p["case_id"]." ".$p["case_category"]), $p["escalated_to_id"], $p["ca_id"]);
 			}
 
 			if ($rt==202 && $p["auth_id"]!=$p["case_created_by_id"])
 			{
-				notify ("update", $p["auth_usn"], $p["case_created_by"], ("#".$p["case_id"]." ".$p["case_category"]), $p["case_created_by_id"], $p["case_id"]);
+				notify ("update", $p["auth_usn"], $p["case_created_by"], ("#".$p["case_id"]." ".$p["case_category"]), $p["case_created_by_id"], $p["ca_id"]);
 			}
 
 			if ($rt==202 && $p["auth_id"]!=$p["case_assigned_to_id"]) 
 			{
-				notify ("update", $p["auth_usn"], $p["case_assigned_to"], ("#".$p["case_id"]." ".$p["case_category"]), $p["case_assigned_to_id"], $p["case_id"]);
+				notify ("update", $p["auth_usn"], $p["case_assigned_to"], ("#".$p["case_id"]." ".$p["case_category"]), $p["case_assigned_to_id"], $p["ca_id"]);
 			}
 
 			error_log ("SYNC ".$p["case_id"].", ".$p["dsp_id"].", ".$p["ca_id"]);
