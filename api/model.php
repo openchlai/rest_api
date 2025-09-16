@@ -1355,15 +1355,15 @@ $cases_def = array
 				
 	array ("escalated_by_id","",		"3","2","","f",	"","","",	"Escalated By ID",""),
 	array ("escalated_by","",		"3","2","","f",	"","","",	"Escalated By",""),
-	array ("escalated_by_role","",	"3","2","","f",	"","","",	"Escalated By Role",""),
+	array ("escalated_by_role","",	"3","2","","f",	"","","",	"Escalated By Role","::user_role:0:1"),
 
 	array ("escalated_to_id","",		"3","2","","f",	"","","",	"Escalated To ID",""),
 	array ("escalated_to","",		"3","2","","",	"","","", 	"Escalated To",""),	
-	array ("escalated_to_role","",	"3","2","","",	"","","", 	"Escalated To Role",""),
+	array ("escalated_to_role","",	"3","2","","",	"","","", 	"Escalated To Role","::user_role:0:1"),
 	
 	array ("assigned_to_id","",		"3","2","","",	"","","", 	"Assigned To ID",""),	
 	array ("assigned_to","",			"3","2","","",	"","","", 	"Assigned To",""),	
-	array ("assigned_to_role","",		"3","2","","",	"","","", 	"Assigned To Role",""),	
+	array ("assigned_to_role","",		"3","2","","",	"","","", 	"Assigned To Role","::user_role:0:1"),	
 	
 	array ("priority","",			"3","2","m","",	"","","", 	"Priority","::case_priority:0:1"), 
 	array ("status","",				"3","2","m","",	"","","", 	"Status","::case_status:0:1"),
@@ -1680,6 +1680,7 @@ $reporters_uuid_api = array			// create reporter -- todo: check if contact_id,sr
 $reporters_none_api = array
 (
 	array ("cases","","dup","id","case_id", NULL, "id","dept"),
+	array ("reporters","","params",  "src"," edit", "src_uid",":#:"),
 	array ("reporters","_none",""),
 	array ("reporters","","params", "reporter_uuid_id","reporter_none_id")
 );
@@ -1918,16 +1919,17 @@ $case_activities_sync_api = array
 $activities_api = array
 (
 	array ("users","","dup","id","assigned_to_id",NULL, "id:assigned_to_id", "usn:assigned_to", "role:assigned_to_role"),
-     array ("cases","","dup","id","form_id",NULL, "id:form_id"), 
+     array ("case_activities","","dup","id","ca_id",NULL, "id:ca_id","case_id:case_id"), 
+	array ("cases","","dup","id","case_id",NULL, "id:case_id"), 
 	array ("activities","","")
 );
 
 $activities_notify_api = array			// create reporter from notification -- todo: check if contact_id,src_uid exist
 (
-	array ("activities","","dup","id","activity_notify_id",NULL,"form_id:case_id","src:src","src_uid:src_uid"),
+	array ("activities","","dup","id","activity_notify_id",NULL,"src:src","src_uid:src_uid","case_id:case_id","ca_id:ca_id"),
 	array ("cases","","dup","id","case_id", NULL, "id","dept"),
 	// array ("activities","","params","action"," complete"),
-	// todo: check if reporter already exists with (src, src_uid, case_id, (contact_id)) match
+	// todo: check if reporter already exists with (src, src_uid, case_id, contact_id) match
 	array ("reporters","_uuid",""),
 	array ("activities","_notify","")
 );
@@ -2009,7 +2011,8 @@ $activities_case_subs =
 
 $activities_notify_subs = 
 [
-["cases","","",		"id","case_id"], // recursive!
+["cases","","",				"id","case_id"], // recursive!
+["case_activities","_notify","", 	"id","ca_id"],
 ];
 
 $dispositions_subs =

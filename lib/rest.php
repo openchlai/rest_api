@@ -109,7 +109,7 @@ function _kv ($k, &$op, &$o, &$p)
 			if (isset ($o[$vv[2]]) && strlen ($o[$vv[2]])>0) $k = $vv[4];
 		        if (isset ($p[$vv[2]]) && strlen ($p[$vv[2]])>0) $k = $vv[4];	
 		}
-		if ($op=="@#") return (_val_id ()."-"._rands (9,"num"));
+		if ($op=="#") return (_val_id ()."-"._rands (9,"num"));
 	}
 	if (isset ($o[$k])) $v = __VESC ($o[$k]);
 	if (isset ($p[$k])) $v = $p[$k];
