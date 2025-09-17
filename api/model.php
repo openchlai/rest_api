@@ -2012,7 +2012,6 @@ $activities_case_subs =
 $activities_notify_subs = 
 [
 ["cases","","",				"id","case_id"], // recursive!
-["case_activities","_notify","", 	"id","ca_id"],
 ];
 
 $dispositions_subs =
