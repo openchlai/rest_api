@@ -15,7 +15,7 @@ include "../lib/rpc.php";
 include "model_qa.php";
 include "model_qa_k.php";
 
-$FN = ["sendOTP"=>1, "verifyOTP"=>1, "resetAuth"=>1, "changeAuth"=>1, "dash"=>1, "wallonly"=>1, "agent"=>1, "chan"=>1, "sup"=>1, "msg"=>1, "msg_end"=>1, "eemis"=>1, "aii"=>1]; // non-crud endpoints
+$FN = ["sendOTP"=>1, "verifyOTP"=>1, "resetAuth"=>1, "changeAuth"=>1, "dash"=>1, "wallonly"=>1, "agent"=>1, "chan"=>1, "sup"=>1, "msg"=>1]; // non-crud endpoints
 
 function copy_from_pabx ($uid) // copy from archive
 {
@@ -79,16 +79,11 @@ function muu_ ($cmd, $args) // nb: does not wait for response
 
 	$ret = socket_write($sock, $req, strlen($req));
 
-	error_log ("dont wait ------------".$ret);
-}
+	sleep(1);
 
-function _aii (&$o, &$p)
-{
-	$s = file_get_contents('aii_demo.json'); // demo ai case output
-	header ("HTTP/1.1 200 OK");
-        header ('Content-Type: application/json');
-	echo $s;
-	return 200;
+	socket_close($sock);
+
+	error_log ("dont wait ------------".$ret);
 }
 
 function national_registry (&$o, &$p)
@@ -191,7 +186,8 @@ function _message_in (&$o, &$p)
 	$o_["src_ts"] = $o["timestamp"];
 	$o_["src_vector"] = "1";
 	$o_['src_mime'] = $o["mime"];
-        if ($o_['src']=='safepal') $o_['src_mime'] = "application/json";
+     if ($o_['src']=='safepal') 	$o_['src_mime'] = "application/json";
+	if ($o_["src"]=="aii") 		$o_['src_usr']  = "*"; // dont agtk!
 	// $o_["gateway_msg_id"] = $o["message_id"];
 	// $o_["gateway_session_id"] = $o["session_id"];
 	$rt = rest_uri_post ("messages", "", NULL, $o_, $p);
@@ -203,7 +199,7 @@ function _message_in (&$o, &$p)
 		if (strlen ($msg)>30) $msg = substr ($msg,0,30)."..."; // trunccate to fit in notif 
 		// $s = "msg?src=".$o_['src']."&address=".$o_['src_address']."&id=".$o_['src_uid']."&msg=".$msg."&";
 		$s = "msg?ctx=".$o_['src']."&cid=".$o_['src_address']."&chan=".$o_['src_callid']."&payload=".$msg."&";
-		if ($o_["src"]=="aii") $s .= "exten=*&"; // dont agtk!
+		if (isset($o_["src_usr"])) $s .= "exten=".$o_["src_usr"]."&"; // dont agtk!
 		muu ("ati", $s); // post to notif_queue
 
 		$aa = [];
@@ -680,8 +676,6 @@ function _request_ ()
 	}
 	
 	if ($u=="msg") return _message_in ($o, $p);
-
-	if ($u=="aii") return _aii ($o, $p);
 
 	if ($_SERVER["REQUEST_METHOD"]=="GET") 
 	{

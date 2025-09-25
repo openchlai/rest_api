@@ -778,7 +778,7 @@ $pmessages_def = array
         array ("created_by_id","",              "0","2","","", "","","",        "",""),
         array ("created_by_role","",            "0","2","","", "","","",        "Created By Role",""),
   
-        array ("src","",                        "1","2","m","", "","","",       "Channel",""),
+        array ("src","",                        "1","2","m","", "","","",       "Channel","::case_src:0:1"),
         array ("src_ts","",                     "1","3","","",  "","","",       "Channel Timestamp",""), 
         array ("src_uid","",                    "1","2","m","", "","","",       "Channel Uniqueid",""), // msgid
         array ("src_uid2","",                   "1","2","","",  "","","",       "Activity Uniqueid",""),// activity_id
@@ -817,7 +817,7 @@ $messages_def = array
         array ("created_by_id","",              "0","2","","", "","","",        "",""),
         array ("created_by_role","",            "0","2","","", "","","",        "Created By Role",""),
 
-        array ("src","",                        "1","2","m","", "","","",       "Channel",""),
+        array ("src","",                        "1","2","m","", "","","",       "Channel","::case_src:0:1"),
         array ("src_ts","",                     "1","2","","",  "","","",       "Channel Timestamp",""),
         array ("src_uid","",                    "1","2","m","", "","","",       "Channel Uniqueid",""), // msgid
         array ("src_uid2","",                   "1","2","","",  "","","",       "Activity Uniqueid",""),// activity_id
