@@ -13,37 +13,37 @@ update kase set escalated_by_id= ///5
 $RESOURCES = array 
 (
 	"au"=>			array ("au","",			"1","0","0",	"Audit Trail", 		"","",			""), 
-	"addr"=>			array ("addr","",		"1","0","0",	"Registered Address", 	"id DESC","",		""), 
-	"otp"=>			array ("otp","",		"1","0","0",	"OTP", 			"","",			""), 
-	"extens"=>		array ("exten","",		"1","0","0",	"WebRTC Extension", 	"","",			""), 
-	"auth"=>			array ("auth","",		"0","0","0",	"Auth", 		"","",			""),
+	"addr"=>			array ("addr","",			"1","0","0",	"Registered Address", 	"id DESC","",		""), 
+	"otp"=>			array ("otp","",			"1","0","0",	"OTP", 			"","",			""), 
+	"extens"=>		array ("exten","",			"1","0","0",	"WebRTC Extension", 	"","",			""), 
+	"auth"=>			array ("auth","",			"0","0","0",	"Auth", 		"","",			""),
 	"users"=>			array ("auth","user",		"3","0","0",	"User", 		"","",			""),
 	"contacts"=>		array ("contact","",		"3","0","0",	"Contact", 		"fullname","",		""), 
 	"profile"=>		array ("contact","profile",	"0","0","0",	"Profile", 		"","",			"contacts"), 
 
 	"schedules"=>		array ("schedule","",		"3","0","0",	"Schedule", 		"id DESC","",		""), 
 	"campaigns"=>		array ("campaign","",		"3","0","0",	"Campaign", 		"id DESC","",		""),	
-	//"members"=>		array ("member","",		"3","0","0",	"Member", 		"","",			""), 		
-	//"voiceprompts"=>	array ("voiceprompt","",	"3","0","0",	"VoicePrompt", 		"","",			""),	
+	//"members"=>		array ("member","",			"3","0","0",	"Member", 		"","",			""), 		
+	//"voiceprompts"=>	array ("voiceprompt","",		"3","0","0",	"VoicePrompt", 		"","",			""),	
 	//"voicefiles"=>	array ("voicefile","",		"3","0","0",	"VoiceFile", 		"pos ASC","",		""),
-	"categories"=>		array ("category","",           "3","0","0",    "Category",             "level,name","",	""), 
+	"categories"=>		array ("category","",		"3","0","0",    "Category",             "level,name","",	""), 
 	"subcategories"=>	array ("category","subcategory","3","0","0",    "Category",             "level,name","",	"categories"), 
 
-	"files"=>			array ("file","",		"1","0","0",	"File", 		"","",			""),
-	"calls"=>			array ("chan","",		"0","0","0",	"Call", 		"","",			""), 
+	"files"=>			array ("file","",			"1","0","0",	"File", 		"","",			""),
+	"calls"=>			array ("chan","",			"0","0","0",	"Call", 		"","",			""), 
 	"chanss"=>		array ("chan_ss","",		"0","0","0",	"Agent Session", 	"","",			""), 
-     "pmessages"=>		array ("pmsg","",		"1","0","0",	"Message Session",	"id DESC","",		""), 
-     "messages"=>		array ("msg","",		"1","0","0",	"Message", 		"id DESC","",		""), 
+     "pmessages"=>		array ("pmsg","",			"1","0","0",	"Message Session",	"id DESC","",		""), 
+     "messages"=>		array ("msg","",			"1","0","0",	"Message", 		"id DESC","",		""), 
 
 	"activities"=>		array ("activity","",		"3","0","0",	"Activity", 		"src_ts DESC","",	""), 
 	"dispositions"=>	array ("disposition","dsp",	"3","0","0",	"Dispositions", 	"created_on DESC","",	""), 
-	"actions"=>		array ("action","",		"1","0","0",	"Actions", 		"id DESC","",		""), 
+	"actions"=>		array ("action","",			"1","0","0",	"Actions", 		"id DESC","",		""), 
 	"attachments"=>	array ("attachment","",		"3","0","0",	"Attachment",		"","",			""), 			
 	"qas"=>			array ("qa","",			"1","0","0",	"Quality Assessment",	"","",			""), 
 		
 	"reporters"=>		array ("reporter","",		"3","0","0",	"Reporter", 		"","",			""), 
-	"clients"=>		array ("client","",		"3","0","0",	"Client", 		"","",			""), 
-	"perpetrators"=>	array ("perpetrator","",	"3","0","0",	"Perpetrator", 		"","",			""), 
+	"clients"=>		array ("client","",			"3","0","0",	"Client", 		"","",			""), 
+	"perpetrators"=>	array ("perpetrator","",		"3","0","0",	"Perpetrator", 		"","",			""), 
 	"services"=>		array ("service","",		"3","0","0",	"Services Offered", 	"","",			""), 
 	"referals"=>		array ("referal","",		"3","0","0",	"Referals", 		"","",			""), 
 	"client_referals"=>	array ("client_referal","",	"3","0","0",	"Client Referals",	"","",			""), 
@@ -2022,7 +2022,7 @@ $dispositions_subs =
 
 $contacts_disposition_subs =	
 [
-// disposition
+["dispositions","","",	"id","dsp_id"],
 ["subcategories","","100",      "category_id",(" ".$DISPOSITION_ROOT_ID)]
 ];
 

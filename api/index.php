@@ -118,7 +118,7 @@ function national_registry (&$o, &$p)
 	return $id;
 }
 
-function notify ($src, $from, $to, $msg, $to_id, $ca_id)
+function notify ($src, $from, $to, $to_id, $to_exten, $msg,  $ca_id)
 {
 	$o_ = ["assigned_to_id"=>$to_id, "contact_id"=>"-1", "ca_id"=>$ca_id];
 	$p_ = [];
@@ -126,13 +126,16 @@ function notify ($src, $from, $to, $msg, $to_id, $ca_id)
 	$o_["src"] = $src;
 	$o_["src_ts"] = _val_id()/10000;
 	$o_["src_uid"] = "notify"._val_id(); //$o_["src_ts"]; 
-	$o_["src_address"] = $to;
-	$o_["src_usr"] = $from;
+	$o_["src_address"] = $from;
+	$o_["src_usr"] = $to;
 	$o_["src_vector"] = "2"; // leg1 for notify is pseudo
 	$o_["action"] = "notify";
 	$o_["action_detail"] = $msg;
 	error_log ("[notify] ".json_encode($o_));
 	$rt = rest_uri_post ("activities", "", NULL, $o_, $p_);
+
+	$s = "msg?ctx=notify&cid=".$from."&chan=".$o_['src_uid']."&payload=".$ca_id."&exten=".to_exten."&";
+     muu ("ati", $s);
 }
 
 function message_out (&$o, &$p)
@@ -169,7 +172,7 @@ function message_out (&$o, &$p)
 	
 	$s = "read?uid=".$o["src_uid2"]."&cid=".$o["src_usr"]."&";
 	if (isset ($o["close"])) $s .= "args=close&"; // close session
-        muu ("ati", $s); // update notification status
+     muu ("ati", $s); // update notification status
 }
 
 function _message_in (&$o, &$p)
@@ -197,7 +200,6 @@ function _message_in (&$o, &$p)
 		$msg = preg_replace ('/[[:^print:]]/', ' ', $msg); 
 		$msg = str_replace ([' ', '&', '<', '>', "\r","\n","\t"], ['_', '', '', '', '', '', ''], $msg); 
 		if (strlen ($msg)>30) $msg = substr ($msg,0,30)."..."; // trunccate to fit in notif 
-		// $s = "msg?src=".$o_['src']."&address=".$o_['src_address']."&id=".$o_['src_uid']."&msg=".$msg."&";
 		$s = "msg?ctx=".$o_['src']."&cid=".$o_['src_address']."&chan=".$o_['src_callid']."&payload=".$msg."&";
 		if (isset($o_["src_usr"])) $s .= "exten=".$o_["src_usr"]."&"; // dont agtk!
 		muu ("ati", $s); // post to notif_queue
@@ -809,17 +811,17 @@ function _request_ ()
 			if (isset ($o["escalated_to_id"]) && $o["escalated_to_id"]>0 && isset ($p["escalated_to_id"]) && $o["escalated_to_id"]==$p["escalated_to_id"])
 			{
 				error_log ("--> ".$o["escalated_to_id"]);
-				notify ("escalation", $p["auth_usn"], $p["escalated_to"], ("^#".$p["case_id"]." ".$p["case_category"]), $p["escalated_to_id"], $p["ca_id"]);
+				notify ("escalation", $p["auth_usn"], $p["escalated_to"], $p["escalated_to_id"], $p["escalated_to_exten"], ("^#".$p["case_id"]." ".$p["case_category"]), $p["ca_id"]);
 			}
 
 			if ($rt==202 && $p["auth_id"]!=$p["case_created_by_id"])
 			{
-				notify ("update", $p["auth_usn"], $p["case_created_by"], ("^#".$p["case_id"]." ".$p["case_category"]), $p["case_created_by_id"], $p["ca_id"]);
+				notify ("update", $p["auth_usn"], $p["case_created_by"], $p["case_created_by_id"], $p["case_created_by_exten"], ("^#".$p["case_id"]." ".$p["case_category"]), $p["ca_id"]);
 			}
 
 			if ($rt==202 && $p["auth_id"]!=$p["case_assigned_to_id"]) 
 			{
-				notify ("update", $p["auth_usn"], $p["case_assigned_to"], ("^#".$p["case_id"]." ".$p["case_category"]), $p["case_assigned_to_id"], $p["ca_id"]);
+				notify ("update", $p["auth_usn"], $p["case_assigned_to"], $p["case_assigned_to_id"], $p["case_assigned_to_exten"], ("^#".$p["case_id"]." ".$p["case_category"]), $p["ca_id"]);
 			}
 
 			error_log ("SYNC ".$p["case_id"].", ".$p["dsp_id"].", ".$p["ca_id"]);
