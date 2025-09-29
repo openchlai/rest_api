@@ -1859,7 +1859,7 @@ $referals_api = array
 	array ("cases","referals","agg4",  	"id","case_id",NULL,  "case_id_","case_id")
 );
 
-$cases_api = array 
+$cases_api = array //
 (
 	array ("categories","","duf","id","case_category_id",NULL, "id:case_category_id", "fullname:case_category", "root_id:case_category_root_id", "fullname_id:case_category_fullname_id", "fullname"),
 	array ("categories","","duf","id","justice_id",NULL, "id:justice_id", "fullname:justice"),
