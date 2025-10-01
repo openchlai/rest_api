@@ -140,36 +140,38 @@ function notify ($src, $from, $to, $to_id, $to_exten, $msg,  $ca_id)
 
 function message_out (&$o, &$p)
 {
-	$hdrs = array ("Content-Type: application/json");
-	$postdata = array
-	(
-		"username"=>$GLOBALS["API_GATEWAY_USN"],
-		"password"=>$GLOBALS["API_GATEWAY_PASS"]  
-	);
-	$token = ""; // kurl ($GLOBALS["API_GATEWAY_AUTH"], 60, json_encode($postdata), $hdrs);
-	
-	$api_url = $GLOBALS["API_GATEWAY_SEND_MSG"];
-	$hdrs = array ("Content-Type: application/json");// , ("Authorization: Token ".json_decode($token["data"],true)["token"]));
-	$postdata = array 
-	(
-		//"chat_sender"=>$o['src_address'], 
-		//"chat_receiver"=>$p['src_usr'], 
-		//"chat_message"=>$o['src_msg'], 
-		//"chat_session"=>$o['src_callid'], 
-		//"chat_channel"=> $o["src"],
-		//"chat_source"=>"OUTBOX"//"HELPLINE"
-		"recipient"=>$o['src_address'],
-		"message_type"=>"text",
-		"content"=>$o["src_msg"]
-	);
-	if (isset ($o["close"]))
+	// if (!isset ($o["partial"])) // complete
 	{
-		$api_url = $GLOBALS["API_GATEWAY_CLOSE_MSG"].$o["src_callid"]."/close/";
-		$postdata = array ("chat_source"=>"HELPLINE");
+		$hdrs = array ("Content-Type: application/json");
+		$postdata = array
+		(
+			"username"=>$GLOBALS["API_GATEWAY_USN"],
+			"password"=>$GLOBALS["API_GATEWAY_PASS"]  
+		);
+		$token = ""; // kurl ($GLOBALS["API_GATEWAY_AUTH"], 60, json_encode($postdata), $hdrs);
+		$api_url = $GLOBALS["API_GATEWAY_SEND_MSG"];
+		$hdrs = array ("Content-Type: application/json");// , ("Authorization: Token ".json_decode($token["data"],true)["token"]));
+		$postdata = array 
+		(
+			//"chat_sender"=>$o['src_address'], 
+			//"chat_receiver"=>$p['src_usr'], 
+			//"chat_message"=>$o['src_msg'], 
+			//"chat_session"=>$o['src_callid'], 
+			//"chat_channel"=> $o["src"],
+			//"chat_source"=>"OUTBOX"//"HELPLINE"
+			"recipient"=>$o['src_address'],
+			"message_type"=>"text",
+			"content"=>$o["src_msg"]
+		);
+		if (isset ($o["close"]))
+		{
+			// $api_url = $GLOBALS["API_GATEWAY_CLOSE_MSG"].$o["src_callid"]."/close/";
+			// $postdata = array ("chat_source"=>"HELPLINE");
+		}
+		error_log ("[postdata] ".json_encode($postdata));
+		kurl ($api_url, 60, json_encode($postdata), $hdrs);
 	}
-	error_log ("[postdata] ".json_encode($postdata));
-	kurl ($api_url, 60, json_encode($postdata), $hdrs);
-	
+
 	$s = "read?uid=".$o["src_uid2"]."&cid=".$o["src_usr"]."&";
 	if (isset ($o["close"])) $s .= "args=close&"; // close session
      muu ("ati", $s); // update notification status
