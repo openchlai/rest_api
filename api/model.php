@@ -1995,7 +1995,7 @@ $pmessages_subs =
 $activities_subs = 
 [
 //["dispositions","","20",	"src_address","src_address"],
-["messages","","100",           "src","src","src_callid","src_callid"]
+["messages","","100",           "src","src","src_callid","src_callid"] // 
 ];
 
 $activities_call_subs =
