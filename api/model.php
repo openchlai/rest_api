@@ -1688,11 +1688,13 @@ $reporters_none_api = array
 $reporters_isclient_api = array 		// create|delete client from a reporter
 (
 	array ("reporters","","aub"),
-	array ("reporters","","dup","id","reporter_isclient_id", NULL, "id:reporter_isclient_id","contact_id:contact_id"), // get contact_id
+
+	array ("reporters","","dup","id","reporter_isclient_id", NULL, "id:reporter_isclient_id","contact_id:contact_id","case_id:case_id"), // get contact_id,case_id
 	array ("contacts","_dup","include"),
 	array ("cases","","dup","id","case_id",NULL, "id", "case_category:case_category", "priority", "status","dept", "created_by_id", "created_by", "assigned_to_id", "assigned_to"), 
 	array ("clients","","dup","is_reporter_id","reporter_isclient_id", NULL, "id"), 	 // check if client_id already in case
-        array ("clients","","params", "activity_ref","reporter_isclient_id", "detail","contact_fullname", "is_reporter_id","reporter_isclient_id"),
+	array ("clients","","params", "activity_ref","reporter_isclient_id", "detail","contact_fullname", "is_reporter_id","reporter_isclient_id", "case_id","::case_category: -2:case_id", "case_id_","::is_client_: -9:case_id"),
+
 	array ("clients","",""),
 	array ("reporters","clients","agg4", "id","reporter_isclient_id",NULL,  "contact_id","contact_id","is_reporter_id","reporter_isclient_id", "case_id_", ":!=: -9"), // set is_client flag	
 	
@@ -1759,13 +1761,13 @@ $clients_api = array
 $clients_del_api = array
 (
 	array ("clients","","aub"),	
-	array ("clients","","dup", "id","client_del_id", NULL, "id", "contact_id", "is_reporter_id"),
-        array ("clients","","params",  "client_id","::client_id: -8:client_id", "client_del_id","client_id", "case_id_"," -9", "client_is_reporter_id","::client_is_reporter_id: -8:client_is_reporter_id"),	
+	array ("clients","","dup", "id","client_del_id", NULL, "id", "contact_id", "contact_fullname", "is_reporter_id"),
+	array ("clients","","params",  "client_id","::client_id: -8:client_id", "client_del_id","client_id", "case_id_"," -9", "client_is_reporter_id","::client_is_reporter_id: -8:client_is_reporter_id"),	
 	array ("clients","",""),
-	
+
 	array ("reporters","clients","agg4", "id","client_is_reporter_id",NULL,  "contact_id","contact_id", "is_reporter_id","client_is_reporter_id", "case_id_", ":!=: -9"), // (un)set is_client flag
 		
-	array ("case_activities","","params", "activity_ref","client_id", "detail","contact_fullname"),	
+	array ("case_activities","","params", "activity_ref","client_id", "detail","client_contact_fullname"),	
 	array ("case_activities","","include"),
 );
 
@@ -1805,12 +1807,12 @@ $perpetrators_api = array
 $perpetrators_del_api = array
 (
 	array ("perpetrators","","aub"),
-	array ("perpetrators","","dup", "id","perpetrator_del_id", NULL, "id"),
-	array ("perpetrators","","params",  "perpetrator_id","::perpetrator_id: -8:perpetrator_id", "perpetrator_del_id","client_id", "case_id_"," -9"),
+	array ("perpetrators","","dup", "id","perpetrator_del_id", NULL, "id","contact_fullname"),
+	array ("perpetrators","","params",  "perpetrator_id","::perpetrator_id: -8:perpetrator_id", "perpetrator_del_id","perpetrator_id", "case_id_"," -9"),
 	array ("perpetrators","",""),
 	
 	// array ("reporters","_dup","include"),	// todo: use reporter_uuid_id
-	array ("case_activities","","params","activity_ref","perpetrator_id","detail","contact_fullname"),
+	array ("case_activities","","params","activity_ref","perpetrator_id","detail","perpetrator_contact_fullname"),
 	array ("case_activities","","include"),
 );
 

@@ -1855,9 +1855,9 @@ function rest_uri_response ($u, $suffix, $id, &$o, &$p, &$aa, $rt)
 		}
 		if ($e>0) $fo_["id"]="0";
 		
-		error_log ("[sub] (".$b[0].$b[1].")  id:".$id_." ".json_encode ($fo_)); //  ."|".json_encode ($p)); 
+		error_log ("[sub] (".$b[0].$b[1].")  id:".$id_." ".json_encode ($fo_)); 	//  ."|".json_encode ($p)); 
 		echo ",";
-		$rt_ = rest_uri_get ($b[0], $b[1], $id_, $fo_, $p_, $aa_); // nb: able to return rpt by seting 'metric' params
+		$rt_ = rest_uri_get ($b[0], $b[1], $id_, $fo_, $p_, $aa_); 				// nb: able to return rpt by seting 'metric' params
 		if ($rt_==200) rest_uri_response ($b[0], $b[1], $id_, $o_, $p, $aa_, 0);
 		// error_log ("[sub-ret<<] (".$b[0].$b[1].")  id:".$id_." | ".$rt_."|".$n); //  ."|".json_encode ($p)); 
 	}

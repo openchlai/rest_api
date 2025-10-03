@@ -134,7 +134,7 @@ function notify ($src, $from, $to, $to_id, $to_exten, $msg,  $ca_id)
 	error_log ("[notify] ".json_encode($o_));
 	$rt = rest_uri_post ("activities", "", NULL, $o_, $p_);
 
-	$s = "msg?ctx=notify&cid=".$from."&chan=".$o_['src_uid']."&payload=".$ca_id."&exten=".to_exten."&";
+	$s = "msg?ctx=notify&chan=".$o_['src_uid']."&payload=".$ca_id."&cid=".$from."&exten=".$to_exten."&";
      muu ("ati", $s);
 }
 
@@ -202,7 +202,7 @@ function _message_in (&$o, &$p)
 		$msg = preg_replace ('/[[:^print:]]/', ' ', $msg); 
 		$msg = str_replace ([' ', '&', '<', '>', "\r","\n","\t"], ['_', '', '', '', '', '', ''], $msg); 
 		if (strlen ($msg)>30) $msg = substr ($msg,0,30)."..."; // trunccate to fit in notif 
-		$s = "msg?ctx=".$o_['src']."&cid=".$o_['src_address']."&chan=".$o_['src_callid']."&payload=".$msg."&";
+		$s = "msg?ctx=".$o_['src']."&chan=".$o_['src_callid']."&cid=".$o_['src_address']."&payload=".$msg."&";
 		if (isset($o_["src_usr"])) $s .= "exten=".$o_["src_usr"]."&"; // dont agtk!
 		muu ("ati", $s); // post to notif_queue
 
