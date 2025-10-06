@@ -1765,7 +1765,7 @@ $clients_del_api = array
 	array ("clients","","params",  "client_id","::client_id: -8:client_id", "client_del_id","client_id", "case_id_"," -9", "client_is_reporter_id","::client_is_reporter_id: -8:client_is_reporter_id"),	
 	array ("clients","",""),
 
-	array ("reporters","clients","agg4", "id","client_is_reporter_id",NULL,  "contact_id","contact_id", "is_reporter_id","client_is_reporter_id", "case_id_", ":!=: -9"), // (un)set is_client flag
+	array ("reporters","clients","agg4", "id","client_is_reporter_id",NULL,  "contact_id","client_contact_id", "is_reporter_id","client_is_reporter_id", "case_id_", ":!=: -9"), // (un)set is_client flag
 		
 	array ("case_activities","","params", "activity_ref","client_id", "detail","client_contact_fullname"),	
 	array ("case_activities","","include"),
