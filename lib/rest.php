@@ -1801,14 +1801,8 @@ function rest_uri_response ($u, $suffix, $id, &$o, &$p, &$aa, $rt)
 	if ($id===NULL) echo ",".$aa["ctx"]."\n";
 	
 	$bb = [];
-	
-	//if ($id===NULL && isset ($GLOBALS[($u.$suffix."_rel")]))
-	//{
-	//	$bb = $GLOBALS[($u.$suffix."_rel")];
-	//	$p = $aa['fo'];
-	//}
 
-	if ($id!==NULL && isset ($GLOBALS[($u.$suffix."_subs")])) // recursion parameters
+	if ($id!==NULL && isset ($GLOBALS[($u.$suffix."_subs")]))
 	{
 		$bb = $GLOBALS[($u.$suffix."_subs")];
 		$k = model_k_id ($u, $suffix, $a);
@@ -1833,12 +1827,12 @@ function rest_uri_response ($u, $suffix, $id, &$o, &$p, &$aa, $rt)
 	{
 		$aa_ = array ("ctx"=>"", "f"=>"", "w"=>"", "s"=>"", "sort"=>"", "lim"=>"", "res"=>NULL);
 		$av_ = [];
-		$o_ = $o;
-		$p_ = $p;
+		$o_  = $o;
+		$p_  = $p;
 		$fo_ = [];
 		$id_ = NULL;
-		$e = 0;
-		$b = $bb[$i];
+		$e   = 0;
+		$b   = $bb[$i];
 		$fo_["_c"] = 10; 
 		if (strlen ($b[2])>0) $fo_["_c"] = $b[2];
 		// if (strlen ($b[3])>0) $fo_["_c"] = $b[3];
@@ -1851,7 +1845,7 @@ function rest_uri_response ($u, $suffix, $id, &$o, &$p, &$aa, $rt)
 			if ($v_===NULL) { error_log ("[sub] (".$b[0].$b[1].")  ".$k_." isnull "); $e++; break; } // then load empty record
 			if ($i_==3 && $b[$i_]=="id" && strlen ($v_)<1) $v_="0";
 			$fo_[$b[$i_]] = $v_;
-			if ($i_==3 && $b[$i_]=="id" && $k_=="case_id") $id_ = $v_; // enable recurion for cases
+			if ($i_==3 && $b[$i_]=="id" && $k_=="case_id") { $id_=$v_; $o_=[]; $p_=[]; } // enable recurion for cases
 		}
 		if ($e>0) $fo_["id"]="0";
 		
@@ -1963,6 +1957,7 @@ function rest_uri_post ($u, $suffix, $id, &$o, &$p)
 	{
 		$b = $bb[$i];
 		$a_ = $GLOBALS[($b[0]."_def")];
+		$k_ = model_k_id ($b[0], $b[1], $a_);
 
 		if ($b[2]=="aub")
 		{
@@ -1999,16 +1994,19 @@ function rest_uri_post ($u, $suffix, $id, &$o, &$p)
 			continue;
 		}
 		
+		$id_ = NULL;
+		if (isset ($o[$k_]) && strlen ($o[$k_])>0) $id_ = $o[$k_];
+		if (isset ($p[$k_]) && strlen ($p[$k_])>0) $id_ = $p[$k_];
+		
+		$fm=0; // boolean contextual predicated on state of parent. applicable to: include, object, array, crud(update only)
+		$bn = count ($b);
+		if ($bn>3 && $b[3]=="1" && $id==NULL) $fm=1; // allow evaluate during add
+		if ($bn>4 && $b[4]=="1" && $id!=NULL) $fm=1; // allow evaluate during upd
+		if ($bn>3 && $fm==0) continue;
+		
 		if ($b[2]=="include") 
 		{
-			$fm_=0;
-			$bn = count ($b);
-			if ($bn>3 && $b[3]=="1" && $id==NULL) $fm_=1; // allow link during add
-			if ($bn>3 && $b[4]=="1" && $id!=NULL) $fm_=1; // allow link during upd
-			if ($bn>3 && $fm_==0) continue;
-			
-			$k_ = model_k_id ($b[0], $b[1], $a_);
-			$rt_ = rest_uri_post ($b[0], $b[1], (isset($p[$k_])?$p[$k_]:NULL), $o, $p); // evaluate the full api scope
+			$rt_ = rest_uri_post ($b[0], $b[1], $id_, $o, $p); // evaluate the full api scope
 			if ($rt_==412) return 412;
 			continue;
 		}
@@ -2017,13 +2015,10 @@ function rest_uri_post ($u, $suffix, $id, &$o, &$p)
 		{	
 			if (!isset ($o[($b[0].$b[1])])) continue; 
 			$o_ = $o[($b[0].$b[1])];
-			$kk_ = array_keys ($o_);
-			$n_ = count ($kk_);
-			error_log ("[obj] ".$b[0].$b[1]."|".$n_."|".json_encode ($o_));
-			if ($n_<1) continue; 
-			for ($i_=0; $i_<$n_; $i_++) $o[$kk_[$i_]] = $o_[$kk_[$i_]]; // copy
-			$rt_ = rest_uri_post ($b[0], $b[1], NULL, $o, $p);
-			// error_log ("[obj] ".$b[0].$b[1]." copied |".$rt_."|".json_encode ($o)); 
+			$n_ = count (array_keys ($o_));
+			error_log ("  [obj] ".$b[0].$b[1]."|".json_encode ($o_));
+			if ($n_<1) continue; 								// skip empty object
+			$rt_ = rest_uri_post ($b[0], $b[1], (isset($o_[$k_])?$o_[$k_]:NULL), $o_, $p);
 			if ($rt_==412) return 412;
 			continue;
 		}
@@ -2031,70 +2026,49 @@ function rest_uri_post ($u, $suffix, $id, &$o, &$p)
 		if ($b[2]=="array")
 		{	
 			if (!isset ($o[($b[0].$b[1])])) continue; 
-			$fm_ = 0;
-			$bn = count ($b);
-			if ($bn>3 && $b[3]=="1" && $id==NULL) $fm_=1; // allow link during add
-			if ($bn>3 && $b[4]=="1" && $id!=NULL) $fm_=1; // allow link during upd
-			if ($bn>3 && $fm_==0) continue;
-		
 			$p_ = [];
 			$o_ = $o[($b[0].$b[1])];
 			$n_ = count ($o_);
 			error_log ("  [arr] ".$b[0].$b[1]."|".$n_);
 			for ($i_=0; $i_<$n_; $i_++)
 			{
-				if (count (array_keys ($o_[$i_]))<1) {error_log ("empty!"); continue; } // skip empty object
+				$n__ = count (array_keys ($o_[$i_]));
+				error_log ("  [arr-obj] ".$b[0].$b[1]."|".$i_." of ".$n_."|".json_encode ($o_));
+				if ($n__<1) continue; 							// skip empty object
 				$o_[$i_]["i_"]=$i_;
-				$p_ = $p; // error_log ("[arr] p: ".json_encode ($p_));
-				$rt_ = rest_uri_post ($b[0], $b[1], NULL, $o_[$i_], $p_); 
+				$p_ = $p;
+				$rt_ = rest_uri_post ($b[0], $b[1], (isset($o_[$i_][$k_])?$o_[$i_][$k_]:NULL), $o_[$i_], $p_); 
 				// if ($rt_==412) return 412;
 			}
-			// depricated // if ($bn>5 && $b[5]=="o") $p[$k_]=$p_[$k_]; // set id if array is marked as 'object'
 			continue;
 		}
 		
-		$k_ = model_k_id ($b[0], $b[1], $a_);
-		$t_ = $GLOBALS["RESOURCES"][$b[0]][0];
-		$m_ = $GLOBALS["RESOURCES"][$b[0]][2];
-		$s_ = "";	
-		$id_ = NULL;
-		if (isset ($o[$k_]) && strlen ($o[$k_])>0) $id_ = $o[$k_];
-		if (isset ($p[$k_]) && strlen ($p[$k_])>0) $id_ = $p[$k_];
+		$m_ = $GLOBALS["RESOURCES"][$b[0]][2]; // resource level add|upd setting
 		
 		if ($b[2]=="try")
 		{
 			$id_ = _try ($b[0], $b[1], $id_, $o, $p, $rights[$b[0]]);
-			$s_ = "@ ";
 		}
 		
 		if (strlen ($b[2])==0 && $id_!=NULL)
 		{
-			if ($m_!=2 && $m_!=3) continue;
-			if ($rights[$b[0]][2]!="1") return 403; // check upd rights flag
-			$fm_ = "2";
-			if (isset ($b[3]))
-			{
-				if ($b[3]=="1" && $id!=NULL) continue; // skip if not in add mode
-				$fm_ = $b[3];
-			}
-			error_log ("[upd] ".$b[0].$b[1]." | ".$k_."=".$id_." | ".$fm_);
-			$id_ = _upd ($b[0], $b[1], $id_, $o, $p, $fm_);
-			$s_ = "& ";
+			if ($m_!=2 && $m_!=3) continue;		// check res-level upd rights flag
+			if ($rights[$b[0]][2]!="1") return 403; // check role-level upd rights flag
+			$id_ = _upd ($b[0], $b[1], $id_, $o, $p, ($fm==0 ? "2" : "1"));
 		}
 
 		if (strlen ($b[2])==0 && $id_==NULL)
 		{
-			if ($m_!=1 && $m_!=3) continue;
-			if ($rights[$b[0]][1]!="1") return 403; // check add rights flag
-			if (isset ($b[3])) continue;		// skip -- b[3] flag not used for _add
-			error_log ("[add] ".$b[0].$b[1]." | ".$k_);
+			if ($m_!=1 && $m_!=3) continue;		// check res-level add rights flag
+			if ($rights[$b[0]][1]!="1") return 403; // check role-level add rights flag
+			if ($fm>0) continue;				// fm not applicable to add
 			$id_ = _add ($b[0], $b[1], $o, $p);
-			$s_ = "* ";
 		}
 
 		if ($b[2]=="file" && $id_==NULL)
 		{
 			if ($rights[$b[0]][1]!="1") return 403; // check add rights flag
+			$t_ = $GLOBALS["RESOURCES"][$b[0]][0];
 			$p['batch_id'] = _val_id ();
 			error_log ("[file] ".$b[0].$b[1]);
 			if (!isset ($_FILES[$t_])) 
@@ -2112,10 +2086,9 @@ function rest_uri_post ($u, $suffix, $id, &$o, &$p)
 				// $p_ = $p;
 				$id_ = _file_upload ($b[0], $b[1], $o_, $p);
 			}
-			$s_ = "** ";
 		}	
 
-		error_log ("    +--".$s_.$k_."=".$id_);
+		error_log ("    +--".$k_."=".$id_);
 
 		$p[$k_] = "".$id_;
 		

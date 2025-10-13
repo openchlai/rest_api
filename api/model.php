@@ -1656,36 +1656,33 @@ $reporters_api = array				// update reporter
 	array ("reporters","",     "aub"),
 	array ("reporters","",     "dup","id","reporter_id", NULL, "id", "contact_id:contact_id"), // get contact_id
 	array ("cases","",         "dup","id","case_id", NULL, "id","dept"),
-        array ("contacts","",      "include"), 	// update contact
-        array ("contacts","_dup",  "include"),
-        array ("reporters","",""),
+	array ("contacts","",      "include"), 	// update contact
+	array ("contacts","_dup",  "include"),
+	array ("reporters","",""),
 	array ("reporters","_dup", "include"),
 
 	array ("clients","",       "dup", "contact_id","contact_id", "is_reporter_id","reporter_id", "case_id",":!=: -9", NULL,"id"),
-        array ("clients","",      "params","client_id","::client_id: -8:client_id", "activity_ref","reporter_id", "detail","contact_fullname"),
+	array ("clients","",      "params","client_id","::client_id: -8:client_id", "activity_ref","reporter_id", "detail","contact_fullname"),
 	array ("clients","",""),
 	
 	array ("case_activities","","include")
 );
 
-$reporters_uuid_api = array			// create reporter -- todo: check if contact_id,src_uid exist
-(
-	array ("contacts","","include"),	// create if does not exist (contact_id is NULL) -- used by gateway
+$reporters_case_api = 					// create reporter -- used by gateway 
+[
+	array ("contacts","_uuid","include"),	// create if does not exist (contact_id is NULL or not in payload)
+	array ("reporters_uuid","","include")
+];
+
+$reporters_uuid_api = 					// todo: check if src,src_uid,contact_id,case_id exist ?
+[
+	array ("contacts","","params", "contact_id","contact_uuid_id"),
 	array ("contacts","_dup","include"),
 	array ("cases","","dup","id","case_id", NULL, "id","dept"),
-	// todo: check if already exists a (src, src_uid, contact_id) match
 	array ("reporters","_uuid",""),
-);
+];
 
-$reporters_none_api = array
-(
-	array ("cases","","dup","id","case_id", NULL, "id","dept"),
-	array ("reporters","","params",  "src"," edit", "src_uid",":#:"),
-	array ("reporters","_none",""),
-	array ("reporters","","params", "reporter_uuid_id","reporter_none_id")
-);
-
-$reporters_isclient_api = array 		// create|delete client from a reporter
+$reporters_isclient_api = array 			// create|delete client from a reporter
 (
 	array ("reporters","","aub"),
 
@@ -1861,7 +1858,7 @@ $referals_api = array
 	array ("cases","referals","agg4",  	"id","case_id",NULL,  "case_id_","case_id")
 );
 
-$cases_api = array //
+$cases_api = array
 (
 	array ("categories","","duf","id","case_category_id",NULL, "id:case_category_id", "fullname:case_category", "root_id:case_category_root_id", "fullname_id:case_category_fullname_id", "fullname"),
 	array ("categories","","duf","id","justice_id",NULL, "id:justice_id", "fullname:justice"),
@@ -1873,9 +1870,9 @@ $cases_api = array //
 	array ("users","","duf","id","assigned_to_id",NULL, "id:assigned_to_id", "usn:assigned_to", "role:assigned_to_role"),
 	array ("cases","","lvl","case_category_fullname_id","5","^",":", "cat_","id_",""), // split cat levels
 
-	array ("reporters","_uuid","object"),				// create reporter if object exist - used by api
+	array ("reporters","_case","object"),					// create reporter if object exist - used by api -> returns reporter_uuid_id
 	array ("cases","","dup","id","case_id",NULL,"reporter_id:reporter_id"),
-	array ("cases","","params", "activity_","::case_id: case_new: case_edit", "reporter_id","::case_id:reporter_uuid_id:reporter_id"),
+	array ("cases","","params", "reporter_id","::case_id:reporter_uuid_id:reporter_id"),
 	array ("reporters","_dup","include"),
 	
      array ("cases","","aub"),
@@ -1883,10 +1880,10 @@ $cases_api = array //
 	array ("cases","cases","agg4",  "id","case_id",NULL,  "id","case_id"), 	// update dt
 	array ("cases","","dup", "id","case_id", NULL, "id:case_id_","case_category:case_category", "priority", "status","dept","created_by_id","created_by","assigned_to_id","assigned_to"),			
 	
-	array ("reporters","_case",  		"include","1",""),		// update case_id during case create only
-	array ("clients","_case",    		"array","1",""),		// update case_id during case create only
-	array ("perpetrators","_case",	"array","1",""), 		// update case_id during case create only
-	array ("attachments","_case",		"array","1",""),		// update case_id during case create only
+	array ("reporters","",  			"","1"),				// update case_id during case create only - crud only
+	array ("clients","_case",    		"array","1"),			// update case_id during case create only - crud only
+	array ("perpetrators","_case",	"array","1"), 			// update case_id during case create only - crud only
+	array ("attachments","_case",		"array","1"),			// update case_id during case create only - crud only
 	array ("referals","",			"array"),
 	array ("services","",			"array"),
 
@@ -1900,10 +1897,9 @@ $cases_api = array //
 	array ("dispositions","_include","include"),
 );
 
-$reporters_case_api = [  ["reporters","","","1"] ];
-$clients_case_api = [ ["clients","","","1"] ];
-$perpetrators_case_api = [  ["perpetrators","","","1"] ];
-$attachments_case_api = [ ["attachments","","","1"] ];
+$clients_case_api 		= [["clients","","","1"]];
+$perpetrators_case_api 	= [["perpetrators","","","1"]];
+$attachments_case_api 	= [["attachments","","","1"]];
 
 $case_activities_api = array 
 (
@@ -1996,8 +1992,10 @@ $pmessages_subs =
 
 $activities_subs = 
 [
-//["dispositions","","20",	"src_address","src_address"],
-["messages","","100",           "src","src","src_callid","src_callid"] // 
+//["dispositions","","20",		"src_address","src_address"],
+["messages","","100",           	"src","src","src_callid","src_callid"],
+["case_activities","_notify","",	"id","ca_id","case_id","case_id"], 
+["cases","","",				"id","case_id"] // recursive!
 ];
 
 $activities_call_subs =
@@ -2030,13 +2028,7 @@ $contacts_disposition_subs =
 
 $reporters_uuid_subs = 
 [
-["cases","","",		"id","case_id"], // recursive!
-["contacts","","",		"id","contact_id"]
-];
-
-$reporters_none_subs =
-[
-["cases","","",		"id","case_id"], // recursive!
+["cases","","",		"id","case_id"], // nests!
 ];
 
 $reporters_isclient_subs = 
@@ -2051,13 +2043,14 @@ $clients_del_subs =
 
 $cases_subs = 
 [
-["reporters","","",	"id","reporter_id"],
-["perpetrators","","",	"case_id_","case_id"],
-["clients","","",	"case_id_","case_id"],
-["attachments","","",	"case_id_","case_id"],
-["case_activities","","","case_id","case_id"],
-["dispositions","","",	"id","dsp_id"],
-["reporters","_uuid","",     "id","reporter_uuid_id"],
+["reporters","","",			"id","reporter_id"],
+["perpetrators","","",		"case_id_","case_id"],
+["clients","","",			"case_id_","case_id"],
+["attachments","","",		"case_id_","case_id"],
+["case_activities","","",	"case_id","case_id"],
+["dispositions","","",		"id","dsp_id"],
+["reporters","_uuid","",		"id","reporter_uuid_id"],
+["contacts","_uuid","",		"id","contact_uuid_id"],
 ];
 
 $case_activities_subs = 
