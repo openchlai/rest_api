@@ -2050,7 +2050,6 @@ $cases_subs =
 ["case_activities","","",	"case_id","case_id"],
 ["dispositions","","",		"id","dsp_id"],
 ["reporters","_uuid","",		"id","reporter_uuid_id"],
-["contacts","_uuid","",		"id","contact_uuid_id"],
 ];
 
 $case_activities_subs = 
