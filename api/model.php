@@ -1922,13 +1922,9 @@ $activities_api = array
 	array ("activities","","")
 );
 
-$activities_notify_api = array			// create reporter from notification -- todo: check if contact_id,src_uid exist
+$activities_notify_api = array			// update activity action
 (
-	array ("activities","","dup","id","activity_notify_id",NULL,"src:src","src_uid:src_uid","case_id:case_id","ca_id:ca_id"),
-	array ("cases","","dup","id","case_id", NULL, "id","dept"),
-	// array ("activities","","params","action"," complete"),
-	// todo: check if reporter already exists with (src, src_uid, case_id, contact_id) match
-	array ("reporters","_uuid",""),
+	// array ("activities","_notify","params","action"," complete"),
 	array ("activities","_notify","")
 );
 
@@ -1994,7 +1990,6 @@ $activities_subs =
 [
 //["dispositions","","20",		"src_address","src_address"],
 ["messages","","100",           	"src","src","src_callid","src_callid"],
-["case_activities","_notify","",	"id","ca_id","case_id","case_id"], 
 ["cases","","",				"id","case_id"] // recursive!
 ];
 
