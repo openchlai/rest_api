@@ -1996,7 +1996,7 @@ $activities_subs =
 $activities_call_subs =
 [
 //["dispositions","","20",      "src_address","src_address"],
-["messages","","100",           "src_callid","src_uid2"]
+//["messages","","100",           "src_callid","src_uid2"]
 ];
 
 $activities_case_subs = 
