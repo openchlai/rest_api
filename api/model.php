@@ -2218,7 +2218,7 @@ $perpetrators_csv=array(
 "guardian_fullname",
 "notes");
 
-$services_csv=array("category_name");
+$services_csv=array("category_name"); 
 
 $referals_csv=array("category_name");
 
