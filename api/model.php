@@ -34,16 +34,15 @@ $RESOURCES = array
 	"chanss"=>		array ("chan_ss","",		"0","0","0",	"Agent Session", 	"","",			""), 
      "pmessages"=>		array ("pmsg","",			"1","0","0",	"Message Session",	"id DESC","",		""), 
      "messages"=>		array ("msg","",			"1","0","0",	"Message", 		"id DESC","",		""), 
-
 	"activities"=>		array ("activity","",		"3","0","0",	"Activity", 		"src_ts DESC","",	""), 
+
 	"dispositions"=>	array ("disposition","dsp",	"3","0","0",	"Dispositions", 	"created_on DESC","",	""), 
-	"actions"=>		array ("action","",			"1","0","0",	"Actions", 		"id DESC","",		""), 
-	"attachments"=>	array ("attachment","",		"3","0","0",	"Attachment",		"","",			""), 			
 	"qas"=>			array ("qa","",			"1","0","0",	"Quality Assessment",	"","",			""), 
-		
+
 	"reporters"=>		array ("reporter","",		"3","0","0",	"Reporter", 		"","",			""), 
 	"clients"=>		array ("client","",			"3","0","0",	"Client", 		"","",			""), 
 	"perpetrators"=>	array ("perpetrator","",		"3","0","0",	"Perpetrator", 		"","",			""), 
+	"attachments"=>	array ("attachment","",		"3","0","0",	"Attachment",		"","",			""), 			
 	"services"=>		array ("service","",		"3","0","0",	"Services Offered", 	"","",			""), 
 	"referals"=>		array ("referal","",		"3","0","0",	"Referals", 		"","",			""), 
 	"client_referals"=>	array ("client_referal","",	"3","0","0",	"Client Referals",	"","",			""), 
@@ -80,17 +79,15 @@ $RIGHTS_1 = array // sel:0,add:1,upd:2 // agent rights
 	"prompts"=>	array ("1","0","0","0","0"),
 	"pmessages"=>	array ("1","1","0","0","0"),
 	"messages"=>	array ("1","1","0","0","0"),
-//	"emails"=>	array ("1","1","0","0","0"), 
-			
-	"activities"=>	array ("1","1","1","0","0","assigned_to_id=","auth_id"),	
+	"activities"=>	array ("1","1","1","0","0","assigned_to_id=","auth_id"),
+
 	"dispositions"=>array ("1","1","1","0","0"),
-	"actions"=>	array ("1","1","0","0","0"),
-	"attachments"=>	array ("1","1","1","0","0"),
 	"qas"=>		array ("1","1","0","0","0","chan_user_id=","auth_id"), 
 
 	"reporters"=>	array ("1","1","1","0","0"),
 	"clients"=>	array ("1","1","1","0","0"),
 	"perpetrators"=>array ("1","1","1","0","0"),
+	"attachments"=>	array ("1","1","1","0","0"),
 	"services"=>	array ("1","1","1","0","0"),
 	"referals"=>	array ("1","1","1","0","0"),
 	"client_referals"=>	array ("1","1","1","0","0"),
@@ -122,18 +119,16 @@ $RIGHTS_2 = array // sel:0,add:1,upd:2,overide-ctc-field:3 // supervisor rights
 	"chanss"=>	array ("1","0","0","0","0","user_id=","auth_id"),  
 	"prompts"=>	array ("1","0","0","0","0"),
 	"pmessages"=>	array ("1","1","0","0","0"),
-	"messages"=>	array ("1","1","0","0","0"),
-//	"emails"=>	array ("1","1","0","0","0"), 
-				
-	"activities"=>	array ("1","1","1","0","0","assigned_to_id=","auth_id"),	
+	"messages"=>	array ("1","1","0","0","0"),				
+	"activities"=>	array ("1","1","1","0","0","assigned_to_id=","auth_id"),
+
 	"dispositions"=>array ("1","1","1","0","0"),
-	"actions"=>	array ("1","1","0","0","0"),
-	"attachments"=>	array ("1","1","1","0","0"),
 	"qas"=>		array ("1","1","0","0","0"), 
 
 	"reporters"=>	array ("1","1","1","0","0"),
 	"clients"=>	array ("1","1","1","0","0"),
 	"perpetrators"=>array ("1","1","1","0","0"),
+	"attachments"=>	array ("1","1","1","0","0"),
 	"services"=>	array ("1","1","1","0","0"),
 	"referals"=>	array ("1","1","1","0","0"),
 	"client_referals"=>	array ("1","1","1","0","0"),
@@ -165,18 +160,16 @@ $RIGHTS_3 = array // sel:0,add:1,upd:2 // casemanger rights
 	"chanss"=>	array ("1","0","0","0","0","user_id=","auth_id"),  
 	"prompts"=>	array ("1","0","0","0","0"),
 	"pmessages"=>	array ("1","1","0","0","0"),
-	"messages"=>	array ("1","1","0","0","0"),
-//	"emails"=>	array ("1","1","0","0","0"), 
-				
-	"activities"=>	array ("1","1","1","0","0","assigned_to_id=","auth_id"),	
+	"messages"=>	array ("1","1","0","0","0"),				
+	"activities"=>	array ("1","1","1","0","0","assigned_to_id=","auth_id"),
+
 	"dispositions"=>array ("1","1","1","0","0"),
-	"actions"=>	array ("1","1","0","0","0"),
-	"attachments"=>array ("1","1","1","0","0"),
 	"qas"=>		array ("1","1","0","0","0"), 
 
 	"reporters"=>	array ("1","1","1","0","0"),
 	"clients"=>	array ("1","1","1","0","0"),
 	"perpetrators"=>array ("1","1","1","0","0"),
+	"attachments"=>array ("1","1","1","0","0"),
 	"services"=>	array ("1","1","1","0","0"),
 	"referals"=>	array ("1","1","1","0","0"),
 	"client_referals"=>	array ("1","1","1","0","0"),
@@ -208,18 +201,16 @@ $RIGHTS_4 = array // sel:0,add:1,upd:2 // case workerr
 	"chanss"=>	array ("1","0","0","0","0","user_id=","auth_id"),  
 	"prompts"=>	array ("1","0","0","0","0"),
 	"pmessages"=>	array ("1","1","0","0","0"),
-	"messages"=>	array ("1","1","0","0","0"),
-//	"emails"=>	array ("1","1","0","0","0"), 
-			
+	"messages"=>	array ("1","1","0","0","0"),			
 	"activities"=>	array ("1","1","1","0","0","assigned_to_id=","auth_id"),	
+
 	"dispositions"=>array ("1","1","1","0","0"),
-	"actions"=>	array ("1","1","0","0","0"),
-	"attachments"=>	array ("1","1","1","0","0"),
 	"qas"=>		array ("1","1","0","0","0","chan_user_id=","auth_id"), 
 
 	"reporters"=>	array ("1","1","1","0","0"),
 	"clients"=>	array ("1","1","1","0","0"),
 	"perpetrators"=>array ("1","1","1","0","0"),
+	"attachments"=>array ("1","1","1","0","0"),
 	"services"=>	array ("1","1","1","0","0"),
 	"referals"=>	array ("1","1","1","0","0"),
 	"client_referals"=>	array ("1","1","1","0","0"),
@@ -256,18 +247,16 @@ $RIGHTS_99 = array // sel:0,add:1,upd:2,sel:id(other) // admin rights (same as s
 	"chanss"=>	array ("1","0","0","0","0","user_id=","auth_id"),  
 	"prompts"=>	array ("1","0","0","0","0"),
 	"pmessages"=>	array ("1","1","0","0","0"),
-	"messages"=>	array ("1","1","0","0","0"),
-//	"emails"=>	array ("1","1","0","0","0"), 
-				
-	"activities"=>	array ("1","1","1","0","0","assigned_to_id=","auth_id"),	
+	"messages"=>	array ("1","1","0","0","0"),				
+	"activities"=>	array ("1","1","1","0","0","assigned_to_id=","auth_id"),
+
 	"dispositions"=>array ("1","1","1","0","0"),
-	"actions"=>	array ("1","1","0","0","0"),
-	"attachments"=>	array ("1","1","1","0","0"),
 	"qas"=>		array ("1","1","0","0","0"), 
 	
 	"reporters"=>	array ("1","1","1","0","0"),
 	"clients"=>	array ("1","1","1","0","0"),
 	"perpetrators"=>array ("1","1","1","0","0"),
+	"attachments"=>array ("1","1","1","0","0"),
 	"services"=>	array ("1","1","1","0","0"),
 	"referals"=>	array ("1","1","1","0","0"),
 	"client_referals"=>	array ("1","1","1","0","0"),
@@ -837,7 +826,6 @@ $messages_def = array
 
 $activities_def = array // nb: activity for any chani
 (
-
 	array ("id","",				"0","2","","", "","","",		"",""),
 	array ("created_on","",			"0","3","","", "","","",		"",""),
 	array ("created_by","",			"0","2","","", "","","",		"",""),
@@ -955,39 +943,6 @@ $dispositions_def = array
         array ("case_priority","",              "3","2","","",  "","","",       "Case Priority",""),
         array ("case_status","",                "3","2","","",  "","","",       "Case Status",""),
 
-);
-
-$actions_def = array 
-(
-	array ("id","",				"0","2","","", "","","",	"",""),
-	array ("created_on","",			"0","3","","", "","","",	"",""),
-	array ("created_by","",			"0","2","","", "","","",	"",""),
-	array ("created_by_id","",		"0","2","","", "","","",	"",""),
-	array ("created_by_role","",		"0","2","","", "","","", 	"Created By Role",""),
-
-	array ("action","",			"1","2","","",	"","","",	"Action",""),
-	array ("campaign_id","",		"1","2","","f", "","","",	"Campaign ID",""), 
-	array ("contact_id","",			"1","2","","f", "","","",	"Contact ID",""), 
-	array ("case_id","",			"1","2","","f", "","","",	"Case ID",""), 
-
-	array ("assigned_to_id","",		"1","2","","f", "","","",	"Assigned To ID",""),
-	array ("assigned_to","",		"1","2","","", "","","",	"Assigned To",""),
-	array ("assigned_to_role","",		"1","2","","", "","","", 	"Assigned To Role",""),
-
-	array ("src","",			"1","2","","",	"","","", 	"Channel",""),
-	array ("src_uid","",			"1","2","","",	"","","", 	"Channel Uniqueid",""),
-	array ("src_uid2","",			"1","2","","",	"","","", 	"Channel Uniqueid 2",""),
-	array ("src_address","",		"1","2","","P",	"","","", 	"Channel Address",""),
-	array ("src_usr","",			"1","2","","",	"","","", 	"Channel User",""),
-	array ("src_vector","",			"1","2","","",	"","","", 	"Channel Direction",""),
-	array ("src_ts","",			"1","2","","",	"","","", 	"Channel Timestamp",""),	
-	array ("src_callid","",			"1","2","","",	"","","", 	"Channel Call ID",""),
-	array ("src_campaign_id","",		"1","2","","",	"","","", 	"Channel Campaign ID",""),
-	array ("src_action_id","",		"1","2","","",	"","","", 	"Channel Action ID",""),
-
-	array ("disposition_id","",		"1","2","","f", "","","",	"Disposition ID",""), 
-	array ("disposition","",		"1","2","","",  "","","",	"Disposition",""),  
-	array ("detail","",			"1","1","","",  "","","",	"Detail",""),  
 );
 
 $attachments_def = array // 
