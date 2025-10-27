@@ -794,6 +794,7 @@ function _request_ ()
 		if ($rt>200 && $rt<203 && ($u=="cases" || $u=="dispositions") && isset ($o["src"]) && $o["src"]=="call") // shrink wrapup to 20 seconds on save
 		{
 			$s = "wrapup?action=0&usr=".$_SESSION["cc_user_exten"];
+			if ($u=="disposition") $s .= "&hangup=1";
 			$r = muu ("ami","sync?c=-1&");
 			$o_ = json_decode ($r['data'], true);
 			if (isset ($o_["channels"]) && isset ($o["src_uid"]) && isset ($o_["channels"][$o["src_uid"]]))  // get chan.uid (if rxists)
