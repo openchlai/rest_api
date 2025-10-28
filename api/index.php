@@ -172,7 +172,7 @@ function message_out (&$o, &$p)
 		kurl ($api_url, 60, json_encode($postdata), $hdrs);
 	}
 
-	$s = "read?uid=".$o["src_uid2"]."&cid=".$o["src_usr"]."&";
+	$s = "read?uid=".$o["src_uid"]."&";
 	if (isset ($o["close"])) $s .= "args=close&"; // close session
      muu ("ati", $s); // update notification status
 }
