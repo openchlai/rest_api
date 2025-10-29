@@ -1879,7 +1879,7 @@ $activities_api = array
 
 $activities_notify_api = array			// update activity action
 (
-	// array ("activities","_notify","params","action"," complete"),
+	array ("activities","_notify","params","action"," complete"),
 	array ("activities","_notify","")
 );
 
