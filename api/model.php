@@ -832,15 +832,12 @@ $activities_def = array // nb: activity for any chani
 	array ("created_by_id","",		"0","2","","", "","","",		"",""),
 	array ("created_by_role","",		"0","2","","", "","","", 	"Created By Role",""),
 
-	array ("activity_ts","",			"3","3","","",	"","","",		"Sched Ts",""),
-	array ("action","",				"3","2","","",  "","","",     "Action",""),
-	array ("action_id","",			"3","2","","f", "","","",	"Action ID",""), 
 	array ("contact_id","",			"1","2","","f", "","","",	"Contact ID",""), 
 	array ("campaign_id","",			"1","2","","f", "","","",	"Campaign ID",""), 
 	array ("case_id","",			"1","2","","f", "","","",	"Case ID",""), 	// todo: form_id
 	array ("ca_id","",				"1","2","","f", "","","",	"Update ID",""), 	// todo: update_id
 
-	array ("assigned_on","",			"1","3","","", "","","",		"Assigned On",""),
+	array ("assigned_ts","",			"1","3","","", "","","",		"Assigned At",""),
 	array ("assigned_to_id","",		"1","2","","", "","","",		"Assigned To ID",""),
 	array ("assigned_to","",			"1","2","","", "","","",		"Assigned To",""),
 	array ("assigned_to_role","",		"1","2","","", "","","", 	"Assigned To Role",""),
@@ -848,21 +845,20 @@ $activities_def = array // nb: activity for any chani
 	array ("src","",				"3","2","","",	"","","", 	"Channel",""),
 	array ("src_uid","",			"3","2","","",	"","","", 	"Channel Uniqueid",""),
 	array ("src_uid2","",			"3","2","","",	"","","", 	"Channel Uniqueid 2",""),
+	array ("src_callid","",			"3","2","","",	"","","", 	"Channel Call ID",""),
 	array ("src_address","",			"3","2","","P","","","", 	"Channel Address",""),
 	array ("src_usr","",			"3","2","","",	"","","", 	"Channel User",""),
 	array ("src_vector","",			"3","2","","",	"","","", 	"Channel Direction",""),
-	array ("src_ts","",				"3","2","","",	"","","", 	"Channel Timestamp",""),	
-	array ("src_callid","",			"3","2","","",	"","","", 	"Channel Call ID",""),
 	array ("src_campaign_id","",		"3","2","","",	"","","", 	"Channel Campaign ID",""),
 	array ("src_action_id","",		"3","2","","",	"","","", 	"Channel Action ID",""),
 	array ("src_status","",			"3","2","","",	"","","", 	"Channel Status",""),
+	array ("src_ts","",				"3","2","","",	"","","", 	"Channel Timestamp",""),	
 	array ("src_status_ts","",		"3","3","","",	"","","", 	"Channel Status Ts",""),
-	array ("src_status_duration","",	"3","4","","",	"","","", 	"Channel Status Duration",""),
 	array ("src_end_ts","",			"3","3","","",	"","","", 	"Channel End Ts",""),
-	array ("src_end_duration","",		"3","4","","",	"","","", 	"Channel Status Duration",""),
+	array ("src_duration","",		"3","4","","",	"","","", 	"Channel Status Duration",""),
+	array ("src_status_duration","",	"3","4","","",	"","","", 	"Channel Status Duration",""),
 
-	array ("action_detail","",		"3","1","","",	"","","", 	"Action Detail",""),
-
+	array ("action","",				"3","2","","",  "","","",     "Action",""), // sched|notify(running)|complete
 	array ("dispositions","",		"4","1","","",  "dispositions","GROUP_CONCAT(disposition)","",  "Disposition",""), 
 	        
 	array ("yr","",				"4","2","","",  "activities","UNIX_TIMESTAMP(CONCAT(YEAR(FROM_UNIXTIME(src_ts)),'-01-01'))","",   "Year",":d:y:0: "), 
@@ -1521,16 +1517,6 @@ $subcategories_api = array // todo: on update (202) propaget changes to childnod
 
 );
 
-$messages_api = array
-(
-	array ("pmessages","","dup","src","src","src_callid","src_callid", NULL, "id","src_callid:src_callid"), // link to first message
-	array ("pmessages","",""),
-	array ("messages","",""),
-	array ("pmessages","pmessages","agg4", "id","pmsg_id",NULL,  "id","pmsg_id"), 	// update dt		
-	array ("pmessages","messages","agg4", "id","pmsg_id", NULL,  "src_callid","src_callid"),
-	array ("pmessages","messages","agg5", "id","pmsg_id", NULL,  "id","last_msg_id"),
-);
-
 $users_api = array
 (
 	array ("users","","dup","usn","usn","id",":!=:user_id: 0",NULL,"usn:usn"), // check duplicate usn
@@ -1604,6 +1590,54 @@ $contacts_dup2_api = array
 "location_id_0:reporter_location_id_0", "location_id_1:reporter_location_id_1", "location_id_2:reporter_location_id_2", "location_id_3:reporter_location_id_3", "location_id_4:reporter_location_id_4", "location_id_5:reporter_location_id_5", "location_id_6:reporter_location_id_6", 
 "location_0:reporter_location_0", "location_1:reporter_location_1", "location_2:reporter_location_2", "location_3:reporter_location_3", "location_4:reporter_location_4", "location_5:reporter_location_5", "location_6:reporter_location_6", 
 "landmark:reporter_landmark")
+);
+
+$messages_api = array
+(
+	array ("pmessages","","dup","src","src","src_callid","src_callid", NULL, "id","src_callid:src_callid"), // link to first message
+	array ("pmessages","",""),
+	array ("messages","",""),
+	array ("pmessages","pmessages","agg4", "id","pmsg_id",NULL,  "id","pmsg_id"), 	// update dt		
+	array ("pmessages","messages","agg4", "id","pmsg_id", NULL,  "src_callid","src_callid"),
+	array ("pmessages","messages","agg5", "id","pmsg_id", NULL,  "id","last_msg_id"),
+);
+
+$activities_api = array
+(
+	array ("case_activities","","dup","id","ca_id",NULL, "id:ca_id","case_id:case_id"), 
+	array ("cases","","dup","id","case_id",NULL, "id:case_id"), 
+	array ("users","","dup","exten","src_usr",NULL, "id:assigned_to_id", "usn:assigned_to", "role:assigned_to_role", "exten:assigned_to_exten"),
+	array ("activities","","dup","src","src", "src_uid","src_uid", NULL, "id"), 
+	array ("activities","","")
+);
+
+$dispositions_api = array
+(
+	array ("contacts","_dup","include"),
+	array ("reporters","",""),
+	array ("dispositions","","dup", "src","src", "src_uid","src_uid", "reporter_contact_id","contact_id", "case_id"," 0", "disposition_id",":!=: ".$DISPOSITION_ID_CONTACT_NEW, NULL,"id"), // get disposition_id (if exists)
+	array ("dispositions","_include","include"),
+);
+
+$dispositions_unk_api = array
+(
+	array ("categories","","dup","id","sex_id",NULL, "id:reporter_sex_id", "fullname:reporter_sex"),
+	array ("categories","","dup","id","age_group_id",NULL, "id:reporter_age_group_id", "fullname:reporter_age_group"),
+     array ("dispositions","","dup", "src","src", "src_uid","src_uid", "reporter_contact_id"," 0", "case_id"," 0", "disposition_id",":!=: ".$DISPOSITION_ID_CONTACT_NEW, NULL,"id"), // get disposition_id (if exists)
+     array ("dispositions","_include","include"),
+	array ("dispositions","","params", "dsp_unk_id","dsp_id")
+);
+
+$dispositions_include_api = array
+(
+	array ("categories","","dup","id","disposition_id",NULL, "id:disposition_id", "name:disposition"),
+	array ("reporters","_dup","include"),
+	array ("dispositions","","params", "src_uid2","::src_uid2: nill:src_uid2", "src_uid_","src_uid", "src_uid2_","src_uid2", "is_active"," 1"),
+	array ("dispositions","",""),
+ 	// array ("dispositions","dispositions","agg1",    "src","src","src_uid","src_uid", "case_id"," 0", NULL, "src","src","src_uid","src_uid", "case_id",":>: 0"), // unlink non-case (if with-case exists)
+	array ("activities","dispositions","agg4",      "src","src", "src_uid","src_uid", NULL, "src","src","src_uid_","src_uid"),      // update activity (if exists)  
+	array ("calls",	"dispositions","agg4",          "uniqueid","src_uid2",  NULL, "src"," call","src_uid2_","src_uid2"),            // update call (if exists)
+	array ("pmessages","dispositions","agg4",	"src","src", "src_callid","src_callid",  NULL, "src","src", "src_callid","src_callid"), // update msg (if exists)
 );
 
 $reporters_api = array				// update reporter
@@ -1869,49 +1903,6 @@ $case_activities_sync_api = array
 	array ("cases","",""),
 );
 
-$activities_api = array
-(
-	array ("users","","dup","id","assigned_to_id",NULL, "id:assigned_to_id", "usn:assigned_to", "role:assigned_to_role"),
-     array ("case_activities","","dup","id","ca_id",NULL, "id:ca_id","case_id:case_id"), 
-	array ("cases","","dup","id","case_id",NULL, "id:case_id"), 
-	array ("activities","","")
-);
-
-$activities_notify_api = array			// update activity action
-(
-	array ("activities","_notify","params","action"," complete"),
-	array ("activities","_notify","")
-);
-
-$dispositions_api = array
-(
-	array ("contacts","_dup","include"),
-	array ("reporters","",""),
-	array ("dispositions","","dup", "src","src", "src_uid","src_uid", "reporter_contact_id","contact_id", "case_id"," 0", "disposition_id",":!=: ".$DISPOSITION_ID_CONTACT_NEW, NULL,"id"), // get disposition_id (if exists)
-	array ("dispositions","_include","include"),
-);
-
-$dispositions_unk_api = array
-(
-	array ("categories","","dup","id","sex_id",NULL, "id:reporter_sex_id", "fullname:reporter_sex"),
-	array ("categories","","dup","id","age_group_id",NULL, "id:reporter_age_group_id", "fullname:reporter_age_group"),
-     array ("dispositions","","dup", "src","src", "src_uid","src_uid", "reporter_contact_id"," 0", "case_id"," 0", "disposition_id",":!=: ".$DISPOSITION_ID_CONTACT_NEW, NULL,"id"), // get disposition_id (if exists)
-     array ("dispositions","_include","include"),
-	array ("dispositions","","params", "dsp_unk_id","dsp_id")
-);
-
-$dispositions_include_api = array
-(
-	array ("categories","","dup","id","disposition_id",NULL, "id:disposition_id", "name:disposition"),
-	array ("reporters","_dup","include"),
-	array ("dispositions","","params", "src_uid2","::src_uid2: nill:src_uid2", "src_uid_","src_uid", "src_uid2_","src_uid2", "is_active"," 1"),
-	array ("dispositions","",""),
- 	// array ("dispositions","dispositions","agg1",    "src","src","src_uid","src_uid", "case_id"," 0", NULL, "src","src","src_uid","src_uid", "case_id",":>: 0"), // unlink non-case (if with-case exists)
-	array ("activities","dispositions","agg4",      "src","src", "src_uid","src_uid", NULL, "src","src","src_uid_","src_uid"),      // update activity (if exists)  
-	array ("calls",	"dispositions","agg4",          "uniqueid","src_uid2",  NULL, "src"," call","src_uid2_","src_uid2"),            // update call (if exists)
-	array ("pmessages","dispositions","agg4",	"src","src", "src_callid","src_callid",  NULL, "src","src", "src_callid","src_callid"), // update msg (if exists)
-);
-
 // ===================================================================================
 
 $categories_subs = 
@@ -1945,23 +1936,8 @@ $activities_subs =
 [
 //["dispositions","","20",		"src_address","src_address"],
 ["messages","","100",           	"src","src","src_callid","src_callid"],
-["cases","","",				"id","case_id"] // recursive!
-];
-
-$activities_call_subs =
-[
-//["dispositions","","20",      "src_address","src_address"],
-//["messages","","100",           "src_callid","src_uid2"]
-];
-
-$activities_case_subs = 
-[
-["cases","","",		"id","case_id"], // recursive!
-];
-
-$activities_notify_subs = 
-[
 ["cases","","",				"id","case_id"], // recursive!
+["activities","_notify","10",		"action"," notify"], 
 ];
 
 $dispositions_subs =

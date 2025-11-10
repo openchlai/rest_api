@@ -45,6 +45,7 @@ function copy_from_pabx ($uid) // copy from archive
 	}
 }
 
+/*
 function muu ($cmd, $args)
 {
 	$url = "http://127.0.0.1:8383/".$cmd."/".$args;
@@ -60,6 +61,27 @@ function muu ($cmd, $args)
         error_log ("[muu] ". $cmd."/".$args." | ".$r['info']['http_code']);
 	// error_log ("[muu] >> ". $r['data']);
         return $r;
+}*/
+
+function muu ($cmd, $args, $timeout=30) // timeout
+{
+	//$url = "http://127.0.0.1:8383/".$cmd."/".$args;
+	$url = $GLOBALS["API_SERVER"]."/".$cmd."/".$args;   //error_log($url);
+	$r = array ('data'=>'', 'info'=>0);
+	$ch = curl_init ();
+	curl_setopt ($ch, CURLOPT_URL, $url);
+	curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt ($ch, CURLOPT_TIMEOUT, $timeout);
+	//curl_setopt ($ch, CURLOPT_VERBOSE, 2);
+	//curl_setopt ($ch, CURLOPT_SSL_VERIFYHOST, true);
+	curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
+	$r['data'] = curl_exec ($ch);
+	$r['error'] = curl_error($ch);
+	$r['info'] = curl_getinfo ($ch);
+	curl_close ($ch);
+	error_log ("[muu] ". $cmd."/".$args." | ".$r['info']['http_code']."|".$r['error']);
+	//error_log ("[muu] >> ". json_encode($r));
+	return $r;
 }
 
 function muu_ ($cmd, $args) // nb: does not wait for response
@@ -71,7 +93,7 @@ function muu_ ($cmd, $args) // nb: does not wait for response
 	}
 
 	if (!socket_connect($sock, "127.0.0.1", "8383")) {
-    		error_log ("Connection failed: " . socket_strerror(socket_last_error($socket)) );
+    		error_log ("Connection failed: " . socket_strerror(socket_last_error($sock)) );
 		return -1;
 	}
 	
@@ -120,21 +142,23 @@ function national_registry (&$o, &$p)
 
 function notify ($src, $from, $to, $to_id, $to_exten, $msg,  $ca_id)
 {
-	$o_ = ["assigned_to_id"=>$to_id, "contact_id"=>"-1", "ca_id"=>$ca_id];
+	$o_ = [];
 	$p_ = [];
 	$o_['i_']=0;
+	$o_['contact_id'] = "-1";
+	$o_['ca_id'] = $ca_id;
 	$o_["src"] = $src;
 	$o_["src_ts"] = _val_id()/10000;
-	$o_["src_uid"] = "notify"._val_id(); //$o_["src_ts"]; 
+	$o_["src_uid"] = "notify"._val_id();
+	// src_callid
 	$o_["src_address"] = $from;
-	$o_["src_usr"] = $to;
-	$o_["src_vector"] = "2"; // leg1 for notify is pseudo
+	$o_["src_usr"] = $to_exten;	// nb: exten is nearly as good as user_id
+	$o_["src_vector"] = "2"; 	// leg1 for notify is pseudo
 	$o_["action"] = "notify";
-	$o_["action_detail"] = $msg;
 	error_log ("[notify] ".json_encode($o_));
 	$rt = rest_uri_post ("activities", "", NULL, $o_, $p_);
 
-	$s = "msg?ctx=notify&chan=".$o_['src_uid']."&payload=".$ca_id."&cid=".$from."&exten=".$to_exten."&";
+	$s = "msg?ctx=notify&chan=0123456789&cid=000&exten=".$to_exten."&payload=notify&";
      muu ("ati", $s);
 }
 
@@ -563,61 +587,41 @@ function _home (&$o, &$p)
 	echo ",";
 	if (rest_uri_get ("categories","", "-9", $fo, $p, $aa)==200) rest_uri_response ("categories","", "-9", $o, $p, $aa, 0);
 
-       	echo ",";
-	if (rest_uri_get ("cases","", "0", $fo, $p, $aa)==200) rest_uri_response ("cases","", "0", $o, $p, $aa, 0); // also load case_subs
+	echo ",";
+	if (rest_uri_get ("calls","", "0", $fo_, $p, $aa)==200) rest_uri_response ("calls","", "0", $o, $p, $aa, 0); // load calls
 
 	echo ",";
 	if (rest_uri_get ("messages","", "0", $fo, $p, $aa)==200) rest_uri_response ("messages","", "0", $o, $p, $aa, 0); // load messages_k
+
+	echo ",";
+	if (rest_uri_get ("dispositions","", "0", $fo, $p, $aa)==200) rest_uri_response ("dispositions","", "0", $o, $p, $aa, 0); // load dispositions_k
 
 	//echo ",";
 	//if (rest_uri_get ("qas","", "0", $fo, $p, $aa)==200) rest_uri_response ("qas","", "0", $o, $p, $aa, 0); // load qas_k
 
 	echo ",";
-	if (rest_uri_get ("dispositions","", "0", $fo, $p, $aa)==200) rest_uri_response ("dispositions","", "0", $o, $p, $aa, 0); // load dispositions_k
+	if (rest_uri_get ("cases","", "0", $fo, $p, $aa)==200) rest_uri_response ("cases","", "0", $o, $p, $aa, 0); // also load case_subs
 	
-	echo ",";
-	$fo_=["_c"=>"10", "action"=>"complete"];
-	if (rest_uri_get ("activities","", NULL, $fo_, $p, $aa)==200) rest_uri_response ("activities","", NULL, $o, $p, $aa, 0); // load activities
-
-	echo ",";
-	$fo_=["_c"=>"10", "action"=>"notify"];
-	if (rest_uri_get ("activities","_notify", NULL, $fo_, $p, $aa)==200) rest_uri_response ("activities","_notify", NULL, $o, $p, $aa, 0); // load _notifications
-
-	echo ",";
-	if (rest_uri_get ("calls","", "0", $fo_, $p, $aa)==200) rest_uri_response ("calls","", "0", $o, $p, $aa, 0); // load calls
-
 	echo ",";
 	if (rest_uri_get ("case_activities","", "0", $fo_, $p, $aa)==200) rest_uri_response ("case_activities","", "0", $o, $p, $aa, 0); // load calls
 
 	echo ","; 
 	$fo_ = ["_c"=>"1000", "root_id"=>$GLOBALS["AGE_GROUP_ROOT_ID"] ];
 	if (rest_uri_get ("categories","_age_group", NULL, $fo_, $p, $aa)==200) rest_uri_response ("categories","_age_group", NULL, $o, $p, $aa, 0);
-		
-	//$q = "SELECT GROUP_CONCAT(DISTINCT campaign_id) FROM workinghour WHERE dt0<=unix_timestamp(date(now())) && dt1>=unix_timestamp(date(now()))";
-	//$av = [];
-	//$row = qryp ($q, "", $av, 1);
-	//$active_campaigns = "0";
-	//if ($row && strlen ($row[0])>0) $active_campaigns=$row[0];
-	//$fo_=["id"=>$active_campaigns];
-	//error_log ("ACTIVE CAMPAIGNS: ".$active_campaigns);
-	//echo ",";
-	//if (rest_uri_get ("campaigns","", NULL, $fo, $p, $aa)==200) rest_uri_response ("campaigns","", NULL, $o, $p, $aa, 0);
-	
-	//$q = "SELECT GROUP_CONCAT(DISTINCT user_id) FROM shift WHERE dt0<=unix_timestamp(date(now())) && dt1>=unix_timestamp(date(now()))";
-	//$av = [];
-	//$row = qryp ($q, "", $av, 1);
-	//$active_users = "0";
-	//if ($row && strlen ($row[0])>0) $active_users=$row[0];
-	//$fo=["_c"=>"1000"]; // ["id"=>$active_users];
-	//error_log ("ACTIVE USERS: ".$active_users);
-	//echo ",";
-	//if (rest_uri_get ("users","", NULL, $fo, $p, $aa)==200) rest_uri_response ("users","", NULL, $o, $p, $aa, 0);
-	
+
+	echo ",";
+	$fo_=["_c"=>"10", "id"=>"0"];
+	if (rest_uri_get ("activities","", NULL, $fo_, $p, $aa)==200) rest_uri_response ("activities","", NULL, $o, $p, $aa, 0); // load activities_k
+
+	echo ",";
+	$fo_=["_c"=>"10", "action"=>"notify"];
+	if (rest_uri_get ("activities","_notify", NULL, $fo_, $p, $aa)==200) rest_uri_response ("activities","_notify", NULL, $o, $p, $aa, 0); // load activities
+
 	echo ",";
 	_dash ($o, $p);
 
-        echo "}";
-        return 200;
+     echo "}";
+	return 200;
 }
 
 function _request_ ()
@@ -790,6 +794,12 @@ function _request_ ()
 		$id = "-2";
 		if (($rt==201 || $rt==202) && isset ($p[$k])) $id = $p[$k];
 		error_log ("rt-->".$rt." ".$k);
+
+		//if ($rt>200 && $rt<203 && $u=="activities")
+		//{
+		//	$s = "msg?ctx=notify&chan=0123456789&cid=000&exten=".$p["assigned_to_exten"]."&payload=notify&";
+     	//	muu ("ati", $s);
+		//}
 
 		if ($rt>200 && $rt<203 && ($u=="cases" || $u=="dispositions") && isset ($o["src"]) && $o["src"]=="call") // shrink wrapup to 20 seconds on save
 		{
