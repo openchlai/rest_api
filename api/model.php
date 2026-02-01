@@ -1937,7 +1937,7 @@ $activities_subs =
 //  ["dispositions","","20",		"src_address","src_address"],
 ["messages","","100",           	"src","src","src_callid","src_callid"],
 ["cases","","",				"id","case_id"], // recursive!
-["activities","_notify","10",		"action"," notify"], 
+["activities","_notify","10"] //,		"action"," notify"], 
 ];
 
 $dispositions_subs =

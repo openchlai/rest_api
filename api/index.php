@@ -108,7 +108,7 @@ function muu_ ($cmd, $args) // nb: does not wait for response
 	error_log ("dont wait ------------".$ret);
 }
 
-function national_registry (&$o, &$p)
+function national_registry (&$o, &$p) // todo: configure on site - remove from base system
 {
 	if (strlen($o["national_id_"])<1) return -1;
 	$id=NULL;
@@ -140,7 +140,7 @@ function national_registry (&$o, &$p)
 	return $id;
 }
 
-function notify ($src, $from, $to, $to_id, $to_exten, $msg,  $ca_id)
+function case_notification ($src, $from, $to, $to_id, $to_exten, $msg,  $ca_id)
 {
 	$o_ = [];
 	$p_ = [];
@@ -154,11 +154,12 @@ function notify ($src, $from, $to, $to_id, $to_exten, $msg,  $ca_id)
 	$o_["src_address"] = $from;
 	$o_["src_usr"] = $to_exten;	// nb: exten is nearly as good as user_id
 	$o_["src_vector"] = "2"; 	// leg1 for notify is pseudo
+	$o_["src_status"] = "0-2-2";	// 
 	$o_["action"] = "notify";
 	error_log ("[notify] ".json_encode($o_));
 	$rt = rest_uri_post ("activities", "", NULL, $o_, $p_);
 
-	$s = "msg?ctx=notify&chan=0123456789&cid=000&exten=".$to_exten."&payload=notify&";
+	$s = "msg?ctx=notify&chan=casenotification&cid=000&exten=".$to_exten."&payload=notify&"; // nb static same channel (per user)
      muu ("ati", $s);
 }
 
@@ -216,7 +217,7 @@ function _message_in (&$o, &$p)
 	$o_["src_vector"] = "1";
 	$o_['src_mime'] = $o["mime"];
      if ($o_['src']=='safepal') 	$o_['src_mime'] = "application/json";
-	if ($o_["src"]=="aii") 		$o_['src_usr']  = "*"; // dont agtk!
+	if ($o_["src"]=="aii") 		$o_['src_usr']  = "*"; // dont acd! (by ati process)
 	// $o_["gateway_msg_id"] = $o["message_id"];
 	// $o_["gateway_session_id"] = $o["session_id"];
 	$rt = rest_uri_post ("messages", "", NULL, $o_, $p);
@@ -225,7 +226,7 @@ function _message_in (&$o, &$p)
 		$msg = $o_["src_msg"];
 		$msg = preg_replace ('/[[:^print:]]/', ' ', $msg); 
 		$msg = str_replace ([' ', '&', '<', '>', "\r","\n","\t"], ['_', '', '', '', '', '', ''], $msg); 
-		if (strlen ($msg)>30) $msg = substr ($msg,0,30)."..."; // trunccate to fit in notif 
+		if (strlen ($msg)>30) $msg = substr ($msg,0,30)."..."; // truncate to fit in notif 
 		$s = "msg?ctx=".$o_['src']."&chan=".$o_['src_callid']."&cid=".$o_['src_address']."&payload=".$msg."&";
 		if (isset($o_["src_usr"])) $s .= "exten=".$o_["src_usr"]."&"; // dont agtk!
 		muu ("ati", $s); // post to notif_queue
@@ -795,12 +796,6 @@ function _request_ ()
 		if (($rt==201 || $rt==202) && isset ($p[$k])) $id = $p[$k];
 		error_log ("rt-->".$rt." ".$k);
 
-		//if ($rt>200 && $rt<203 && $u=="activities")
-		//{
-		//	$s = "msg?ctx=notify&chan=0123456789&cid=000&exten=".$p["assigned_to_exten"]."&payload=notify&";
-     	//	muu ("ati", $s);
-		//}
-
 		if ($rt>200 && $rt<203 && ($u=="cases" || $u=="dispositions") && isset ($o["src"]) && $o["src"]=="call") // shrink wrapup to 20 seconds on save
 		{
 			$s = "wrapup?action=0&usr=".$_SESSION["cc_user_exten"];
@@ -824,17 +819,17 @@ function _request_ ()
 			if (isset ($o["escalated_to_id"]) && $o["escalated_to_id"]>0 && isset ($p["escalated_to_id"]) && $o["escalated_to_id"]==$p["escalated_to_id"])
 			{
 				error_log ("--> ".$o["escalated_to_id"]);
-				notify ("escalation", $p["auth_usn"], $p["escalated_to"], $p["escalated_to_id"], $p["escalated_to_exten"], ("^#".$p["case_id"]." ".$p["case_category"]), $p["ca_id"]);
+				case_notification ("escalation", $p["auth_usn"], $p["escalated_to"], $p["escalated_to_id"], $p["escalated_to_exten"], ("^#".$p["case_id"]." ".$p["case_category"]), $p["ca_id"]);
 			}
 
 			if ($rt==202 && $p["auth_id"]!=$p["case_created_by_id"])
 			{
-				notify ("update", $p["auth_usn"], $p["case_created_by"], $p["case_created_by_id"], $p["case_created_by_exten"], ("^#".$p["case_id"]." ".$p["case_category"]), $p["ca_id"]);
+				case_notification ("update", $p["auth_usn"], $p["case_created_by"], $p["case_created_by_id"], $p["case_created_by_exten"], ("^#".$p["case_id"]." ".$p["case_category"]), $p["ca_id"]);
 			}
 
 			if ($rt==202 && $p["auth_id"]!=$p["case_assigned_to_id"]) 
 			{
-				notify ("update", $p["auth_usn"], $p["case_assigned_to"], $p["case_assigned_to_id"], $p["case_assigned_to_exten"], ("^#".$p["case_id"]." ".$p["case_category"]), $p["ca_id"]);
+				case_notification ("update", $p["auth_usn"], $p["case_assigned_to"], $p["case_assigned_to_id"], $p["case_assigned_to_exten"], ("^#".$p["case_id"]." ".$p["case_category"]), $p["ca_id"]);
 			}
 
 			error_log ("SYNC ".$p["case_id"].", ".$p["dsp_id"].", ".$p["ca_id"]);
