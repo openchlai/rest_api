@@ -688,10 +688,18 @@ function _request_ ()
 
 	if ($_SERVER["REQUEST_METHOD"]=="GET") 
 	{
-		$fo = $_GET;
+		$fo = []; //$_GET;
+		foreach ($_GET as $k => $v) 
+		{
+			if (strlen($v)>0) // skip blank args
+				$fo[$k]=$v; 
+		}
+		error_log ("GET-----------------------------------------");
+		error_log (json_encode($fo));
+	
 		$rt = 200;
 		if ($id=="-1") $o = $fo;
-	
+		
 		if ($u=="calls" && isset ($_GET["dash_period"])) 
 		{
 			error_log ("dash ----|".json_encode ($_GET));

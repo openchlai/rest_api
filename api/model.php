@@ -858,15 +858,15 @@ $activities_def = array // nb: activity for any chani
 	array ("src_duration","",		"3","4","","",	"","","", 	"Channel Status Duration",""),
 	array ("src_status_duration","",	"3","4","","",	"","","", 	"Channel Status Duration",""),
 
-	array ("action","",				"3","2","","",  "","","",     "Action",""), // sched|notify(running)|complete
-	array ("dispositions","",		"4","1","","",  "dispositions","GROUP_CONCAT(disposition)","",  "Disposition",""), 
+	array ("action","",				"3","2","","", "","","",     "Action",""), // sched|notify(running)|complete
+	array ("dispositions","",		"4","1","","", "dispositions","GROUP_CONCAT(disposition)","",  "Disposition",""), 
 	        
-	array ("yr","",				"4","2","","",  "activities","UNIX_TIMESTAMP(CONCAT(YEAR(FROM_UNIXTIME(src_ts)),'-01-01'))","",   "Year",":d:y:0: "), 
-	array ("mn","",				"4","2","","",   "activities","UNIX_TIMESTAMP(CONCAT(YEAR(FROM_UNIXTIME(src_ts)),'-',MONTH(FROM_UNIXTIME(src_ts)),'-01'))","",   "Month",":d:my:0: "), 
-	array ("wk","",				"4","2","","",   "activities","UNIX_TIMESTAMP(DATE(FROM_UNIXTIME(src_ts))) - (DAYOFWEEK(FROM_UNIXTIME(src_ts))*86400)","",   "Week",":d:dmy:0: "), 
-	array ("dt","",				"4","2","","",   "activities","UNIX_TIMESTAMP(DATE(FROM_UNIXTIME(src_ts)))","",   "Date",":d:dmy:0: "), 
-	array ("dth","",				"4","2","","",   "activities","UNIX_TIMESTAMP(DATE(FROM_UNIXTIME(src_ts))) + (HOUR(FROM_UNIXTIME(src_ts))*3600)","",   "Hour",":d:dmyh:0: "), 
-	array ("h","",					"4","2","","",   "activities","HOUR(FROM_UNIXTIME(src_ts))","",   "Hour",""), 
+	array ("yr","",				"4","2","","", "activities","UNIX_TIMESTAMP(CONCAT(YEAR(FROM_UNIXTIME(src_ts)),'-01-01'))","",   "Year",":d:y:0: "), 
+	array ("mn","",				"4","2","","", "activities","UNIX_TIMESTAMP(CONCAT(YEAR(FROM_UNIXTIME(src_ts)),'-',MONTH(FROM_UNIXTIME(src_ts)),'-01'))","",   "Month",":d:my:0: "), 
+	array ("wk","",				"4","2","","", "activities","UNIX_TIMESTAMP(DATE(FROM_UNIXTIME(src_ts))) - (DAYOFWEEK(FROM_UNIXTIME(src_ts))*86400)","",   "Week",":d:dmy:0: "), 
+	array ("dt","",				"4","2","","", "activities","UNIX_TIMESTAMP(DATE(FROM_UNIXTIME(src_ts)))","",   "Date",":d:dmy:0: "), 
+	array ("dth","",				"4","2","","", "activities","UNIX_TIMESTAMP(DATE(FROM_UNIXTIME(src_ts))) + (HOUR(FROM_UNIXTIME(src_ts))*3600)","",   "Hour",":d:dmyh:0: "), 
+	array ("h","",					"4","2","","", "activities","HOUR(FROM_UNIXTIME(src_ts))","",   "Hour",""), 
 );
 
 $dispositions_def = array 

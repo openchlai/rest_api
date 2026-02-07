@@ -1077,7 +1077,7 @@ function k_c ($t, $k, $v, &$aa, &$av)
 	if (strlen ($aa["w"])>0) $s = ' && ';
 	$n = count ($v);
 	$c = 0;
-	for ($j=0; $j<$n; $j++) if (strlen($v[$j])>0) 
+	for ($j=0; $j<$n; $j++) // if (strlen($v[$j])>0) 
 	{
 		if ($c==0) $aa["w"] .= $s.$t.'.'.$k." IN (";
 		if ($c>0) $aa["w"] .=","; 
@@ -1109,13 +1109,14 @@ function k_s ($t, $k, $v, &$aa, &$av)
 
 function ctx_fv ($t, $m, $v, &$a, &$aa, &$av)
 {
-	if ($m==1) k_s ($t, $a[0], explode (",",$v), $aa, $av);
+	//error_log ("ctx:".$a[0]."-------------------");
+	if ($m==1) k_s 	($t, $a[0], explode (",",$v), $aa, $av);
 	if ($m==2) k_c 	($t, $a[0], explode (",",$v), $aa, $av);
 	if ($m==3) k_d 	($t, $a[0], explode (";",$v), $aa, $av);
 	if ($m==4) k_n 	($t, $a[0], explode ("-",$v), $aa, $av);
 	if ($m==6) k_c 	($t, $a[0], explode (",",$v), $aa, $av);
-	if ($m==9) k_ft ($t, $a[0], explode (" ",$v), $aa, $av); // fulltext search
-	if ($m==12)k_ch ($t, $a,    explode (",",$v), $aa, $av); // hie-enum
+	if ($m==9) k_ft 	($t, $a[0], explode (" ",$v), $aa, $av); // fulltext search
+	if ($m==12)k_ch 	($t, $a,    explode (",",$v), $aa, $av); // hie-enum
 }
 
 function ctx_f ($u, &$aa, &$av, &$fo, $is_join=0) // parse GET parameters
@@ -1140,7 +1141,7 @@ function ctx_f ($u, &$aa, &$av, &$fo, $is_join=0) // parse GET parameters
 		if (isset ($fo[$k])) $v = $fo[$k];
 		if (isset ($fo[($k.'__')])) { $v=$fo[($k.'__')]; $m=9; } // using dash double-dash coz there are fields ending with
 		if ($v===NULL && $is_join==1) continue; 		 // skip blanks for join (only add columns filtered with)	
-		if ($v!==NULL && strlen ($v)>0)
+		if ($v!==NULL) //  && strlen ($v)>0)
 		{
 			if (isset ($a[$i][11])) $m=12;
 			ctx_fv ($t, $m, $v, $a[$i], $aa, $av);
@@ -1208,7 +1209,6 @@ function ctx ($u, $suffix, &$aa, &$av, &$fo, &$join)
 	$join_n = count ($join);
 	$ujoin = null;
 	if (isset ($GLOBALS[($u."_join")])) { $ujoin=$GLOBALS[($u."_join")]; }
-	
 	
 	$aa["ta"] = "";
 	$aa["f"] .= '"'.$u.$suffix.'_k":{';
