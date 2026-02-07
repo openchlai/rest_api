@@ -150,7 +150,7 @@ function case_notification ($src, $from, $to, $to_id, $to_exten, $msg,  $ca_id)
 	$o_["src"] = $src;
 	$o_["src_ts"] = _val_id()/10000;
 	$o_["src_uid"] = "notify"._val_id();
-	// src_callid
+	$o_["src_callid"] = $o_["src_uid"];
 	$o_["src_address"] = $from;
 	$o_["src_usr"] = $to_exten;	// nb: exten is nearly as good as user_id
 	$o_["src_vector"] = "2"; 	// leg1 for notify is pseudo
