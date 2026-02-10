@@ -154,7 +154,7 @@ function case_notification ($src, $from, $to, $to_id, $to_exten, $msg,  $ca_id)
 	$o_["src_address"] = $from;
 	$o_["src_usr"] = $to_exten;	// nb: exten is nearly as good as user_id
 	$o_["src_vector"] = "2"; 	// leg1 for notify is pseudo
-	$o_["src_status"] = "0-2-2";	// 
+	// $o_["src_status"] = "0-2-2";	// 
 	$o_["action"] = "notify";
 	error_log ("[notify] ".json_encode($o_));
 	$rt = rest_uri_post ("activities", "", NULL, $o_, $p_);
@@ -611,7 +611,7 @@ function _home (&$o, &$p)
 	if (rest_uri_get ("categories","_age_group", NULL, $fo_, $p, $aa)==200) rest_uri_response ("categories","_age_group", NULL, $o, $p, $aa, 0);
 
 	echo ",";
-	$fo_=["_c"=>"10", "id"=>"0"];
+	$fo_=["_c"=>"10"];
 	if (rest_uri_get ("activities","", NULL, $fo_, $p, $aa)==200) rest_uri_response ("activities","", NULL, $o, $p, $aa, 0); // load activities_k
 
 	echo ",";

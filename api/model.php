@@ -32,7 +32,7 @@ $RESOURCES = array
 	"files"=>			array ("file","",			"1","0","0",	"File", 		"","",			""),
 	"calls"=>			array ("chan","",			"0","0","0",	"Call", 		"","",			""), 
 	"chanss"=>		array ("chan_ss","",		"0","0","0",	"Agent Session", 	"","",			""), 
-     "pmessages"=>		array ("pmsg","",			"1","0","0",	"Message Session",	"id DESC","",		""), 
+     "pmessages"=>		array ("pmsg","",			"1","0","0",	"Message Session",	"ts DESC","",		""), 
      "messages"=>		array ("msg","",			"1","0","0",	"Message", 		"id DESC","",		""), 
 	"activities"=>		array ("activity","",		"3","0","0",	"Activity", 		"src_ts DESC","",	""), 
 
@@ -1937,7 +1937,7 @@ $activities_subs =
 //  ["dispositions","","20",		"src_address","src_address"],
 ["messages","","100",           	"src","src","src_callid","src_callid"],
 ["cases","","",				"id","case_id"], // recursive!
-["activities","_notify","10"] //,		"action"," notify"], 
+["activities","_notify","10",		"action"," notify"], 
 ];
 
 $dispositions_subs =
