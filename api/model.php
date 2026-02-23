@@ -2186,9 +2186,9 @@ $case_status_enum = [""=>["","Unknown"], "0"=>["0","Unknown"], "1"=>["1","Ongoin
 
 $case_priority_enum = [""=>["","Unknown"], "0"=>["0","Unknown"], "1"=>["1","Low"], "2"=>["2","Medium"], "3"=>["3","High"]];
 
-$src_enum = 
+$src_enum =  // needed to validate src_address 
 [
-"escalation"=>["escalation","Case Escalation","username",""],
+"escalation"=>["escalation","Case Escalation","username",""], 
 "update"=>["update","Case Update","username",""],
 "call"=>["call","Call","Phone Number","1"],
 "walkin"=>["walkin","Walkin","Phone Number","1"],
@@ -2204,6 +2204,7 @@ $src_enum =
 "webform"=>["webform","Web From","session",""],
 "cmis"=>["cmis","CMIS","session",""],
 "ceemis"=>["ceemis","Integration","Phone Number","1"],
+"ais"=>["ais","AI service","a text",""],
 ];
 
 ?>

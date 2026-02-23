@@ -11,62 +11,44 @@ include "../lib/rest.php";
 include "../lib/session.php";
 include "../lib/XLSXbuf.php"; 
 include "../lib/rpc.php"; 
-//include "../lib/dialplan.php";
 include "model_qa.php";
 include "model_qa_k.php";
+//include "email.php";
 
-$FN = ["sendOTP"=>1, "verifyOTP"=>1, "resetAuth"=>1, "changeAuth"=>1, "dash"=>1, "wallonly"=>1, "agent"=>1, "chan"=>1, "sup"=>1, "msg"=>1]; // non-crud endpoints
+$FN = ["resetAuthAdmin"=>1, "sendOTP"=>1, "changeAuthOTP"=>1, "changeAuth"=>1, "dash"=>1, "wallonly"=>1, "agent"=>1, "chan"=>1, "sup"=>1, "msg"=>1]; // non-crud endpoints
 
 function copy_from_pabx ($uid) // copy from archive
 {
 	$url = $GLOBALS["RECORDING_ARCHIVE_URL"].$uid;
-        $r = array ('data'=>'', 'info'=>0);
-        $ch = curl_init ();
-        curl_setopt ($ch, CURLOPT_URL, $url);
-        curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt ($ch, CURLOPT_TIMEOUT, 60);
+	$r = array ('data'=>'', 'info'=>0);
+	$ch = curl_init ();
+	curl_setopt ($ch, CURLOPT_URL, $url);
+	curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt ($ch, CURLOPT_TIMEOUT, 60);
 //      curl_setopt ($ch, CURLOPT_VERBOSE, 2);
-        $r['data'] = curl_exec ($ch);
-        $r['info'] = curl_getinfo ($ch);
+	$r['data'] = curl_exec ($ch);
+	$r['info'] = curl_getinfo ($ch);
 	error_log ("[copy_from_archive] ". $url." ".$r['info']['http_code']);
 	if ($r['info']['http_code']==200)
 	{
 		header ("Content-Type: " . $r['info']['content_type']);
-        	header ("Content-Length: " . strlen ($r['data']));
-	        // header ('Content-Description: File Download');
-        	header ('Content-Disposition: attachment; filename="'.$uid.'.ogg"');
-	        // header ('Expires: 0');
-        	header ('Cache-Control: no-cache');
-	        // header ('Pragma: public');
-	        header ("Content-Transfer-Encoding: binary");
+		header ("Content-Length: " . strlen ($r['data']));
+		// header ('Content-Description: File Download');
+		header ('Content-Disposition: attachment; filename="'.$uid.'.ogg"');
+		// header ('Expires: 0');
+		header ('Cache-Control: no-cache');
+		// header ('Pragma: public');
+		header ("Content-Transfer-Encoding: binary");
 		echo $r['data'];
 		// error_log (json_encode ($r['info']));
 		exit (0);
 	}
 }
 
-/*
-function muu ($cmd, $args)
-{
-	$url = "http://127.0.0.1:8383/".$cmd."/".$args;
-        $r = array ('data'=>'', 'info'=>0);
-        $ch = curl_init ();
-        curl_setopt ($ch, CURLOPT_URL, $url);
-        curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt ($ch, CURLOPT_TIMEOUT, 60);
-//      curl_setopt ($ch, CURLOPT_VERBOSE, 2);
-        $r['data'] = curl_exec ($ch);
-        $r['info'] = curl_getinfo ($ch);
-        curl_close ($ch);
-        error_log ("[muu] ". $cmd."/".$args." | ".$r['info']['http_code']);
-	// error_log ("[muu] >> ". $r['data']);
-        return $r;
-}*/
-
 function muu ($cmd, $args, $timeout=30) // timeout
 {
 	//$url = "http://127.0.0.1:8383/".$cmd."/".$args;
-	$url = $GLOBALS["API_SERVER"]."/".$cmd."/".$args;   //error_log($url);
+	$url = "https://".$GLOBALS["VA_SIP_HOST"]."/".$cmd."/".$args;   //error_log($url);
 	$r = array ('data'=>'', 'info'=>0);
 	$ch = curl_init ();
 	curl_setopt ($ch, CURLOPT_URL, $url);
@@ -79,65 +61,27 @@ function muu ($cmd, $args, $timeout=30) // timeout
 	$r['error'] = curl_error($ch);
 	$r['info'] = curl_getinfo ($ch);
 	curl_close ($ch);
-	error_log ("[muu] ". $cmd."/".$args." | ".$r['info']['http_code']."|".$r['error']);
+	error_log ("[muu] ". $cmd."/".$args." | ".$r['info']['http_code']."|".$r['error']."|".$url);
 	//error_log ("[muu] >> ". json_encode($r));
 	return $r;
 }
 
 function muu_ ($cmd, $args) // nb: does not wait for response
 {
-	$sock = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-	if (!$sock) {
-    		error_log ("Failed to create socket: " . socket_strerror(socket_last_error()));
-		return -1;
-	}
-
-	if (!socket_connect($sock, "127.0.0.1", "8383")) {
-    		error_log ("Connection failed: " . socket_strerror(socket_last_error($sock)) );
-		return -1;
-	}
-	
+	$url = "tls://".$GLOBALS["VA_SIP_HOST"].":8384";
 	$req = "GET /".$cmd."/".$args." HTTP/1.1\r\n\r\n";
-
-	$ret = socket_write($sock, $req, strlen($req));
-
-	sleep(1);
-
-	socket_close($sock);
-
-	error_log ("dont wait ------------".$ret);
-}
-
-function national_registry (&$o, &$p) // todo: configure on site - remove from base system
-{
-	if (strlen($o["national_id_"])<1) return -1;
-	$id=NULL;
-	//$dup_ = array ("contacts","","dup","national_id","national_id_",NULL, "id"); // todo: use hidden field to match same contact everytime
-	//_dup ($dup_, $o, $p);
-	//if (isset($p["contact_id"])) $id=$p["contact_id"];
-	error_log ("national_register: [o] ".json_encode($p));
-	error_log ("national_register: [p] ".json_encode($o));
-	$api_url = "https://backend.bitz-itc.com/api/webhook/eemis"; 
-	$api_hdrs = ["Content-Type: application/json"];
-	$api_body = "{ \"national_id\": \"".$o["national_id_"]."\" }";
-	$r = kurl ($api_url, 60, $api_body, $api_hdrs);
-	$a = json_decode ($r["data"], true);
-	if ($a && isset($a["national_id"])) //  && isset($a["data"]) && isset($a["data"]["data"]))
+	$ctx = stream_context_create (['ssl' => ['verify_peer' => false, 'verify_peer_name' => false]]);
+	$fp = stream_socket_client ($url, $errno, $errstr, 10, STREAM_CLIENT_CONNECT, $ctx);
+	if (!$fp) 
 	{
-		$kk = array_keys ($a);
-		$kn = count($kk);
-		for ($i=0; $i<$kn; $i++) $o[("contact_".$kk[$i])] = $a[$kk[$i]];
-		$o["contact_id"] = 0;
-		$o["contact_fullname"] = $o["contact_lname"]." ".$o["contact_fname"];
-		//rest_uri_post ("contacts","", $id, $a, $p); // create/update contact
-		//if (isset($p["contact_id"])) 
-		//{
-		//	$id = $p["contact_id"];
-		//	_dup ($GLOBALS["contacts_dup_api"][0], $o, $p);
-		//}	
-		$id=1;
+		error_log ("muu_: Connection failed - $errstr ($errno)");
+		return;
 	}
-	return $id;
+	stream_set_blocking ($fp, false);
+	fwrite ($fp, $req);
+	fflush ($fp);
+	fclose ($fp);
+	error_log ("muu_: dont wait (".$cmd.$args.")-------");
 }
 
 function case_notification ($src, $from, $to, $to_id, $to_exten, $msg,  $ca_id)
@@ -212,14 +156,12 @@ function _message_in (&$o, &$p)
 	$o_["src_uid"] = $o["message_id"]; 
 	$o_["src_callid"] = $o["session_id"]; 
 	$o_["src_address"] = $o["from"];
-	$o_["src_msg"] = $o["message"];
+	$o_["src_msg"] = $o["message"];	// base64 encode
 	$o_["src_ts"] = $o["timestamp"];
 	$o_["src_vector"] = "1";
 	$o_['src_mime'] = $o["mime"];
      if ($o_['src']=='safepal') 	$o_['src_mime'] = "application/json";
 	if ($o_["src"]=="aii") 		$o_['src_usr']  = "*"; // dont acd! (by ati process)
-	// $o_["gateway_msg_id"] = $o["message_id"];
-	// $o_["gateway_session_id"] = $o["session_id"];
 	$rt = rest_uri_post ("messages", "", NULL, $o_, $p);
 	if ($rt==201) 
 	{
@@ -239,7 +181,7 @@ function _message_in (&$o, &$p)
 			return rest_uri_response ("messages", "", $p["msg_id"], $o, $p, $aa, 201);
 		}
 	}
-	error_log (" msg rt=".$rt." | ". json_encode ($p));
+	error_log ("   message_in ----- rt:".$rt." | ". json_encode ($p));
 	return $rt;
 }
 
@@ -295,7 +237,7 @@ function _chan (&$o)
 	
 	if ($o['action']>2 && $o['action']<6) // cb_xfer, cb_conference, cb_resume
 	{
-		$s = "redirect?action=".$o['action']."&exten=".$o['exten']."&chan1=".$o['chan']."&chan3=".$o['chan3']."&";
+		$s = "redirect?action=".$o['action']."&exten=".$o['cbid']."&chan1=".$o['chan']."&chan2=".$o['chan2']."&";
 		muu ("ami",$s); 
 	}
 
@@ -323,7 +265,7 @@ function _chan (&$o)
 		}
 	
 		$o['exten'] = 'CB'.$o['src_uid'];
-		if (isset ($o['cbid']) && strlen ($o['cbid'])>0) { $o['exten'] = $o['cbid']; $o['chan2'] = ''; } // dont redirect peer already in bridge
+		if (isset ($o['cbid']) && strlen ($o['cbid'])>0) { $o['exten'] = $o['cbid']; $o['chan2'] = ''; } // dont redirect peer; if peer already in bridge
 		if (!isset ($o['chan2'])) $o['chan2'] = '';
 		$s = "redirect?action=".$o['action']."&usr=".$o['usr']."&exten=".$o['exten']."&chan1=".$o['chan']."&chan2=".$o['chan2']."&add=".$o['add']."&ref=".$o['src_address']."&";
 		muu ("ami", $s); 
@@ -377,13 +319,13 @@ function _agent (&$o)
 
 	if ($o['action']=='1')
 	{
-		$k = ['any','sun','mon','tue','wed','thu','fri','sat'];
-		$q = "SELECT UNIX_TIMESTAMP(Date(Now())), Dayofweek(Now())";
-		$row = qryp ($q, "", [], 1);
-		$at = [];
-		$av = [$row[0], $row[0], _S('cc_user_id')];	
-		$q = "SELECT workinghour.campaign_id, campaign_campaign FROM workinghour INNER JOIN member ON workinghour.campaign_id=member.campaign_id && source='1' && dt0<=? && dt1>=? && ".$k[$row[1]]."='1' && user_id=?";  // fetch active campaigns
-		$res = qryp ($q, "sss", $av, 0);
+		//$k = ['any','sun','mon','tue','wed','thu','fri','sat'];
+		//$q = "SELECT UNIX_TIMESTAMP(Date(Now())), Dayofweek(Now())";
+		//$row = qryp ($q, "", [], 1);
+		//$at = [];
+		//$av = [$row[0], $row[0], _S('cc_user_id')];	
+		//$q = "SELECT workinghour.campaign_id, campaign_campaign FROM workinghour INNER JOIN member ON workinghour.campaign_id=member.campaign_id && source='1' && dt0<=? && dt1>=? && ".$k[$row[1]]."='1' && user_id=?";  // fetch active campaigns
+		//$res = qryp ($q, "sss", $av, 0);
 		$campaigns = "0,";
 		$outbound = 0;
 		
@@ -521,6 +463,7 @@ function _wallonly (&$o, &$p)
 	$q = "SELECT id, usn, exten, role FROM auth WHERE exten=?";
 	$av = [__VESC(_G("exten"))];
 	$row = qryp ($q, "s", $av, 1);
+	if (!$row) $row = ["","","",""];
 	header("HTTP/1.0 200 OK");
 	header ('Content-Type: application/json');
 	echo '{ "users":[["'.$row[0].'","'.$row[1].'"]] }';
@@ -606,9 +549,9 @@ function _home (&$o, &$p)
 	echo ",";
 	if (rest_uri_get ("case_activities","", "0", $fo_, $p, $aa)==200) rest_uri_response ("case_activities","", "0", $o, $p, $aa, 0); // load calls
 
-	echo ","; 
-	$fo_ = ["_c"=>"1000", "root_id"=>$GLOBALS["AGE_GROUP_ROOT_ID"] ];
-	if (rest_uri_get ("categories","_age_group", NULL, $fo_, $p, $aa)==200) rest_uri_response ("categories","_age_group", NULL, $o, $p, $aa, 0);
+	//echo ","; 
+	//$fo_ = ["_c"=>"1000", "root_id"=>$GLOBALS["AGE_GROUP_ROOT_ID"] ];
+	//if (rest_uri_get ("categories","_age_group", NULL, $fo_, $p, $aa)==200) rest_uri_response ("categories","_age_group", NULL, $o, $p, $aa, 0);
 
 	echo ",";
 	$fo_=["_c"=>"10"];
@@ -637,15 +580,14 @@ function _request_ ()
 	// error_log ("[request] ".$_SERVER["REQUEST_URI"]);
 
 	$rt = rest_uri_parse ($_SERVER["REQUEST_METHOD"], $_SERVER["REQUEST_URI"], 3, $u, $suffix, $id, $o);
+	error_log ("[request] " . $u . "/" . $id ."|". $rt);
 	if ($rt!=0) return $rt;
-
-	error_log ("[request] " . $u . "/" . $id ."|". json_encode ($o));
 	
 	if ($u=="wallonly") return _wallonly ($o, $p);
 
-	if ($u=="sendOTP") return _sendOTP ($o,$p);
+	// todo: reset_auth // aka sendOTP
 
-	if ($u=="verifyOTP") return _verifyOTP ($o,$p); // onverify creates a 'temp' session to allow password reset
+	if ($u=="changeAuthOTP") return change_auth ($o, $p); // aka verify OTP
 
 	if (isset ($_GET["logout"]))
 	{
@@ -666,9 +608,23 @@ function _request_ ()
 		
 	if (strlen($u)<1) return _home ($o,$p);
 
-	if ($u=="resetAuth") return changeAuthAdmin ($id);
+	if ($u=="resetAuthAdmin") 
+	{
+		$rt = reset_auth_admin ($o, $p);
+		if ($rt==202)
+		{
+			error_log ("[otp] ".$p["otp"]);
+			$p["recipient_id"] = $p["user_id"];
+			email_send ($o, $p, "RESET_AUTH_ADMIN");
+			header ("HTTP/1.0 202 OK");
+			header ('Content-Type: application/json');
+        		echo '{"auth_nb":[["info","Password Reset Successful. Email sent to: '.$p["contact_email"].'"]]}';
+			// echo '{"auth_nb":[["info","Password Reset Successful. The new password is '.$o["otp"].'"]]}';
+		}
+		return $rt;
+	}
 	
-	if ($u=="changeAuth") return changeAuth ($o, $p);
+	if ($u=="changeAuth") return change_auth ($o, $p); // aka change passwd
 	
 	if ($u=="agent") return _agent ($o);
 	
@@ -685,6 +641,12 @@ function _request_ ()
 	}
 	
 	if ($u=="msg") return _message_in ($o, $p);
+
+	if ($u=="mailer") return _mailer ($o, $p);
+
+	if ($u=="kyc_verify") return _kyc_verify ($o, $p);
+		
+	if ($u=="kyc_otp") return _kyc_otp ($o, $p);
 
 	if ($_SERVER["REQUEST_METHOD"]=="GET") 
 	{
@@ -872,6 +834,15 @@ if ($rt==203)
 	header ("HTTP/1.0 203 Wait");
 	header ('Content-Type: application/json');
 	echo '{ "action":[["notice","async"]] }'; 
+}
+
+if ($rt==302)
+{
+	error_log ("loading subpage from url ---------------"); 
+	//header ("HTTP/1.0 200 OK");
+	//header ('Content-Type: text/html');
+	//$GLOBALS["config"] = true;
+	//include "/var/www/html/helpline/index.php";
 }
 
 ?>

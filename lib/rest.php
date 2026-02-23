@@ -2118,6 +2118,8 @@ function rest_uri_parse ($meth, $uri, $i, &$u, &$suffix, &$id, &$o)
 	$nn = count ($vv);
 	if ($nn>0 && strlen ($vv[$nn-1])<1) $nn--; // skip last item if blank
 
+	if ($nn>2 && $vv[2]!="api") return 302;
+
 	for ($i; $i<$nn; $i+=2)
 	{
 		$u = $vv[$i];
