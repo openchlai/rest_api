@@ -742,20 +742,6 @@ function _request_ ()
 			//$p["gateway_session_id"] = $o["src_uid"];
 			//$p["gateway_msg_id"] = $o["src"]."-".$tv["sec"]."-".$tv["usec"]; 
 		}
-
-		if ($u=="clients" && isset($o["national_id_"]))
-		{
-			$aa = [];
-			$id = national_registry($o, $p);
-			echo "{";
-			if ($id>0)
-			{
-				error_log ("[national reg]".json_encode($o));
-				rest_uri_response ("clients", "", "-1", $o, $p, $aa, 0);
-			}
-			echo "}";
-			return 200;
-		}
 					
 		$o['i_']=0;
 		$rt = rest_uri_post ($u, $suffix, $id, $o, $p);
