@@ -1,6 +1,31 @@
 <?php
 
-$ERRORS=array();
+$RESOURCES 	= [];
+$MODELS		= [];
+$MODELS_K	= [];
+$JOINS		= [];
+$APIS		= [];
+$SUBS		= [];
+$RIGHTS		= [];
+$ERRORS 	= [];
+
+function _ks () // load models_ks
+{
+	$kk = array_keys ($GLOBALS["RESOURCES"]);
+	$kn = count($kk);
+	for ($i=0; $i<$kn; $i++)
+	{
+		$u = $kk[$i];
+		$jn = count($GLOBALS["MODELS"][$u]);
+		$GLOBALS["MODELS_K"][$u] = [];
+		for ($j=0; $j<$jn; $j++)
+		{
+			$k = $GLOBALS["MODELS"][$u][$j][0];
+			$GLOBALS["MODELS_K"][$u][$k] = $j;
+		}
+	}
+	// error_log (json_encode (array_keys($GLOBALS["MODELS_K"])));
+}
 
 function _G ($k)
 {

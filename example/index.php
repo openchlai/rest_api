@@ -23,10 +23,10 @@ function _request_ ()
 	$rt = rest_uri_parse ($_SERVER["REQUEST_METHOD"], $_SERVER["REQUEST_URI"], 3, $vw, $u, $suffix, $id, $o);
 	if ($rt!=0) return $rt;
 	
-	if ($vw!="api")
-	{
-		return _vw ($vw);
-	}
+	//if ($vw!="api") // load UI
+	//{
+	//	return _vw ($vw);
+	//}
 
 	if (isset ($_GET["logout"]))
 	{
@@ -89,4 +89,5 @@ session_set_save_handler ("ss_open", "ss_close", "ss_read", "ss_write", "ss_dest
 session_name (THE_APP_SESSION_NAME);
 session_start ();
 
-
+$rt = _request_ ();
+if ($rt>399) rest_uri_response_error ($rt);
