@@ -4,9 +4,9 @@ include "config.php";
 $db = mysqli_connect (null, THE_DB_USN, null, THE_DB_NAME, null, THE_DB_SOCK) or die ("Could Not connect to Database Server.");
 $db2 = mysqli_connect (null, THE_DB_USN, null, THE_DB_NAME, null, THE_DB_SOCK) or die ("Could Not connect to Database Server.");
 
-include "lib/rest.php";
-include "lib/session.php";
-include "lib/XLSXbuf.php";
+include "../rest.php";
+include "../session.php";
+include "../XLSXbuf.php";
 
 include "users.php";
 
