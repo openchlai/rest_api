@@ -1,4 +1,6 @@
-This library generates REST API endpoints for a given mysql table.
+# REST_API
+
+This library generates REST API endpoints given a 'model defination' for a mysql table.
 
 The generated REST API endpoints are:
 - List     GET /
@@ -6,5 +8,5 @@ The generated REST API endpoints are:
 - Add:	   POST
 - Update   POST /<id>
 
-HOW TO USE
+# EXAMPLE
 See examples/index.php
