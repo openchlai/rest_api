@@ -2180,6 +2180,8 @@ function rest_uri_parse ($meth, $uri, $i, &$u, &$suffix, &$id, &$o)
 			
 	$id = $id_;
 
+	_ks (); // load models_k dynamicaly
+	
 	return 0;
 }
 
