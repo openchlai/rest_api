@@ -1,11 +1,10 @@
 <?php
 include "config.php";
+include "../rest.php";
+include "users.php";
 
 $db = mysqli_connect (null, THE_DB_USN, null, THE_DB_NAME, null, THE_DB_SOCK) or die ("Could Not connect to Database Server.");
 $db2 = mysqli_connect (null, THE_DB_USN, null, THE_DB_NAME, null, THE_DB_SOCK) or die ("Could Not connect to Database Server.");
-
-include "../rest.php";
-include "users.php";
 
 function _request_ () 
 {
