@@ -68,7 +68,7 @@ function muu ($cmd, $args, $timeout=30) // timeout
 
 function muu_ ($cmd, $args) // nb: does not wait for response
 {
-	$url = "tls://".$GLOBALS["VA_SIP_HOST"].":8384";
+	$url = "tls://".$GLOBALS["VA_SIP_HOST"] .":443";
 	$req = "GET /".$cmd."/".$args." HTTP/1.1\r\n\r\n";
 	$ctx = stream_context_create (['ssl' => ['verify_peer' => false, 'verify_peer_name' => false]]);
 	$fp = stream_socket_client ($url, $errno, $errstr, 10, STREAM_CLIENT_CONNECT, $ctx);
@@ -298,7 +298,7 @@ function _agent (&$o)
 	{
 		$r = muu ("ati","sync?c=-1&");
 		$o_ = json_decode ($r['data'], true);
-		$k = array_keys ($o_['ati']);
+		$k = []; //array_keys ($o_['ati']);
 		$n = count ($k);
 		$me = null;
 		for ($i=0; $i<$n; $i++) if ($o_['ati'][$k[$i]][0]==$exten) { $me=$k[$i]; break; }
