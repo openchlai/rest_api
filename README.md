@@ -1,12 +1,13 @@
 # REST_API
 
-This library generates REST API endpoints given a 'model defination' for a mysql table.
+This is a 'No code' library that sits in front of your mysql tables and generates REST APIs.
 
-The generated REST API endpoints are:
 - List     GET /
 - View     GET /<id>
 - Add:	   POST
 - Update   POST /<id>
+
+* Need a config file though!
 
 # EXAMPLE
 See examples/index.php
