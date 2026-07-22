@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main, lib]
+  pull_request:
+    branches: [main, lib]
+
+jobs:
+  lint:
+    name: PHP syntax lint
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['7.4', '8.1']
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+      - name: php -l on all PHP files
+        run: |
+          set -e
+          find . -type f -name '*.php' -not -path './vendor/*' -print0 \
+            | xargs -0 -n1 php -l
+
+  smoke:
+    name: Examples smoke test (TODO — not yet blocking)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: myapp
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -proot"
+          --health-interval=10s --health-timeout=5s --health-retries=5
+    steps:
+      - uses: actions/checkout@v4
+      - name: TODO — boot examples/ against MySQL and assert CRUD + envelope
+        run: |
+          echo "TODO: create the users table from examples/users.php, include rest_api.php,"
+          echo "      invoke rest_api(...), then curl the generated endpoints and assert the"
+          echo "      response envelope (_k / _ctx). Blocks 2.0.0 — see VERSIONING.md."
