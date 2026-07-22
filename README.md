@@ -17,7 +17,7 @@ sudo mysql -e "CREATE DATABASE helpline;"
 ### 1.3 Import Database Schema
 Import the database schema into the `helpline` database:
 ```bash
-sudo mysql helpline < /usr/src/OpenChs/rest_api/uchl.sql
+sudo mysql helpline < /usr/src/OpenChs/rest_api/config/demo_db.sql
 ```
 
 ### 1.4 Grant Permissions
