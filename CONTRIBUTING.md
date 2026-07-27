@@ -7,7 +7,8 @@
 
 ## Pull requests
 1. Keep PRs focused. A draft PR is welcome for early discussion.
-2. **CI must pass** — PHP syntax lint (`php -l`) and CodeQL run on every PR (see `.github/workflows/ci.yml`).
+2. **CI must pass** — PHP syntax lint (`php -l`, `.github/workflows/ci.yml`). A Semgrep security scan
+   (`.github/workflows/security.yml`) also runs and reports to the Security tab; it's non-blocking for now.
 3. **`examples/` must still boot.** If you change behavior, update the examples.
 4. **Contract changes bump the version.** If your change touches any of the three public surfaces in
    [`VERSIONING.md`](./VERSIONING.md) — the `rest_api()` entry signature, the config-file schema, or the HTTP
