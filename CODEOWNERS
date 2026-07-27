@@ -3,10 +3,10 @@
 # A PR touching a path below auto-requests review from its owner.
 
 # --- The engine: the library core ---
-/rest_api.php        @josephkihiuhia
+/rest_api.php        @josephkimaniai
 
 # --- Examples / schema demonstrations ---
-/examples/           @josephkihiuhia
+/examples/           @josephkimaniai
 
 # --- Packaging, licensing, CI, governance docs: maintenance owner ---
 /LICENSE             @K-NURF
