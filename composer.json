@@ -1,0 +1,20 @@
+{
+    "name": "bitz-itc/rest_api",
+    "description": "OpenCHS REST_API — a no-code PHP library that sits in front of MySQL tables and generates REST APIs from the table schema, extended by config files.",
+    "type": "library",
+    "keywords": ["openchs", "rest", "api", "no-code", "mysql", "dpg"],
+    "homepage": "https://github.com/BITZ-IT-Consulting-LTD/rest_api",
+    "license": "GPL-3.0-or-later",
+    "version": "2.0.0-dev",
+    "require": {
+        "php": ">=7.4",
+        "ext-mysqli": "*",
+        "ext-json": "*"
+    },
+    "autoload": {
+        "files": ["rest_api.php"]
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

@@ -1,0 +1,20 @@
+# Code owners for rest_api.
+# Requires branch protection with "Require review from Code Owners" to enforce.
+# A PR touching a path below auto-requests review from its owner.
+
+# --- The engine: the library core ---
+/rest_api.php        @josephkimaniai
+
+# --- Examples / schema demonstrations ---
+/examples/           @josephkimaniai
+
+# --- Packaging, licensing, CI, governance docs: maintenance owner ---
+/LICENSE             @K-NURF
+/composer.json       @K-NURF
+/CHANGELOG.md        @K-NURF
+/VERSIONING.md       @K-NURF
+/CONTRIBUTING.md     @K-NURF
+/STANDARDS.md        @K-NURF
+/CODEOWNERS          @K-NURF
+/.editorconfig       @K-NURF
+/.github/            @K-NURF

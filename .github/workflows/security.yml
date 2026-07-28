@@ -1,0 +1,40 @@
+name: Security
+
+on:
+  push:
+    branches: [main, lib]
+  pull_request:
+    branches: [main, lib]
+  schedule:
+    - cron: '24 4 * * 2'   # weekly (Tue) — matches the cadence the old CodeQL job used
+
+permissions:
+  contents: read
+  security-events: write   # upload SARIF to the Security tab (free on this public repo)
+
+jobs:
+  semgrep:
+    name: Semgrep (PHP SAST + secrets)
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    steps:
+      - uses: actions/checkout@v4
+
+      # Non-blocking for now: surface findings as code-scanning alerts without
+      # failing the PR. Flip `continue-on-error` to false (or add --error) once the
+      # initial backlog is triaged, to make high-severity findings block.
+      - name: Semgrep scan
+        continue-on-error: true
+        run: |
+          semgrep scan \
+            --config p/php \
+            --config p/security-audit \
+            --config p/secrets \
+            --sarif --output semgrep.sarif
+
+      - name: Upload results to code scanning
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3   # generic SARIF uploader; not CodeQL analysis
+        with:
+          sarif_file: semgrep.sarif
