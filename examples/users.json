@@ -1,0 +1,39 @@
+{
+
+"api_name":"users",
+"table_name":"auth",
+"ui_name":"User",
+"default_sort":"usn",
+"permission":3,
+
+"model":
+[
+["id","",			"0","2","","", 	"","","", "ID",""],
+["created_on","",		"0","3","","", 	"","","", "Created On",""],
+["created_by","",		"0","2","","", 	"","","", "Created By",""],
+["created_by_id","",		"0","2","","", 	"","","", "Created By ID",""],
+["created_by_role","",		"0","2","","", 	"","","", "Created By Role",""],
+["usn","",			"3","2","u","", "","","", "Username",""],
+["role","",			"3","2","m","", "","","", "Role",""],
+["is_active","",             	"3","2","v","", "","1","", "Active",""],
+["contact_id","",		"1","2","","f", "","","", "Contact ID",""],
+["contact_fullname","",		"3","2","","",  "","","", "Fullname",""],
+["contact_fname","",		"3","2","m","", "","","", "First Name",""],
+["contact_lname","",		"3","2","","",  "","","", "Last Name",""],
+["contact_phone","",		"3","2","","p", "","","", "Phone",""],
+["contact_email","",		"3","2","m","", "","","", "Email",""],
+["contact_location","",		"3","2","","",  "","","", "Location",""]
+],
+
+"api":
+[
+["users","","dup","id","user_id",NULL,"contact_id:contact_id"],
+["users","","dup","usn","usn","id",":!=:user_id: 0",NULL,"usn:usn"],
+["users","","params", "contact_fname","fname", "contact_phone","phone", "contact_email","email"],
+["users","","try"],
+["contacts","","include"], 
+["contacts","_dup","include"],
+["users","",""]
+]
+
+}
