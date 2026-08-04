@@ -1,42 +1,6 @@
 <?php
 
-# NB: dont use global variable -- use $aa instead
-
-function _ks () // load models_ks
-{
-	$kk = array_keys ($GLOBALS["RESOURCES"]);
-	$kn = count($kk);
-	for ($i=0; $i<$kn; $i++)
-	{
-		$u = $kk[$i];
-		$jn = count($GLOBALS["MODELS"][$u]);
-		$GLOBALS["MODELS_K"][$u] = [];
-		for ($j=0; $j<$jn; $j++)
-		{
-			$k = $GLOBALS["MODELS"][$u][$j][0];
-			$GLOBALS["MODELS_K"][$u][$k] = $j;
-		}
-	}
-	// error_log (json_encode (array_keys($GLOBALS["MODELS_K"])));
-}
-
-function _G ($k)
-{
-	if (isset($_GET[$k])) return $_GET[$k];
-	return "";
-}
-
-function _P ($k)
-{
-	if (isset($_POST[$k])) return $_POST[$k];
-	return "";
-}
-
-function _S ($k)
-{
-	if (isset($_SESSION[$k])) return $_SESSION[$k];
-	return "";
-}
+# NB: dont use global variable -- use $ctx instead
 
 function _V (&$vv,$k)
 {
@@ -96,7 +60,7 @@ function _enum ($fmt, $v)
         return $v;
 }
 
-function model_k_id ($u, $suffix, &$a)
+function model_id_name ($u, $suffix, &$ctx)
 {
         $t = $GLOBALS["RESOURCES"][$u][0];
         $ta = $GLOBALS["RESOURCES"][$u][1];
@@ -1695,6 +1659,32 @@ function _agg (&$b, &$o, &$p)
 
 // ------------------------------------------------------------------------------------------------------ 
 
+function model_permission ()
+{
+
+}
+
+function model_load (&$ctx, $u) 
+{
+
+	// todo: load model schema from config file
+
+	$kk = array_keys ($GLOBALS["RESOURCES"]);
+	$kn = count($kk);
+	for ($i=0; $i<$kn; $i++)
+	{
+		$u = $kk[$i];
+		$jn = count($GLOBALS["MODELS"][$u]);
+		$GLOBALS["MODELS_K"][$u] = [];
+		for ($j=0; $j<$jn; $j++)
+		{
+			$k = $GLOBALS["MODELS"][$u][$j][0];
+			$GLOBALS["MODELS_K"][$u][$k] = $j;
+		}
+	}
+	// error_log (json_encode (array_keys($GLOBALS["MODELS_K"])));
+}
+
 function rest_uri_response_error ($rt)
 {
 
@@ -2120,78 +2110,69 @@ function rest_uri_post ($u, $suffix, $id, &$o, &$p)
 	return 201;
 }
 
-function rest_uri_parse ($ctx)
+function rest_uri_parse (&$u, &$suffix, &$id, &$o, &$ctx)
 {
-	if ($meth=="POST" && isset ($_SERVER["CONTENT_TYPE"]) && strstr ($_SERVER["CONTENT_TYPE"], "application/json")!=FALSE )
+	if ($ctx["request_method"]=="POST" && isset ($ctx["request_content_type"]) && strstr ($ctx["request_content_type"], "application/json")!=FALSE )
 	{
 		$s = file_get_contents ("php://input");
-		// error_log ("[POST] ".$s);
 		$o = json_decode ($s, true);
-		if ($o==NULL) return 400;
+		if ($o===NULL) return 400;
 	}
 
-	$id_ = NULL;
-	$uri_ = explode ('?', $uri);
-	$vv = explode ('/',$uri_[0]);
+	$uri = explode ('?', $ctx["request_uri"]);
+	$vv = explode ('/', $uri[0]);
 	$nn = count ($vv);
-	if ($nn>0 && strlen ($vv[$nn-1])<1) $nn--; // skip last item if blank
-
+	if ($nn>0 && strlen ($vv[$nn-1])<1) $nn--; 			// skip last item if blank
 	if ($nn>2 && $vv[2]!="api") return 302;
 
 	for ($i; $i<$nn; $i+=2)
 	{
-		$u = $vv[$i];
+		$u_ = $vv[$i];
+		$suffix_ = "";
 		$id_ = NULL;
 		if ($i+1<$nn) $id_ = $vv[($i+1)];
-		
-		error_log ($u.",".$id_." |".$nn." | ".$i);
+		if (strlen ($u_)<1) return 404;
+		$u_ = urldecode ($u_);
+		$uu_ = explode ('^', $u_);
+		$u_ = $uu_[0];
+		$suffix_ = "";
+		if (count($uu)>1) $suffix_ = "_".$uu_[1];
 
-		if (strlen ($u)<1) return 404;
-		$u = urldecode ($u);
-		$uu = explode ('^', $u);
-		$u = $uu[0];
-		$suffix = "";
-		if (count($uu)>1) $suffix = "_".$uu[1];
-		// error_log ("---".$suffix);
-		if (!isset ($GLOBALS[($u."_def")])) 
+		if (!isset ($ctx["models"][$u_]) && model_load ($ctx, $u_)!=0)
 		{
-			if (isset ($GLOBALS["FN"][$u])) break;
 			return 404;
 		}
 
-		$t = $GLOBALS["RESOURCES"][$u][0];
-		$ta = $GLOBALS["RESOURCES"][$u][1];
-		if (strlen($ta)<1) $ta=$t;
-		$a = $GLOBALS[($u."_def")];
-		$n = count ($a);
-		//$k = $ta."_".$a[0][0];
-		//if (strlen ($a[0][1])>0) $k = $a[0][1];
-		$k = model_k_id ($u, $suffix, $a);
+		$k = model_id_name ($u, $suffix, $ctx["models"][$u_]);
 		$o[$k] = $id_;
-		if ($meth=="GET") $_GET[$k] = $id_;
+
+		$u = $u_;
+		$suffix = $suffix_;
+		$id = $id_;
 	}
-			
-	$id = $id_;
 	
 	return 0;
 }
 
-function rest_uri_request ($ctx)
+function rest_uri_request (&$ctx)
 {
-	$rt = rest_uri_parse ($ctx);
-	if ($rt!=0) return $rt;
+	$u = "";
+	$suffix = "";
+	$id = NULL;
+	$o = [];
+	$p = [];
 
-	// todo: db connect here
+	$rt = rest_uri_parse ($u, $suffix, $id, $o, $ctx);
+	if ($rt!=0) return $rt;
 
 	if ($_SERVER["REQUEST_METHOD"]=="POST")
 	{
-		$rt = rest_uri_post ($u, $suffix, $id, $o, $p);
-		// todo: implement callback for here
+		$rt = rest_uri_post ($u, $suffix, $id, $o, $p, $ctx);
 	}
 
 	if ($rt==200 || $rt==201 || $rt==202)
 	{
-		$rt = rest_uri_get ($u, $suffix, $id, $o, $p, $rt);
+		$rt = rest_uri_get ($u, $suffix, $id, $o, $p, $ctx, $rt);
 	}
 
 	return $rt;
@@ -2200,24 +2181,20 @@ function rest_uri_request ($ctx)
 function rest_uri ($db_username, $db_password, $db_host, $db_name, $db_sock, $configs_path, $oauth_host, $oauth_path)
 {
 	$ctx = [];
-	$ctx["db_username"] = $db_username;
-	$ctx["db_password"] = $db_password;
-	$ctx["db_host"] = $db_host;
-	$ctx["db_name"] = $db_name;
-	$ctx["db_sock"] = $db_sock;
-	$ctx["configs_path"] = $configs_path;
-	$ctx["oauth_host"] = $oauth_host;
-	$ctx["oauth_path"] = $oauth_path;
-	$ctx["u"] = [];
-	$ctx["suffix"] = [];
-	$ctx["o"] = [];
-	$ctx["p"] = [];
-	$ctx["id"] = NULL;
-	$ctx["request_method"] = $_SERVER["REQUEST_METHOD"];
-	$ctx["request_uri"] = $_SERVER["REQUEST_URI"];
+	$ctx["db"] = mysqli_connect (null, $ctx["db_username"], $ctx["db_password"], $ctx["db_name"], null, $ctx["db_sock"]) 
+		or return rest_uri_response_error (500);
+	$ctx["db2"] = mysqli_connect (null, $ctx["db_username"], $ctx["db_password"], $ctx["db_name"], null, $ctx["db_sock"]) 
+		or return rest_uri_response_error (500);
+	$ctx["configs_path"] 	= $configs_path;
+	$ctx["oauth_host"] 	= $oauth_host;
+	$ctx["oauth_path"] 	= $oauth_path;
+	$ctx["request_method"] 	= $_SERVER["REQUEST_METHOD"];
+	$ctx["request_uri"] 	= $_SERVER["REQUEST_URI"];
 	$ctx["request_content_type"] = $_SERVER["CONTENT_TYPE"];
+	$ctx["models"] 		= []; // cache models here
 	$rt = rest_uri_request ($ctx);
 	if ($rt>399) rest_uri_response_error ($rt);
+	return $rt;
 }
 
 ?>
