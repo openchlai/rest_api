@@ -1659,30 +1659,36 @@ function _agg (&$b, &$o, &$p)
 
 // ------------------------------------------------------------------------------------------------------ 
 
-function model_load (&$ctx, $u) 
+function model_load (&$ctx, $u, $suffix) 
 {
-	// todo: load model schema from config file
+	$model_name = $u.$suffix;
 
-	$kk = array_keys ($GLOBALS["RESOURCES"]);
-	$kn = count($kk);
-	for ($i=0; $i<$kn; $i++)
+	$file_name = $ctx["configs_path"]."/".$model_name.".json";
+
+	if (!file_exists($file_name)) return -1;
+
+	$s = file_get_contents ($file_name);
+
+	$o = json_decode ($s, true);
+
+	if ($o===NULL) return -1;
+
+	$ctx["models"][$model_name] = $o;
+	$ctx["models"][$model_name]["keys"] = [];
+	$n = count ($o["models"]);
+	for ($j=0; $j<$n; $j++)
 	{
-		$u = $kk[$i];
-		$jn = count($GLOBALS["MODELS"][$u]);
-		$GLOBALS["MODELS_K"][$u] = [];
-		for ($j=0; $j<$jn; $j++)
-		{
-			$k = $GLOBALS["MODELS"][$u][$j][0];
-			$GLOBALS["MODELS_K"][$u][$k] = $j;
-		}
+		$k = $ctx["models"][$model_name][$j][0];
+		$ctx["models"][$model_name]["keys"][$k] = $j;
 	}
-	// error_log (json_encode (array_keys($GLOBALS["MODELS_K"])));
+	return 0;
 }
 
 function model_pemission (&$ctx, $u)
 {
 	// $pem = ctx["permissions"][$u];
-	return ["1","1","1","0","0"]; // default placeholder
+	$pem = ["1","1","1","0","0"];
+	return $pem; // default placeholder
 }
 
 function user_pemissions (&$ctx, $token);
@@ -1721,7 +1727,7 @@ function rest_uri_response_error ($rt)
 
 	if ($rt == 404)
 	{
-	error_log ("rest_uri_response_error - 404");
+		error_log ("rest_uri_response_error - 404");
 		header("HTTP/1.0 404 Not Found");
 		header ('Content-Type: application/json');
 		echo '{ "errors":[["error","The requested URL '.__VESC($_SERVER["REQUEST_URI"]).' was not found on this server"]]}';
@@ -2145,7 +2151,9 @@ function rest_uri_parse (&$u, &$suffix, &$id, &$o, &$ctx)
 		$suffix_ = "";
 		if (count($uu)>1) $suffix_ = "_".$uu_[1];
 
-		if (!isset ($ctx["models"][$u_]) && model_load ($ctx, $u_)!=0)
+		// todo: sanitize u_,suffix_,id_ using regex
+
+		if (!isset ($ctx["models"][$u_]) && model_load ($ctx, $u_, "")!=0)
 		{
 			return 404;
 		}
