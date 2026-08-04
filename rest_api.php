@@ -1,13 +1,6 @@
 <?php
 
-$RESOURCES 	= [];
-$MODELS		= [];
-$MODELS_K	= [];
-$JOINS		= [];
-$APIS		= [];
-$SUBS		= [];
-$RIGHTS		= [];
-$ERRORS 	= [];
+# NB: dont use global variable -- use $aa instead
 
 function _ks () // load models_ks
 {
@@ -2127,7 +2120,7 @@ function rest_uri_post ($u, $suffix, $id, &$o, &$p)
 	return 201;
 }
 
-function rest_uri_parse ($meth, $uri, $i, &$u, &$suffix, &$id, &$o)
+function rest_uri_parse ($ctx)
 {
 	if ($meth=="POST" && isset ($_SERVER["CONTENT_TYPE"]) && strstr ($_SERVER["CONTENT_TYPE"], "application/json")!=FALSE )
 	{
@@ -2179,10 +2172,52 @@ function rest_uri_parse ($meth, $uri, $i, &$u, &$suffix, &$id, &$o)
 	}
 			
 	$id = $id_;
-
-	_ks (); // load models_k dynamicaly
 	
 	return 0;
+}
+
+function rest_uri_request ($ctx)
+{
+	$rt = rest_uri_parse ($ctx);
+	if ($rt!=0) return $rt;
+
+	// todo: db connect here
+
+	if ($_SERVER["REQUEST_METHOD"]=="POST")
+	{
+		$rt = rest_uri_post ($u, $suffix, $id, $o, $p);
+		// todo: implement callback for here
+	}
+
+	if ($rt==200 || $rt==201 || $rt==202)
+	{
+		$rt = rest_uri_get ($u, $suffix, $id, $o, $p, $rt);
+	}
+
+	return $rt;
+}
+
+function rest_uri ($db_username, $db_password, $db_host, $db_name, $db_sock, $configs_path, $oauth_host, $oauth_path)
+{
+	$ctx = [];
+	$ctx["db_username"] = $db_username;
+	$ctx["db_password"] = $db_password;
+	$ctx["db_host"] = $db_host;
+	$ctx["db_name"] = $db_name;
+	$ctx["db_sock"] = $db_sock;
+	$ctx["configs_path"] = $configs_path;
+	$ctx["oauth_host"] = $oauth_host;
+	$ctx["oauth_path"] = $oauth_path;
+	$ctx["u"] = [];
+	$ctx["suffix"] = [];
+	$ctx["o"] = [];
+	$ctx["p"] = [];
+	$ctx["id"] = NULL;
+	$ctx["request_method"] = $_SERVER["REQUEST_METHOD"];
+	$ctx["request_uri"] = $_SERVER["REQUEST_URI"];
+	$ctx["request_content_type"] = $_SERVER["CONTENT_TYPE"];
+	$rt = rest_uri_request ($ctx);
+	if ($rt>399) rest_uri_response_error ($rt);
 }
 
 ?>

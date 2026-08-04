@@ -26,5 +26,17 @@ FEATURES IN CONFIG FILE
 - aggregate column values eg total price, etc
 - multi-table transactions
 
-# EXAMPLE
-See examples/index.php
+# CONFIG FILE FORMAT
+Each table has a config file (aliases also have a separate config file). The file's name should match the resouce's name (or alias) 
+ eg users.json, users_admin.json
+
+Each config file has the following:
+ - five properties: api_name, table_name, UI_name, default sort field, permission:[readonly|addonly|add_and_update]
+ - three objects: model, api, sub 
+
+# EXAMPLE 
+See: examples/users.json
+
+# USAGE
+examples/index.php
+
