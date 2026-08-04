@@ -1659,14 +1659,8 @@ function _agg (&$b, &$o, &$p)
 
 // ------------------------------------------------------------------------------------------------------ 
 
-function model_permission ()
-{
-
-}
-
 function model_load (&$ctx, $u) 
 {
-
 	// todo: load model schema from config file
 
 	$kk = array_keys ($GLOBALS["RESOURCES"]);
@@ -1683,6 +1677,19 @@ function model_load (&$ctx, $u)
 		}
 	}
 	// error_log (json_encode (array_keys($GLOBALS["MODELS_K"])));
+}
+
+function model_pemission (&$ctx, $u)
+{
+	// $pem = ctx["permissions"][$u];
+	return ["1","1","1","0","0"]; // default placeholder
+}
+
+function user_pemissions (&$ctx, $token);
+{
+	$ctx["permissions"] = [];
+	// todo: populate from url or sdk
+	
 }
 
 function rest_uri_response_error ($rt)
@@ -2178,13 +2185,14 @@ function rest_uri_request (&$ctx)
 	return $rt;
 }
 
-function rest_uri ($db_username, $db_password, $db_host, $db_name, $db_sock, $configs_path, $oauth_host, $oauth_path)
+function rest_uri ($db_username, $db_password, $db_host, $db_name, $db_sock, $configs_path, $oauth_host, $oauth_path, $token)
 {
 	$ctx = [];
 	$ctx["db"] = mysqli_connect (null, $ctx["db_username"], $ctx["db_password"], $ctx["db_name"], null, $ctx["db_sock"]) 
 		or return rest_uri_response_error (500);
 	$ctx["db2"] = mysqli_connect (null, $ctx["db_username"], $ctx["db_password"], $ctx["db_name"], null, $ctx["db_sock"]) 
 		or return rest_uri_response_error (500);
+	user_permissions ($ctx, $token);				// load RIGHTS table for a given user -- used to be hardcoded previously
 	$ctx["configs_path"] 	= $configs_path;
 	$ctx["oauth_host"] 	= $oauth_host;
 	$ctx["oauth_path"] 	= $oauth_path;
