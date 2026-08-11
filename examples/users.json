@@ -2,7 +2,7 @@
 
 "api_name":"users",
 "table_name":"auth",
-"ui_name":"User",
+"label":"User",
 "default_sort":"usn",
 "permission":3,
 

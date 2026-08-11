@@ -60,16 +60,6 @@ function _enum ($fmt, $v)
         return $v;
 }
 
-function model_id_name ($u, $suffix, &$ctx)
-{
-        $t = $GLOBALS["RESOURCES"][$u][0];
-        $ta = $GLOBALS["RESOURCES"][$u][1];
-        if (strlen($ta)<1) $ta=$t;
-        $k = $ta.$suffix."_".$a[0][0];
-        if (strlen ($a[0][1])>0) $k = $a[0][1].$suffix;
-        return $k;
-}
-
 function _kv ($k, &$op, &$o, &$p)
 {
 	$v = NULL;
@@ -1659,6 +1649,47 @@ function _agg (&$b, &$o, &$p)
 
 // ------------------------------------------------------------------------------------------------------ 
 
+function model (&$ctx, $u)
+{
+	if (isset ($ctx["models"][$u]) && isset ($ctx["models"][$u]["model"])) 
+		return $ctx["models"][$u]["model"];
+	return NULL;
+}
+
+function model_id (&$ctx, $u, $suffix)
+{
+	$a = $ctx["models"][$u]["model"];
+	$t = $ctx["models"][$u]["table_name"];
+	if (isset ($ctx["models"][$u]["alias"]) $t=$ctx["models"][$u]["alias"];
+	$k = $ta.$suffix."_".$a[0][0];
+	if (strlen ($a[0][1])>0) $k = $a[0][1].$suffix;
+	return $k;
+}
+
+function model_api (&$ctx, $u, $suffix)
+{
+	$m = $u.$suffix;
+	if (isset ($ctx["models"][$m]) && isset ($ctx["models"][$m]["api"])) 
+	{
+		return $ctx["models"][$m]["api"];
+	}
+	return NULL;
+}
+
+function model_user_pemissions (&$ctx, $u)
+{
+        // $pem = ctx["permissions"][$u];
+        $pem = ["1","1","1","0","0"];  					// debug placeholder
+        return $pem;
+}
+
+function user_pemissions ($oauth_host, $oauth_path, $token);
+{
+        // check if in cache and has not expired -- /tmp folder 	// provide callback to auther to purge
+        // todo: populate from url or sdk
+	return [];
+}
+
 function model_load (&$ctx, $u, $suffix) 
 {
 	$model_name = $u.$suffix;
@@ -1675,30 +1706,16 @@ function model_load (&$ctx, $u, $suffix)
 
 	$ctx["models"][$model_name] = $o;
 	$ctx["models"][$model_name]["keys"] = [];
-	$n = count ($o["models"]);
+	$n = count ($o["models"][$model_name]["model"]);
 	for ($j=0; $j<$n; $j++)
 	{
-		$k = $ctx["models"][$model_name][$j][0];
+		$k = $ctx["models"][$model_name]["model"][$j][0];
 		$ctx["models"][$model_name]["keys"][$k] = $j;
 	}
 	return 0;
 }
 
-function model_pemission (&$ctx, $u)
-{
-	// $pem = ctx["permissions"][$u];
-	$pem = ["1","1","1","0","0"];
-	return $pem; // default placeholder
-}
-
-function user_pemissions (&$ctx, $token);
-{
-	$ctx["permissions"] = [];
-	// todo: populate from url or sdk
-	
-}
-
-function rest_uri_response_error ($rt)
+function rest_uri_response_error (&$errors, $rt)
 {
 
 	if ($rt == 400)
@@ -1719,7 +1736,7 @@ function rest_uri_response_error ($rt)
 
 	if ($rt == 403)
 	{
-		header("HTTP/1.0 412 Access Denied");
+		header("HTTP/1.0 403 Access Denied");
 		header ('Content-Type: application/json');
 		echo '{"errors":[["error","You do not have rights to update this resource","Access Denied","","",""]]}';
 		return;
@@ -1727,18 +1744,17 @@ function rest_uri_response_error ($rt)
 
 	if ($rt == 404)
 	{
-		error_log ("rest_uri_response_error - 404");
 		header("HTTP/1.0 404 Not Found");
 		header ('Content-Type: application/json');
 		echo '{ "errors":[["error","The requested URL '.__VESC($_SERVER["REQUEST_URI"]).' was not found on this server"]]}';
-		exit(0);
+		return;
 	}
 
 	if ($rt == 412)
 	{
 		header("HTTP/1.0 412 Invalid Data");
 		header ('Content-Type: application/json');
-		$s = json_encode ($GLOBALS["ERRORS"]); // nb: each error-item will have fieldname, tablename, row-index
+		$s = json_encode ($errors); // nb: each error-item will have fieldname, tablename, row-index
 		echo '{"errors":'.$s.'}';
 		return;
 	}
@@ -1747,15 +1763,105 @@ function rest_uri_response_error ($rt)
 	{
 		header("HTTP/1.0 500 Server Error");
 		header ('Content-Type: application/json');
-		$s = json_encode ($GLOBALS["ERRORS"]); // nb: each error-item will have fieldname, tablename, row-index
+		$s = json_encode ($errors); // nb: each error-item will have fieldname, tablename, row-index
 		echo '{"errors":'.$s.'}';
 		return;
 	}
 }
 
-function rest_uri_response ($u, $suffix, $id, &$o, &$p, &$aa, $rt)
+function subs (&$ctx, $u, $suffix, $p)
 {
-	// error_log ("[rest_uri_response] ".$u.$suffix."/".$id);
+	$bb = $ctx["models"][($u.$suffix)]["subs"];
+	$bn = count ($bb);
+	for ($i=0; $i<$bn; $i++)
+	{
+		$id_ = NULL;
+		$fo_ = ["_c"=>10];
+		$p_ = $p;
+		$e = 0;
+		$b = $bb[$i];
+		$n = count ($b);
+		if (strlen ($b[2])>0) $fo_["_c"] = $b[2];
+		for ($j=3; $j<$n; $j+=2)
+		{
+			$op_ = "=";
+			$k_ = _kv ($b[$j], $op_, $fo_, $p_);
+			$op_ = "=";
+			$v_ = _kv ($b[($j+1)], $op_, $fo_, $p_);
+			if ($k_===NULL || $v_===NULL)
+			{
+				error_log ("    [sub] (".$b[0].$b[1].") ".($k_===null?$b[$j]:"").", ".($v_===null?$b[($j+1)]:"")." isnull");
+				$e++;
+				continue;
+			}
+			$fo_[$k_] = $v_;
+			// if ($j==3 && $b[$j]=="id") $id_ = $v_; 		// recursion -- currently works for 1:[1|m] scenarios -- breaks on m:[1|m]
+		}
+		if ($e>0) { $fo_=[]; $fo_["id"]="0";  }
+		// error_log ($e."|".json_encode (fo_));
+		echo ",";
+		rest_uri_get ($ctx, $b[0], $b[1], $id_, $fo_, $p_);
+	}
+}
+
+function rest_uri_get (&$ctx, $u, $suffix, $id, &$o, &$p, $rt=0)
+{
+	error_log ("    [o] ". json_encode ($o));
+	// error_log ("  [p] ". json_encode ($p));
+
+	$rights = model_user_permissions ($ctx, $u);
+        if ($rights==NULL) return 403;
+
+	$a = model ($ctx, $u);
+	if ($a==NULL) return 404;
+
+        $k = model_id ($ctx, $u, $suffix);
+	$t = $ctx["models"][$u]["table_name"];
+	$aa = ["ctx"=>"", "f"=>"", "w"=>"", "sort"=>"", "group"=>"", "lim"=>"", "join"=>[], "s"=>"", "v"=>[]]; // aka query object
+		
+	if ($id===NULL)
+	{
+		if (ctx_rights ($ctx, $u, $p, $aa, $rights)!=0) return 403; 
+		ctx ($ctx, $u, $suffix, $o, $aa);
+	}
+	
+	if ($id!==NULL)
+	{ 
+		$aa["w"]=" WHERE ".$t.".".$a[0][0]."=? "; 
+		$aa["s"]="s"; 
+		$aa["v"][]=$id; 
+		if ($rights[$u][3]=="0" && ctx_rights ($u, $p, $rights[$u], $aa)!=0) return 403; 
+		$fo_ = ["id" => $id];
+		$aa_ = ["w"=>"", "s"=>""];	
+		$aa_["f"] = '"'.$u.$suffix.'_k":{';
+		ctx_f ($u, $fo_, $aa_); // generate kmap only (no filters)
+		$aa_["f"] .= '}';
+		$aa["f"] = $aa_["f"];
+	}
+	
+	$res = _select ($ctx, $u, $aa); 
+	
+	if ($res==NULL) return 500;
+	
+	if ($id!==NULL && isset ($fo["file"]))
+	{
+		return _file_download ($u, $suffix, $aa, $res, $fo["file"]); 
+	}
+
+	if ($id===NULL && isset ($fo["csv"]))
+	{
+		return _csv_download ($u, $suffix, $aa, $res); 
+	}
+
+	if ($id===NULL && isset ($fo["xlsx"]))
+	{
+		return _xlsx_download ($u, $suffix, $aa, $res); 
+	}
+
+	if (isset ($fo["metrics"]))
+	{ 
+		return rpt ($u, $suffix, $fo, $aa); 
+	}
 
 	if ($rt!=0)
 	{
@@ -1766,234 +1872,56 @@ function rest_uri_response ($u, $suffix, $id, &$o, &$p, &$aa, $rt)
 		header ('Content-Type: application/json');
 		echo '{';
 	}
-	
-	$fmt_start = array ('":[', '":{', '":[', '":{', '":[');
-	$fmt_end = array (']', '}', ']', '}', ']');
-	$fmt = $GLOBALS["RESOURCES"][$u][3];
-	$a = $GLOBALS[($u."_def")];
-	$an = count ($a);
-	$i = 0;
-	$l = 0;
-	$row = NULL;
-	
-	if (isset ($aa["rpt"]))
-	{
-		echo $aa["rpt"]; 
-		$an = $aa["rpt_jn"]; 
-		$fmt = 4;
-	}
-	
-	// error_log (">>".$id);
 
-	echo '"'.$u.$suffix.$fmt_start[$fmt]; 
-	if ($id=="-1") 
-	{
-		echo "[\"-1\"";
-		for ($j=1; $j<$an; $j++)  // map any avalable field
-		{
-			$v="";
-			if (isset ($o[$a[$j][0]])) { $v=__VESC($o[$a[$j][0]]); error_log (" --> map: ".$a[$j][0]."=".$v); }
-			if (isset ($p[$a[$j][0]])) $v=$p[$a[$j][0]];
-			if (strlen ($v)>0 && $a[$j][5]=="p") _val_phone ($v);
-			if (strlen ($v)>0 && $a[$j][5]=="P") _val_addr ($o, $v);
-			echo ",\"".$v."\"";
-		}
-		echo "]";
-		$i++;
-	}
-	else
-	{
-		while ($row = mysqli_fetch_row ($aa['res']))
-		{
-			if ($i>0) echo ',';
-			ur ($row, $a, $an, $fmt, $i, $l); 
-			$i++;
-			$l++; if ($l>1) $l=0;
-			if (isset ($aa['sub_id'])) { $p[$aa['sub_id']] = ("".$row[0]); }
-			if ($id!==NULL) break;
-		}
-	}
-	echo $fmt_end[$fmt]."\n";
-	 
-	if ($i==0) echo ', "'.$u.$suffix.'_no_data":[[]]'."\n";
-	
-	if (isset($aa["f"])) echo ",".$aa["f"]."\n";
-	
-	if ($id===NULL) echo ",".$aa["ctx"]."\n";
-	
-	$bb = [];
+	rr ($ctx, $u, $suffix, $id, $o, $p, $res);
 
-	if ($id!==NULL && isset ($GLOBALS[($u.$suffix."_subs")]))
+	if ($id===NULL) echo ",". $aa["ctx"] .",". $aa["f"];
+
+	if ($id!==NULL)
 	{
-		$bb = $GLOBALS[($u.$suffix."_subs")];
-		$k = model_k_id ($u, $suffix, $a);
-		$p[$k] = $id;
-		$n = 0;
-		if ($row!=NULL) $n = count ($a);
-		for ($j=1; $j<$n; $j++)  // collect fk
-		{
-			$v=$row[$j];
-			if ($a[$j][3]!='2') continue;
-			$p[$a[$j][0]] = $v; 
-			error_log ("[fk] ".$j." : ".$a[$j][0]." = ".$v);
-		}
+		if (isset ($ctx["models"][($u.$suffix)]["subs"])) subs ($ctx, $u, $suffix, $p);
+		if ($rt==201 || $rt==202) echo ',"'.$u.$suffix.'_nba":[["info","'.$ctx["models"][$u]["label"].' '.($rt==201 ? "Created" : "Updated").'"]]';
+		if ($rt==201 && $u=="csv") echo ','.$p['csv_data_k'].','.$p['csv_data_nb'].','.$p['csv_data'];
 	}
 
-	// error_log ("[subs-p] ".json_encode ($p));
-	// error_log ("[subs-o] ".json_encode ($o));
-
-	$n = count ($bb);
-			
-	for ($i=0; $i<$n; $i++)
-	{
-		$aa_ = array ("ctx"=>"", "f"=>"", "w"=>"", "s"=>"", "sort"=>"", "lim"=>"", "res"=>NULL);
-		$av_ = [];
-		$o_  = $o;
-		$p_  = $p;
-		$fo_ = [];
-		$id_ = NULL;
-		$e   = 0;
-		$b   = $bb[$i];
-		$fo_["_c"] = 10; 
-		if (strlen ($b[2])>0) $fo_["_c"] = $b[2];
-		// if (strlen ($b[3])>0) $fo_["_c"] = $b[3];
-		$n_ = count ($b); 
-		for ($i_=3; $i_<$n_; $i_+=2)
-		{
-			$op_ = "=";
-			$k_ = $b[($i_+1)];  
-			$v_ = _kv ($k_, $op_, $o_, $p_);
-			if ($v_===NULL) { error_log ("[sub] (".$b[0].$b[1].")  ".$k_." isnull "); $e++; break; } // then load empty record
-			if ($i_==3 && $b[$i_]=="id" && strlen ($v_)<1) $v_="0";
-			$fo_[$b[$i_]] = $v_;
-			if ($i_==3 && $b[$i_]=="id" && $k_=="case_id") { $id_=$v_; $o_=[]; $p_=[]; } // enable recurion for cases
-		}
-		if ($e>0) $fo_["id"]="0";
-		
-		error_log ("[sub] (".$b[0].$b[1].")  id:".$id_." ".json_encode ($fo_)); 	//  ."|".json_encode ($p)); 
-		echo ",";
-		$rt_ = rest_uri_get ($b[0], $b[1], $id_, $fo_, $p_, $aa_); 				// nb: able to return rpt by seting 'metric' params
-		if ($rt_==200) rest_uri_response ($b[0], $b[1], $id_, $o_, $p, $aa_, 0);
-		// error_log ("[sub-ret<<] (".$b[0].$b[1].")  id:".$id_." | ".$rt_."|".$n); //  ."|".json_encode ($p)); 
-	}
-	
 	if ($rt!=0)
 	{
-		if ($rt==201) echo ',"'.$u.'_nb":[["info","'.$GLOBALS["RESOURCES"][$u][5].' Created"]]';
-		if ($rt==202) echo ',"'.$u.'_nb":[["info","'.$GLOBALS["RESOURCES"][$u][5].' Updated"]]';
-		if ($rt==201 && $u=="csv") echo ','.$p['csv_data_k'].','.$p['csv_data_nb'].','.$p['csv_data'];
 		echo '}';
 	}
-	
+
 	return $rt;
 }
 
-function rest_uri_get ($u, $suffix, $id, &$fo, &$p, &$aa)
+function rest_uri_post_ (&$ctx, $u, $suffix, $id, &$o, &$p)
 {
-	$aa['res'] = NULL;
-	$aa["ctx"] = ""; 
-	$aa["f"] = ""; 
-	$aa["w"] = ""; 
-	$aa["s"] = ""; 
-	$aa["sort"] = ""; 
-	$aa["lim"] = "";
+	error_log ("----------------------POST START (".$u.$suffix."/".$id.")-------------------------------------".$ctx["permissions"]["user_role"]);
+	// error_log ("  [o] ". json_encode ($o));
+	// error_log ("  [p] ". json_encode ($p));
 	
-	if (!isset ($GLOBALS[("RIGHTS_".$_SESSION["cc_user_role"])])) return 404;
-	$rights = $GLOBALS[("RIGHTS_".$_SESSION["cc_user_role"])];
-	if ($rights[$u][0]!="1") return 403; // check read rights flag
-	
-	$a = $GLOBALS[($u."_def")];
-	$k = model_k_id ($u, $suffix, $a);
-	$t = $GLOBALS["RESOURCES"][$u][0];
-		
-	$av = [];
-	$join = [];
-	
-	if ($id===NULL)
-	{
-		if (ctx_rights ($u, $aa, $av, $p, $rights[$u])!=0) return 403; 
-		ctx ($u, $suffix, $aa, $av, $fo, $join);
-		if (isset ($fo["csv"]) || isset ($fo["xlsx"])) $aa["lim"] = "";
-	}
-	
-	if ($id!==NULL)
-	{ 
-		$aa["w"]=" WHERE ".$t.".".$a[0][0]."=? "; 
-		$aa["s"]="s"; 
-		$av[]=$id; 
-		if ($rights[$u][3]=="0" && ctx_rights ($u, $aa, $av, $p, $rights[$u])!=0) return 403; 	
-		$aa_ = array ("ctx"=>"", "f"=>"", "w"=>"", "s"=>"", "sort"=>"", "lim"=>""); 
-		$av_ = [];
-		$fo_ = ["id"=>$id];
-		$aa_["f"] = '"'.$u.$suffix.'_k":{';
-		ctx_f ($u, $aa_, $av_, $fo_); // generate kmap only (no filters)
-		$aa_["f"] .= '}';
-		$aa["f"] = $aa_["f"];
-	}
-	
-	if (isset ($fo["metrics"]))
-	{ 
-		return rpt ($u, $suffix, $fo, $aa, $av, $join); 
-	}
+	$rights = model_user_permissions ($ctx, $u);
+	if ($rights==NULL) return 403;
 
-	$aa['res'] = _select ($u, $aa, $av, "db", $join); 
-	
-	if ($aa['res']==NULL) return 500;
-	
-	if ($id!==NULL && isset ($fo["file"]))
-	{
-		return _file_download ($u, $aa, $fo["file"]); 
-	}
+	$api = model_api ($ctx, $u, $suffix);
+	if ($api == NULL) return 404;
 
-	if ($id===NULL && isset ($fo["csv"]))
-        {
-                return _csv_download ($u, $aa['res'], $join); 
-        }
-
-	if ($id===NULL && isset ($fo["xlsx"]))
-        {
-                return _xlsx_download ($u, $aa['res'], $join); 
-        }
-
-	return 200;
-}
-
-function rest_uri_post ($u, $suffix, $id, &$o, &$p)
-{
-	error_log ("----------------------POST START (".$u.$suffix."/".$id.")-------------------------------------".$_SESSION["cc_user_role"]);
-	error_log ("[o] ". json_encode ($o));
-	//error_log ("[p] ". json_encode ($p));
-	
-	if (!isset ($GLOBALS[("RIGHTS_".$_SESSION["cc_user_role"])])) return 403;
-	$rights = $GLOBALS[("RIGHTS_".$_SESSION["cc_user_role"])];
-	
-	if (!isset ($GLOBALS[($u.$suffix."_api")])) return 404;
-
-	$a = $GLOBALS[($u."_def")];
-	$k = model_k_id ($u, $suffix, $a);
-	
-	$bb = $GLOBALS[($u.$suffix."_api")];
-	$n = count ($bb);
+	$a = model ($ctx, $u);
+	$k = model_id ($ctx, $u, $suffix);
+	$n = count ($api);
+	$e = 0;
 	for ($i=0; $i<$n; $i++)
 	{
-		$b = $bb[$i];
-		$a_ = $GLOBALS[($b[0]."_def")];
-		$k_ = model_k_id ($b[0], $b[1], $a_);
-
+		$b = $api[$i];
+		$a_ = model ($b[0]);
+		$k_ = model_id ($ctx, $b[0], $b[1]);
+		
 		if ($b[2]=="aub")
 		{
 			if (isset ($p["aub_id"]) && strlen ($p["aub_id"])>0) continue;
 			$q = "INSERT INTO aub(t) VALUES(?)";
 			$argt = "s";
 			$argv = [$b[0]];
-			$aub_id = qryp ($q, $argt, $argv, 2);  // generate audit batch_id
+			$aub_id = qryp ($ctx["db"], $q, $argt, $argv, 2);  // generate audit batch_id
 			$p["aub_id"] = "".$aub_id;
-			continue;
-		}
-		
-		if ($b[2]=="lvl")
-		{
-			 _lvl ($b, $o, $p);
 			continue;
 		}
 		
@@ -2003,136 +1931,181 @@ function rest_uri_post ($u, $suffix, $id, &$o, &$p)
 			continue;
 		}
 
+		if ($b[2]=="lvl")
+		{
+			 _params_lvl ($b, $o, $p);
+			continue;
+		}
+
 		if ($b[2]=="dup" || $b[2]=="duf")
 		{
-			 _dup ($b, $o, $p);
+			 _dup ($ctx, $b, $o, $p);
 			continue;
 		}
 		
 		if (substr($b[2],0,3)=="agg")
 		{
-			_agg ($b, $o, $p);
+			_agg ($ctx, $b, $o, $p);
 			continue;
 		}
 		
-		$id_ = NULL;
-		if (isset ($o[$k_]) && strlen ($o[$k_])>0) $id_ = $o[$k_];
-		if (isset ($p[$k_]) && strlen ($p[$k_])>0) $id_ = $p[$k_];
-		
-		$fm=0; // boolean contextual predicated on state of parent. applicable to: include, object, array, crud(update only)
-		$bn = count ($b);
-		if ($bn>3 && $b[3]=="1" && $id==NULL) $fm=1; // allow evaluate during add
-		if ($bn>4 && $b[4]=="1" && $id!=NULL) $fm=1; // allow evaluate during upd
-		if ($bn>3 && $fm==0) continue;
-		
+		if ($b[2]=="pos")
+		{
+			_pos ($b, $o, $p); // swap items
+			continue;
+		}
+
 		if ($b[2]=="include") 
 		{
-			$rt_ = rest_uri_post ($b[0], $b[1], $id_, $o, $p); // evaluate the full api scope
-			if ($rt_==412) return 412;
+			$fm_ = 0;
+			$bn = count ($b);
+			if ($bn>3 && $b[3]=="1" && $id==NULL) $fm_=1; 	// allow link during add
+			if ($bn>3 && $b[4]=="1" && $id!=NULL) $fm_=1; 	// allow link during upd
+			if ($bn>3 && $fm_==0) continue;
+			$id_ = isset($p[$k_]) ? $p[$k_] : NULL;
+			$rt_ = rest_uri_post ($ctx, $b[0], $b[1], $id_, $o, $p);
+			if ($rt_==412) $e++;
 			continue;
 		}
 		
 		if ($b[2]=="object")
-		{	
-			if (!isset ($o[($b[0].$b[1])])) continue; 
-			$o_ = $o[($b[0].$b[1])];
-			$n_ = count (array_keys ($o_));
-			error_log ("  [obj] ".$b[0].$b[1]."|".json_encode ($o_));
-			if ($n_<1) continue; 								// skip empty object
-			$rt_ = rest_uri_post ($b[0], $b[1], (isset($o_[$k_])?$o_[$k_]:NULL), $o_, $p);
-			if ($rt_==412) return 412;
+		{
+			if (!isset ($o[($b[0].$b[1])])) { continue; } 
+			$fm_ = 0;
+			$bn = count ($b);
+			if ($bn>3 && $b[3]=="1" && $id==NULL) $fm_=1; 				// allow link during add
+			if ($bn>3 && $b[4]=="1" && $id!=NULL) $fm_=1; 				// allow link during upd
+			if ($bn>3 && $fm_==0) continue;
+			$o_ = $o[($b[0].$b[1])];	
+			if (is_array ($o_) && isset ($o_[0]) && is_array ($o_[0])) $o_ = $o_[0];	
+			error_log ("    [obj](".$b[0].$b[1].") ".json_encode(array_keys ($o_)));
+			if (count (array_keys ($o_))<1) continue; 					// skip empty object // todo check isobject
+			$o_["i_"] = 0;
+			if (isset ($o_["id"])) $o_[$k_] = $o_["id"];
+			$id_ = isset($p[$k_]) ? $p[$k_] : NULL;
+			$rt_ = rest_uri_post ($ctx, $b[0], $b[1], $id_, $o_, $p);
+			if ($rt_==412) $e++;
 			continue;
 		}
 		
 		if ($b[2]=="array")
 		{	
 			if (!isset ($o[($b[0].$b[1])])) continue; 
-			$p_ = [];
+			$fm_ = 0;
+			$bn = count ($b);
+			if ($bn>3 && $b[3]=="1" && $id==NULL) $fm_=1; 				// allow link during add
+			if ($bn>3 && $b[4]=="1" && $id!=NULL) $fm_=1; 				// allow link during upd
+			if ($bn>3 && $fm_==0) continue;
 			$o_ = $o[($b[0].$b[1])];
 			$n_ = count ($o_);
-			error_log ("  [arr] ".$b[0].$b[1]."|".$n_);
+			error_log ("    [arr] ".$b[0].$b[1]." n:".$n_);
 			for ($i_=0; $i_<$n_; $i_++)
 			{
-				$n__ = count (array_keys ($o_[$i_]));
-				error_log ("  [arr-obj] ".$b[0].$b[1]."|".$i_." of ".$n_."|".json_encode ($o_));
-				if ($n__<1) continue; 							// skip empty object
+				if (count (array_keys ($o_[$i_]))<1) continue; 			// skip empty object
 				$o_[$i_]["i_"]=$i_;
 				$p_ = $p;
-				$rt_ = rest_uri_post ($b[0], $b[1], (isset($o_[$i_][$k_])?$o_[$i_][$k_]:NULL), $o_[$i_], $p_); 
-				// if ($rt_==412) return 412;
+				$id_ = isset($p[$k_]) ? $p[$k_] : NULL;
+				$rt_ = rest_uri_post ($ctx, $b[0], $b[1], $id_, $o_[$i_], $p_); 
+				error_log ("    [arr] ".$b[0].$b[1]."  ".$i_." of ".$n_."|".$rt_);
+				if ($rt_==412) $e++;
 			}
 			continue;
 		}
 		
-		$m_ = $GLOBALS["RESOURCES"][$b[0]][2]; // resource level add|upd setting
+		$m_ = model_permission ($ctx, $b[0]);
+		$id_ = NULL;
+		if (isset ($o[$k_]) && strlen ($o[$k_])>0) $id_ = $o[$k_];
+		if (isset ($p[$k_]) && strlen ($p[$k_])>0) $id_ = $p[$k_];
 		
 		if ($b[2]=="try")
 		{
-			$id_ = _try ($b[0], $b[1], $id_, $o, $p, $rights[$b[0]]);
-		}
-		
-		if (strlen ($b[2])==0 && $id_!=NULL)
-		{
-			if ($m_!=2 && $m_!=3) continue;		// check res-level upd rights flag
-			if ($rights[$b[0]][2]!="1") return 403; // check role-level upd rights flag
-			$id_ = _upd ($b[0], $b[1], $id_, $o, $p, ($fm==0 ? "2" : "1"));
+			if ($rights[$b[0]][1]!="1" && $rights[$b[0]][2]!="1") return 403; 		// check upd rights flag
+			_try ($b[0], $b[1], $id_, $o, $p, $rights[$b[0]]);
+			$e_ = count ($ctx["errors"]);
+			error_log ("    --- try(".$b[1].") errors:".$e_);
+			if (strlen ($b[1])==0 && $e_>0) return 412;					// return errors at primary try block
+			continue;
 		}
 
-		if (strlen ($b[2])==0 && $id_==NULL)
+		if (strlen ($b[2])==0 && $id_!=NULL && $id_>0)
 		{
-			if ($m_!=1 && $m_!=3) continue;		// check res-level add rights flag
-			if ($rights[$b[0]][1]!="1") return 403; // check role-level add rights flag
-			if ($fm>0) continue;				// fm not applicable to add
-			$id_ = _add ($b[0], $b[1], $o, $p);
+			if ($m_!=2 && $m_!=3) continue;
+			if ($rights[$b[0]][2]!="1") return 403; 					// check upd rights flag
+			$fm_ = "2";
+			if (isset ($b[3]))
+			{
+				if ($b[3]=="1" && $id!=NULL) continue; 					// skip if not in add mode
+				$fm_ = $b[3];
+			}
+			error_log ("    [upd] ".$b[0].$b[1]." | ".$k_."=".$id_." | ".$fm_);
+			$id_ = upd ($ctx, $b[0], $b[1], $id_, $o, $p, $fm_);
+		}
+
+		if (strlen ($b[2])==0 && $id_===NULL)
+		{
+			if ($m_!=1 && $m_!=3) continue;
+			if ($rights[$b[0]][1]!="1") return 403; 					// check add rights flag
+			if (isset ($b[3]) && $b[3]=="1" && $id!=NULL) continue;
+			error_log ("    [add] ".$b[0].$b[1]." | ".$k_);
+			// error_log ("    [o] ".json_encode ($o));
+			// error_log ("    [p] ".json_encode ($p));
+			$id_ = add ($ctx, $b[0], $b[1], $o, $p);
 		}
 
 		if ($b[2]=="file" && $id_==NULL)
 		{
-			if ($rights[$b[0]][1]!="1") return 403; // check add rights flag
-			$t_ = $GLOBALS["RESOURCES"][$b[0]][0];
+			if ($rights[$b[0]][1]!="1") return 403; 					// check add rights flag
 			$p['batch_id'] = _val_id ();
-			error_log ("[file] ".$b[0].$b[1]);
-			if (!isset ($_FILES[$t_])) 
+			// error_log ("[file] ".$b[0].$b[1]."|".$p['batch_id']);
+			if (!isset ($_FILES[$u_])) 
 			{ 
-				error_log (" --- no file to upload"); 
-				_val_error ($u, $i, "File Format", "", "INVALID", "File Upload Failed!"); 
+				error_log (" --- no file to uploadb |".$k_); 
+				_val_error ($ctx, $u, $i, "File Format", "", "INVALID", "File Upload Failed!"); 
 				return 412; 
 			}
-			$n_ = count ($_FILES[$t_]["name"]); // check for multiple files // nb: id_ = last file uploaded
+			$n_ = count ($_FILES[$u_]["name"]); 						// check for multiple files // nb: id_ = last file uploaded
 			for ($i_=0; $i_<$n_; $i_++)
 			{
-				error_log ("  [file] ".$b[0].$b[1]."  ".$i_." of ".$n_);
-				$o_ = array ();
-				$o_["i_"]=$i_;				
-				// $p_ = $p;
-				$id_ = _file_upload ($b[0], $b[1], $o_, $p);
+				error_log ("    [file] ".$b[0].$b[1]." (".$p['batch_id'].") ".$i_." of ".$n_);
+				$o_ =  ["i_" => $i_ ];			
+				$p_ = $p;
+				$id_ = _file_upload ($ctx, $b[0], $b[1], $o_, $p_);
 			}
 		}	
 
-		error_log ("    +--".$k_."=".$id_);
+		error_log ("    ---".$k_."=".$id_);
 
 		$p[$k_] = "".$id_;
 		
-		if ($id_==-2) return 412;		
+		if ($id_==-2) return 412;
 	}
-
-	error_log ("----------------------POST END (".$u.$suffix."/".$id.")-------------------------------------");
 
 	if ($id!=NULL) return 202;
 	
 	return 201;
 }
 
-function rest_uri_parse (&$u, &$suffix, &$id, &$o, &$ctx)
+function rest_uri_post (&$ctx, $u, $suffix, &$id, &$o, &$p)
 {
-	if ($ctx["request_method"]=="POST" && isset ($ctx["request_content_type"]) && strstr ($ctx["request_content_type"], "application/json")!=FALSE )
+	if (!isset ($o['i_'])) $o['i_']=0;
+	$rt = rest_uri_post_ ($u, $suffix, $id, $o, $p, $ctx);
+	$k = model_k_id ($u, $suffix);
+	$id = "-2";
+	if (($rt==201 || $rt==202) && isset ($p[$k])) $id = $p[$k];
+	error_log ("----------------------POST END (".$u.$suffix."/".$id.") ".$rt." -------------------------------------");
+	return $rt;
+}
+
+function rest_uri_parse (&$ctx, &$u, &$suffix, &$id, &$o)
+{
+	if ($_SERVER["REQUEST_METHOD"]=="POST" && isset ($_SERVER["CONTENT_TYPE"]) && strstr ($_SERVER["CONTENT_TYPE"], "application/json")!=FALSE )
 	{
 		$s = file_get_contents ("php://input");
 		$o = json_decode ($s, true);
 		if ($o===NULL) return 400;
 	}
 
-	$uri = explode ('?', $ctx["request_uri"]);
+	$uri = explode ('?', $_SERVER["REQUEST_URI"]);
 	$vv = explode ('/', $uri[0]);
 	$nn = count ($vv);
 	if ($nn>0 && strlen ($vv[$nn-1])<1) $nn--; 			// skip last item if blank
@@ -2158,7 +2131,7 @@ function rest_uri_parse (&$u, &$suffix, &$id, &$o, &$ctx)
 			return 404;
 		}
 
-		$k = model_id_name ($u, $suffix, $ctx["models"][$u_]);
+		$k = model_id ($u, $suffix, $ctx["models"][$u_]);
 		$o[$k] = $id_;
 
 		$u = $u_;
@@ -2177,17 +2150,17 @@ function rest_uri_request (&$ctx)
 	$o = [];
 	$p = [];
 
-	$rt = rest_uri_parse ($u, $suffix, $id, $o, $ctx);
+	$rt = rest_uri_parse ($ctx, $u, $suffix, $id, $o);
 	if ($rt!=0) return $rt;
 
 	if ($_SERVER["REQUEST_METHOD"]=="POST")
 	{
-		$rt = rest_uri_post ($u, $suffix, $id, $o, $p, $ctx);
+		$rt = rest_uri_post ($ctx, $u, $suffix, $id, $o, $p);
 	}
 
 	if ($rt==200 || $rt==201 || $rt==202)
 	{
-		$rt = rest_uri_get ($u, $suffix, $id, $o, $p, $ctx, $rt);
+		$rt = rest_uri_get ($ctx, $u, $suffix, $id, $o, $p, $rt);
 	}
 
 	return $rt;
@@ -2196,20 +2169,18 @@ function rest_uri_request (&$ctx)
 function rest_uri ($db_username, $db_password, $db_host, $db_name, $db_sock, $configs_path, $oauth_host, $oauth_path, $token)
 {
 	$ctx = [];
-	$ctx["db"] = mysqli_connect (null, $ctx["db_username"], $ctx["db_password"], $ctx["db_name"], null, $ctx["db_sock"]) 
-		or return rest_uri_response_error (500);
-	$ctx["db2"] = mysqli_connect (null, $ctx["db_username"], $ctx["db_password"], $ctx["db_name"], null, $ctx["db_sock"]) 
-		or return rest_uri_response_error (500);
-	user_permissions ($ctx, $token);				// load RIGHTS table for a given user -- used to be hardcoded previously
-	$ctx["configs_path"] 	= $configs_path;
-	$ctx["oauth_host"] 	= $oauth_host;
-	$ctx["oauth_path"] 	= $oauth_path;
-	$ctx["request_method"] 	= $_SERVER["REQUEST_METHOD"];
-	$ctx["request_uri"] 	= $_SERVER["REQUEST_URI"];
-	$ctx["request_content_type"] = $_SERVER["CONTENT_TYPE"];
-	$ctx["models"] 		= []; // cache models here
+	$ctx["configs_path"] 		= $configs_path;
+	$ctx["models"] 			= []; 				// lazy load models here -- no need to load 'all' models
+	$ctx["errors"]                  = [];                           // collect ui error messages here
+	$ctx["db"] = mysqli_connect (null, $db_username, $db_password, $db_name, null, $db_sock);
+	if ($ctx["db"]==NULL) 
+	{
+		// todo: error msg
+		return rest_uri_response_error ($ctx["errors"], 500);
+	}
+	$ctx["permissions"]		= user_permissions ($oauth_host, $oauth_path, $token); 	// load complete RIGHTS table (and user details) here -- used to be 'hardcoded'
 	$rt = rest_uri_request ($ctx);
-	if ($rt>399) rest_uri_response_error ($rt);
+	if ($rt>399) rest_uri_response_error ($ctx["errors"], $rt);
 	return $rt;
 }
 
